@@ -1,21 +1,24 @@
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp"
     android:height="108dp"
-    android:viewportWidth="108"
-    android:viewportHeight="108">
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M54 24C45.71 24 39 30.71 39 39V69C39 77.29 45.71 84 54 84C62.29 84 69 77.29 69 69V39C69 30.71 62.29 24 54 24ZM54 27C59.62 27 64 31.38 64 37V69C64 74.62 59.62 79 54 79C48.38 79 44 74.62 44 69V37C44 31.38 48.38 27 54 27Z"/>
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M78 40.5L72 42V39L78 37.5L84 39V42L78 40.5Z"/>
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M78 67.5L72 66V69L78 70.5L84 69V66L78 67.5Z"/>
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M30 40.5L24 42V39L30 37.5L36 39V42L30 40.5Z"/>
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M30 67.5L24 66V69L30 70.5L36 69V66L30 67.5Z"/>
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    
+    <!-- Icon Content (Scaled to 65% to fit within the 72dp safe zone of adaptive icons) -->
+    <group 
+        android:scaleX="0.65"
+        android:scaleY="0.65"
+        android:pivotX="12"
+        android:pivotY="12">
+        
+        <!-- Music Note -->
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M12,3v10.55c-0.59,-0.34 -1.27,-0.55 -2,-0.55c-2.21,0 -4,1.79 -4,4s1.79,4 4,4s4,-1.79 4,-4V7h4V3h-6z"/>
+            
+        <!-- Gemini Star / Sparkle (Top Right) -->
+        <path
+            android:fillColor="#FFD700"
+            android:pathData="M20,6l-1.5,-3.5L17,6l-3.5,1.5L17,9l1.5,3.5L20,9l3.5,-1.5L20,6z"/>
+    </group>
 </vector>
