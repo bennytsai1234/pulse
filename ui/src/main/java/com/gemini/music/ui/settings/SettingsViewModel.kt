@@ -12,10 +12,14 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+import com.gemini.music.domain.model.ScanStatus
+import kotlinx.coroutines.flow.MutableStateFlow
+
 data class SettingsUiState(
     val minAudioDuration: Long = 10000L,
     val includedFolders: Set<String> = emptySet(),
-    val themeMode: String = UserPreferencesRepository.THEME_SYSTEM
+    val themeMode: String = UserPreferencesRepository.THEME_SYSTEM,
+    val scanStatus: ScanStatus = ScanStatus.Idle
 )
 
 @HiltViewModel
@@ -24,12 +28,15 @@ class SettingsViewModel @Inject constructor(
     private val musicRepository: MusicRepository
 ) : ViewModel() {
 
+    private val _scanStatus = MutableStateFlow<ScanStatus>(ScanStatus.Idle)
+
     val uiState: StateFlow<SettingsUiState> = combine(
         userPreferencesRepository.minAudioDuration,
         userPreferencesRepository.includedFolders,
-        userPreferencesRepository.themeMode
-    ) { duration, folders, theme ->
-        SettingsUiState(duration, folders, theme)
+        userPreferencesRepository.themeMode,
+        _scanStatus
+    ) { duration, folders, theme, scanStatus ->
+        SettingsUiState(duration, folders, theme, scanStatus)
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
@@ -66,7 +73,9 @@ class SettingsViewModel @Inject constructor(
 
     fun rescanLibrary() {
         viewModelScope.launch {
-            musicRepository.scanLocalMusic()
+            musicRepository.scanLocalMusic().collect { status ->
+                _scanStatus.value = status
+            }
         }
     }
 }

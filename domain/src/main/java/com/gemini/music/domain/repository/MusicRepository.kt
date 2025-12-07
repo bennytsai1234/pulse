@@ -3,6 +3,7 @@ package com.gemini.music.domain.repository
 import com.gemini.music.domain.model.Album
 import com.gemini.music.domain.model.Artist
 import com.gemini.music.domain.model.Playlist
+import com.gemini.music.domain.model.ScanStatus
 import com.gemini.music.domain.model.Song
 import kotlinx.coroutines.flow.Flow
 
@@ -33,7 +34,8 @@ interface MusicRepository {
     fun getSongsByAlbumId(albumId: Long): Flow<List<Song>>
 
     // 觸發掃描系統媒體庫並更新資料庫
-    suspend fun scanLocalMusic()
+    fun scanLocalMusic(): Flow<ScanStatus>
+
     
     // --- Playlist Management ---
     fun getPlaylists(): Flow<List<Playlist>>

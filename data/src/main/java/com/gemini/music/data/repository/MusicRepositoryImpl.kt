@@ -1,6 +1,5 @@
 package com.gemini.music.data.repository
 
-
 import com.gemini.music.data.database.PlaylistDao
 import com.gemini.music.data.database.SongDao
 import com.gemini.music.data.database.asDomainModel
@@ -9,10 +8,14 @@ import com.gemini.music.data.source.LocalAudioSource
 import com.gemini.music.domain.model.Album
 import com.gemini.music.domain.model.Artist
 import com.gemini.music.domain.model.Playlist
+import com.gemini.music.domain.model.ScanStatus
 import com.gemini.music.domain.model.Song
 import com.gemini.music.domain.repository.MusicRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
@@ -46,7 +49,6 @@ class MusicRepositoryImpl @Inject constructor(
     }
 
     override fun getAlbums(): Flow<List<Album>> {
-        // 在記憶體中聚合 (MVP 方案)
         return getSongs().map { songs ->
             songs.groupBy { it.albumId }
                 .map { (albumId, albumSongs) ->
@@ -63,7 +65,6 @@ class MusicRepositoryImpl @Inject constructor(
     }
 
     override fun getArtists(): Flow<List<Artist>> {
-        // 在記憶體中聚合 (MVP 方案)
         return getSongs().map { songs ->
             songs.groupBy { it.artist }
                 .map { (artistName, artistSongs) ->
@@ -82,16 +83,24 @@ class MusicRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun scanLocalMusic() {
-        val minDuration = userPreferencesRepository.minAudioDuration.first()
-        val includedFolders = userPreferencesRepository.includedFolders.first()
+    override fun scanLocalMusic(): Flow<ScanStatus> = flow {
+        emit(ScanStatus.Scanning(0, 0, "Initializing scan..."))
+        try {
+            val minDuration = userPreferencesRepository.minAudioDuration.first()
+            val includedFolders = userPreferencesRepository.includedFolders.first()
 
-        // 1. 從 MediaStore 獲取最新資料
-        val songsFromSystem = localAudioSource.loadMusic(minDuration, includedFolders)
-        
-        // 2. 轉換為 Entity 並更新至 Room 資料庫 (Transaction)
-        songDao.updateMusicLibrary(songsFromSystem.map { it.asEntity() })
-    }
+            val songsFromSystem = localAudioSource.loadMusic(minDuration, includedFolders)
+            
+            val total = songsFromSystem.size
+            emit(ScanStatus.Scanning(total, total, "Processing $total songs..."))
+            
+            songDao.updateMusicLibrary(songsFromSystem.map { it.asEntity() })
+            
+            emit(ScanStatus.Completed(total))
+        } catch (e: Exception) {
+            emit(ScanStatus.Failed(e.message ?: "Unknown scanning error"))
+        }
+    }.flowOn(Dispatchers.IO)
 
     // --- Playlist Implementation ---
 
