@@ -31,7 +31,7 @@ android {
 
     sourceSets {
         getByName("main") {
-            java.srcDirs("albumdetail", "component", "home", "main", "navigation", "nowplaying", "search", "settings")
+            java.srcDirs("albumdetail", "component", "home", "main", "navigation", "nowplaying", "search", "settings", "playlist")
         }
     }
 }

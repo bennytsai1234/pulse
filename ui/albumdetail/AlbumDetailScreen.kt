@@ -49,7 +49,7 @@ import coil.request.ImageRequest
 import com.gemini.music.domain.model.Album
 import com.gemini.music.domain.model.Song
 import com.gemini.music.ui.component.EmptyState
-import com.gemini.music.ui.home.SongListItem
+import com.gemini.music.ui.component.SongListItem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

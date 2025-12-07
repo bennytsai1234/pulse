@@ -21,6 +21,11 @@ sealed class Screen(val route: String) {
         const val albumIdArg = "albumId"
         fun createRoute(albumId: Long) = "album_detail/$albumId"
     }
+    data object PlaylistList : Screen("playlists")
+    data object PlaylistDetail : Screen("playlist_detail/{playlistId}") {
+        const val playlistIdArg = "playlistId"
+        fun createRoute(playlistId: Long) = "playlist_detail/$playlistId"
+    }
 }
 
 @Composable
@@ -39,6 +44,9 @@ fun MusicNavigation(navController: NavHostController) {
                 },
                 onAlbumClick = { albumId ->
                     navController.navigate(Screen.AlbumDetail.createRoute(albumId))
+                },
+                onPlaylistClick = {
+                    navController.navigate(Screen.PlaylistList.route)
                 }
             )
         }
@@ -62,6 +70,22 @@ fun MusicNavigation(navController: NavHostController) {
                 onSongClick = { _ -> 
                     // Just play, don't navigate
                 }
+            )
+        }
+        composable(Screen.PlaylistList.route) {
+            com.gemini.music.ui.playlist.list.PlaylistListScreen(
+                onBackClick = { navController.popBackStack() },
+                onPlaylistClick = { id: Long ->
+                    navController.navigate(Screen.PlaylistDetail.createRoute(id))
+                }
+            )
+        }
+        composable(
+            route = Screen.PlaylistDetail.route,
+            arguments = listOf(navArgument(Screen.PlaylistDetail.playlistIdArg) { type = NavType.LongType })
+        ) {
+            com.gemini.music.ui.playlist.detail.PlaylistDetailScreen(
+                onBackClick = { navController.popBackStack() }
             )
         }
     }

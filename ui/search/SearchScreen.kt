@@ -26,7 +26,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.gemini.music.ui.home.SongListItem
+import com.gemini.music.ui.component.SongListItem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

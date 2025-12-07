@@ -87,6 +87,7 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.gemini.music.domain.model.Song
 import com.gemini.music.ui.component.EmptyState
+import com.gemini.music.ui.component.SongListItem
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -96,7 +97,8 @@ fun HomeScreen(
     onSongClick: (Song) -> Unit,
     onSettingsClick: () -> Unit,
     onSearchClick: () -> Unit,
-    onAlbumClick: (Long) -> Unit
+    onAlbumClick: (Long) -> Unit,
+    onPlaylistClick: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
@@ -141,6 +143,16 @@ fun HomeScreen(
                     selected = false,
                     onClick = { /* TODO */ },
                     icon = { Icon(Icons.Rounded.Folder, null) },
+                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+                )
+                NavigationDrawerItem(
+                    label = { Text("Playlists") },
+                    selected = false,
+                    onClick = {
+                        scope.launch { drawerState.close() }
+                        onPlaylistClick()
+                    },
+                    icon = { Icon(Icons.AutoMirrored.Rounded.PlaylistAdd, null) },
                     modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
                 )
                 // Add more items...
@@ -385,85 +397,7 @@ fun SongList(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-fun SongListItem(
-    song: Song,
-    isSelected: Boolean = false,
-    isSelectionMode: Boolean = false,
-    onClick: () -> Unit,
-    onLongClick: () -> Unit = {},
-    modifier: Modifier = Modifier
-) {
-    val backgroundColor = if (isSelected) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f) else Color.Transparent
-
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .background(backgroundColor)
-            .combinedClickable(
-                onClick = onClick,
-                onLongClick = onLongClick
-            )
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        // Leading: Art or Checkbox
-        Box(contentAlignment = Alignment.Center) {
-            Card(
-                shape = RoundedCornerShape(8.dp),
-                modifier = Modifier.size(50.dp)
-            ) {
-                AsyncImage(
-                    model = ImageRequest.Builder(LocalContext.current)
-                        .data(song.albumArtUri)
-                        .crossfade(true)
-                        .build(),
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize()
-                )
-            }
-            
-            // Selection Overlay
-            if (isSelectionMode) {
-                Box(
-                    modifier = Modifier
-                        .size(50.dp)
-                        .background(Color.Black.copy(alpha = 0.4f), RoundedCornerShape(8.dp)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = if (isSelected) Icons.Rounded.CheckCircle else Icons.Rounded.RadioButtonUnchecked,
-                        contentDescription = null,
-                        tint = if (isSelected) MaterialTheme.colorScheme.primary else Color.White,
-                        modifier = Modifier.size(24.dp)
-                    )
-                }
-            }
-        }
-        
-        Spacer(modifier = Modifier.width(16.dp))
-        
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = song.title,
-                style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.Medium,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-            Text(
-                text = song.artist,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-        }
-    }
-}
+// SongListItem moved to ui/component/SongListItem.kt
 
 @Composable
 fun FastScroller(
