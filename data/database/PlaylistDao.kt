@@ -21,7 +21,7 @@ interface PlaylistDao {
     @Query("""
         SELECT 
             p.*, 
-            (SELECT s.albumArtUri FROM playlist_songs ps JOIN songs s ON ps.songId = s.id WHERE ps.playlistId = p.playlistId ORDER BY ps.dateAdded ASC LIMIT 1) as coverArtUri,
+            (SELECT s.albumId FROM playlist_songs ps JOIN songs s ON ps.songId = s.id WHERE ps.playlistId = p.playlistId ORDER BY ps.dateAdded ASC LIMIT 1) as coverAlbumId,
             (SELECT COUNT(*) FROM playlist_songs ps WHERE ps.playlistId = p.playlistId) as songCount
         FROM playlists p
         ORDER BY p.name ASC
@@ -31,7 +31,7 @@ interface PlaylistDao {
     @Query("""
         SELECT 
             p.*, 
-            (SELECT s.albumArtUri FROM playlist_songs ps JOIN songs s ON ps.songId = s.id WHERE ps.playlistId = p.playlistId ORDER BY ps.dateAdded ASC LIMIT 1) as coverArtUri,
+            (SELECT s.albumId FROM playlist_songs ps JOIN songs s ON ps.songId = s.id WHERE ps.playlistId = p.playlistId ORDER BY ps.dateAdded ASC LIMIT 1) as coverAlbumId,
             (SELECT COUNT(*) FROM playlist_songs ps WHERE ps.playlistId = p.playlistId) as songCount
         FROM playlists p
         WHERE p.playlistId = :playlistId
@@ -40,7 +40,7 @@ interface PlaylistDao {
 
     data class PlaylistWithMeta(
         @Embedded val playlist: PlaylistEntity,
-        @ColumnInfo(name = "coverArtUri") val coverArtUri: String?,
+        @ColumnInfo(name = "coverAlbumId") val coverAlbumId: Long?,
         @ColumnInfo(name = "songCount") val songCount: Int
     )
 

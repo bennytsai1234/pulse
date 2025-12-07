@@ -102,7 +102,7 @@ class MusicRepositoryImpl @Inject constructor(
                     id = it.playlist.playlistId,
                     name = it.playlist.name,
                     songCount = it.songCount,
-                    coverArtUri = it.coverArtUri
+                    coverArtUri = it.coverAlbumId?.let { albumId -> "content://media/external/audio/albumart/$albumId" }
                 ) 
             }
         }
@@ -115,7 +115,7 @@ class MusicRepositoryImpl @Inject constructor(
                     id = it.playlist.playlistId,
                     name = it.playlist.name,
                     songCount = it.songCount,
-                    coverArtUri = it.coverArtUri
+                    coverArtUri = it.coverAlbumId?.let { albumId -> "content://media/external/audio/albumart/$albumId" }
                 )
             }
         }
