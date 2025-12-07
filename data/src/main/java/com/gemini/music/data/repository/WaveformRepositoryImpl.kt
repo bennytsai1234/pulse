@@ -18,11 +18,16 @@ class WaveformRepositoryImpl @Inject constructor(
     @ApplicationContext private val context: Context
 ) : WaveformRepository {
 
-    private val amplituda = Amplituda(context)
-
-
+    // DISABLED: Amplituda native library causes SIGSEGV crash on x86_64 emulators
+    // private val amplituda = Amplituda(context)
 
     override suspend fun extractWaveform(filePath: String): List<Int> = withContext(Dispatchers.IO) {
+        // Temporarily return empty list to prevent native crash
+        // The UI will fall back to animated random waveform display
+        // TODO: Re-enable when running on real ARM devices or find alternative library
+        return@withContext emptyList()
+        
+        /* Original implementation - disabled due to native crash
         val file = File(filePath)
         if (!file.exists()) return@withContext emptyList()
 
@@ -36,5 +41,6 @@ class WaveformRepositoryImpl @Inject constructor(
                     continuation.resume(emptyList())
                 })
         }
+        */
     }
 }

@@ -137,8 +137,17 @@ class HomeViewModel @Inject constructor(
     fun scanMusic() {
         viewModelScope.launch {
             _isLoading.value = true
-            scanLocalMusicUseCase()
-            _isLoading.value = false
+            // Must collect the Flow to trigger the scan operation
+            scanLocalMusicUseCase().collect { status ->
+                // Scan completed when we receive Completed or Failed
+                when (status) {
+                    is com.gemini.music.domain.model.ScanStatus.Completed,
+                    is com.gemini.music.domain.model.ScanStatus.Failed -> {
+                        _isLoading.value = false
+                    }
+                    else -> { /* Scanning in progress */ }
+                }
+            }
         }
     }
 
