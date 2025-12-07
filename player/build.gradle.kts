@@ -21,11 +21,7 @@ android {
         jvmTarget = "17"
     }
 
-    sourceSets {
-        getByName("main") {
-            java.srcDirs("manager", "notification", "service", "di")
-        }
-    }
+
 }
 
 dependencies {

@@ -46,6 +46,7 @@ data class NowPlayingUiState(
     val onBackgroundColor: Color = Color.White,
     val lyrics: List<LyricLine> = emptyList(),
     val currentLyricIndex: Int = -1,
+    val waveform: List<Float> = emptyList(), // Normalized amplitudes
     val shuffleModeEnabled: Boolean = false,
     val repeatMode: RepeatMode = RepeatMode.OFF,
     val queue: List<Song> = emptyList()
@@ -64,7 +65,8 @@ class NowPlayingViewModel @Inject constructor(
     private val toggleShuffleUseCase: ToggleShuffleUseCase,
     private val cycleRepeatModeUseCase: CycleRepeatModeUseCase,
     private val playQueueItemUseCase: PlayQueueItemUseCase,
-    private val removeQueueItemUseCase: RemoveQueueItemUseCase
+    private val removeQueueItemUseCase: RemoveQueueItemUseCase,
+    private val getSongWaveformUseCase: com.gemini.music.domain.usecase.GetSongWaveformUseCase
 ) : ViewModel() {
 
     private val _paletteColor = MutableStateFlow(Pair(Color(0xFF1E1E1E), Color.White))
@@ -80,6 +82,23 @@ class NowPlayingViewModel @Inject constructor(
                 flowOf(emptyList())
             }
         }
+    
+    // Waveform Loading
+    private val waveformFlow = musicState.map { it.currentSong }
+        .distinctUntilChanged()
+        .flatMapLatest { song ->
+             if (song != null) {
+                 kotlinx.coroutines.flow.flow {
+                     val rawData = getSongWaveformUseCase(song.dataPath)
+                     // Normalize to 0f..1f
+                     val max = rawData.maxOrNull() ?: 1
+                     val normalized = rawData.map { it.toFloat() / max }
+                     emit(normalized)
+                 }
+             } else {
+                 flowOf(emptyList())
+             }
+        }
 
     private val formattedPlaybackStateFlow: StateFlow<FormattedPlaybackState> = lyricsFlow.flatMapLatest { lyrics ->
         getFormattedPlaybackStateUseCase(lyrics)
@@ -89,8 +108,9 @@ class NowPlayingViewModel @Inject constructor(
         musicState,
         formattedPlaybackStateFlow,
         lyricsFlow,
+        waveformFlow,
         _paletteColor
-    ) { state, formattedState, lyrics, palette ->
+    ) { state, formattedState, lyrics, waveform, palette ->
         NowPlayingUiState(
             song = state.currentSong,
             isPlaying = state.isPlaying,
@@ -102,6 +122,7 @@ class NowPlayingViewModel @Inject constructor(
             totalTime = formattedState.totalTime,
             currentLyricIndex = formattedState.currentLyricIndex,
             lyrics = lyrics,
+            waveform = waveform,
             backgroundColor = palette.first,
             onBackgroundColor = palette.second
         )

@@ -22,4 +22,9 @@ abstract class DataModule {
     abstract fun bindLyricsRepository(
         lyricsRepositoryImpl: LyricsRepositoryImpl
     ): LyricsRepository
+
+    @Binds
+    abstract fun bindWaveformRepository(
+        waveformRepositoryImpl: com.gemini.music.data.repository.WaveformRepositoryImpl
+    ): com.gemini.music.domain.repository.WaveformRepository
 }

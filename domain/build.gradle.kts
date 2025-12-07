@@ -13,11 +13,7 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach 
     }
 }
 
-sourceSets {
-    getByName("main") {
-        java.srcDirs("model", "repository", "usecase")
-    }
-}
+
 
 dependencies {
     // The @Inject annotation

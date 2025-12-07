@@ -29,11 +29,7 @@ android {
         jvmTarget = "17"
     }
 
-    sourceSets {
-        getByName("main") {
-            java.srcDirs("albumdetail", "component", "home", "main", "navigation", "nowplaying", "search", "settings", "playlist")
-        }
-    }
+
 }
 
 dependencies {

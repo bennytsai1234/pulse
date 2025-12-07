@@ -21,11 +21,7 @@ android {
         jvmTarget = "17"
     }
 
-    sourceSets {
-        getByName("main") {
-            java.srcDirs("database", "mapper", "repository", "source", "di")
-        }
-    }
+
 }
 
 dependencies {
@@ -47,4 +43,7 @@ dependencies {
 
     // Android Core
     implementation(libs.androidx.core.ktx)
+
+    // Amplituda (Audio Waveform)
+    implementation(libs.amplituda)
 }

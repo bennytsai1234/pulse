@@ -225,7 +225,7 @@ fun NowPlayingScreen(
                 totalTime = uiState.totalTime,
                 activeColor = uiState.backgroundColor,
                 onSeek = { viewModel.onEvent(NowPlayingEvent.SeekTo(it)) },
-                waveform = waveform
+                waveform = uiState.waveform
             )
 
             Spacer(modifier = Modifier.height(16.dp))
