@@ -12,6 +12,8 @@ import com.gemini.music.domain.usecase.GetSongsUseCase
 import com.gemini.music.domain.usecase.PlaySongUseCase
 import com.gemini.music.domain.usecase.ScanLocalMusicUseCase
 import com.gemini.music.domain.usecase.ToggleShuffleUseCase
+import com.gemini.music.domain.model.Playlist
+import com.gemini.music.domain.repository.MusicRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -30,10 +32,14 @@ data class HomeUiState(
     val recentlyAdded: List<Song> = emptyList(),
     val albums: List<Album> = emptyList(),
     val artists: List<Artist> = emptyList(),
+    // Playlists
+    val playlists: List<Playlist> = emptyList(),
     val isLoading: Boolean = false,
     // Selection Mode
     val isSelectionMode: Boolean = false,
     val selectedSongIds: Set<Long> = emptySet(),
+    // Dialogs
+    val showAddToPlaylistDialog: Boolean = false,
     // Sorting
     val sortOption: SortOption = SortOption.TITLE
 )
@@ -46,37 +52,47 @@ class HomeViewModel @Inject constructor(
     getArtistsUseCase: GetArtistsUseCase,
     private val scanLocalMusicUseCase: ScanLocalMusicUseCase,
     private val playSongUseCase: PlaySongUseCase,
-    private val toggleShuffleUseCase: ToggleShuffleUseCase // Reusing existing UseCase logic for shuffle
+    private val toggleShuffleUseCase: ToggleShuffleUseCase,
+    private val musicRepository: MusicRepository // Direct Access for Playlist MVP
 ) : ViewModel() {
 
     private val _isLoading = MutableStateFlow(false)
     private val _isSelectionMode = MutableStateFlow(false)
     private val _selectedSongIds = MutableStateFlow<Set<Long>>(emptySet())
     private val _sortOption = MutableStateFlow(SortOption.TITLE)
+    private val _showAddToPlaylistDialog = MutableStateFlow(false)
 
     // Group Data Flows
     private val _dataFlow = combine(
         getSongsUseCase(),
         getRecentlyAddedSongsUseCase(),
         getAlbumsUseCase(),
-        getArtistsUseCase()
-    ) { songs, recent, albums, artists ->
-        DataState(songs, recent, albums, artists)
+        getArtistsUseCase(),
+        musicRepository.getPlaylists()
+    ) { songs, recent, albums, artists, playlists ->
+        DataState(songs, recent, albums, artists, playlists)
+    }
+
+    private val _controlsFlow = combine(
+        _isLoading,
+        _isSelectionMode,
+        _selectedSongIds,
+        _showAddToPlaylistDialog,
+        _sortOption
+    ) { isLoading, isSelection, selected, showDialog, sort ->
+        ControlsState(isLoading, isSelection, selected, showDialog, sort)
     }
 
     // Combine Data with UI State
     val uiState: StateFlow<HomeUiState> = combine(
         _dataFlow,
-        _isLoading,
-        _isSelectionMode,
-        _selectedSongIds,
-        _sortOption
-    ) { data, isLoading, isSelection, selected, sort ->
+        _controlsFlow
+    ) { data, controls ->
         // Apply Sorting
-        val sortedSongs = when (sort) {
+        val sortedSongs = when (controls.sortOption) {
             SortOption.TITLE -> data.songs.sortedBy { it.title }
             SortOption.ARTIST -> data.songs.sortedBy { it.artist }
-            SortOption.DATE_ADDED -> data.recent // Or implement proper date sorting
+            SortOption.DATE_ADDED -> data.recent 
         }
 
         HomeUiState(
@@ -84,10 +100,12 @@ class HomeViewModel @Inject constructor(
             recentlyAdded = data.recent,
             albums = data.albums,
             artists = data.artists,
-            isLoading = isLoading,
-            isSelectionMode = isSelection,
-            selectedSongIds = selected,
-            sortOption = sort
+            playlists = data.playlists,
+            isLoading = controls.isLoading,
+            isSelectionMode = controls.isSelectionMode,
+            selectedSongIds = controls.selectedSongIds,
+            showAddToPlaylistDialog = controls.showAddToPlaylistDialog,
+            sortOption = controls.sortOption
         )
     }.stateIn(
         scope = viewModelScope,
@@ -104,7 +122,16 @@ class HomeViewModel @Inject constructor(
         val songs: List<Song>,
         val recent: List<Song>,
         val albums: List<Album>,
-        val artists: List<Artist>
+        val artists: List<Artist>,
+        val playlists: List<Playlist>
+    )
+
+    data class ControlsState(
+        val isLoading: Boolean,
+        val isSelectionMode: Boolean,
+        val selectedSongIds: Set<Long>,
+        val showAddToPlaylistDialog: Boolean,
+        val sortOption: SortOption
     )
 
     fun scanMusic() {
@@ -130,9 +157,6 @@ class HomeViewModel @Inject constructor(
     fun shuffleAll() {
         val allSongs = uiState.value.songs
         if (allSongs.isNotEmpty()) {
-            // Shuffle logic: Play index 0 but with shuffle mode ON (handled by repo/player usually)
-            // Or we can shuffle the list here and play.
-            // For now, simpler:
             playSongUseCase(allSongs.shuffled(), 0)
         }
     }
@@ -153,8 +177,7 @@ class HomeViewModel @Inject constructor(
         if (current.contains(songId)) {
             _selectedSongIds.value = current - songId
             if (_selectedSongIds.value.isEmpty()) {
-                // Optional: Exit selection mode if empty? Or keep it.
-                // exitSelectionMode() 
+                // Keep selection mode active even if empty
             }
         } else {
             _selectedSongIds.value = current + songId
@@ -182,9 +205,36 @@ class HomeViewModel @Inject constructor(
         }
     }
     
-    fun addToPlaylist() {
-        // TODO
-        exitSelectionMode()
+    fun addToPlaylistClicked() {
+        if (_selectedSongIds.value.isNotEmpty()) {
+            _showAddToPlaylistDialog.value = true
+        }
+    }
+
+    fun dismissAddToPlaylistDialog() {
+        _showAddToPlaylistDialog.value = false
+    }
+
+    fun createPlaylist(name: String) {
+        viewModelScope.launch {
+            val playlistId = musicRepository.createPlaylist(name)
+            // Add selected songs
+            _selectedSongIds.value.forEach { songId ->
+                musicRepository.addSongToPlaylist(playlistId, songId)
+            }
+            dismissAddToPlaylistDialog()
+            exitSelectionMode()
+        }
+    }
+
+    fun addSelectedToPlaylist(playlist: Playlist) {
+         viewModelScope.launch {
+            _selectedSongIds.value.forEach { songId ->
+                musicRepository.addSongToPlaylist(playlist.id, songId)
+            }
+            dismissAddToPlaylistDialog()
+            exitSelectionMode()
+        }
     }
     
     fun deleteSelected() {

@@ -3,6 +3,7 @@ package com.gemini.music.data.di
 import android.content.Context
 import androidx.room.Room
 import com.gemini.music.data.database.GeminiDatabase
+import com.gemini.music.data.database.PlaylistDao
 import com.gemini.music.data.database.SongDao
 import dagger.Module
 import dagger.Provides
@@ -22,11 +23,18 @@ object DatabaseModule {
             context,
             GeminiDatabase::class.java,
             "gemini_music.db"
-        ).build()
+        )
+        .fallbackToDestructiveMigration() // For development only, since we bump version
+        .build()
     }
 
     @Provides
     fun provideSongDao(database: GeminiDatabase): SongDao {
         return database.songDao()
+    }
+
+    @Provides
+    fun providePlaylistDao(database: GeminiDatabase): PlaylistDao {
+        return database.playlistDao()
     }
 }

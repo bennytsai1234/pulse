@@ -167,7 +167,7 @@ fun HomeScreen(
                     onSearchClick = onSearchClick,
                     onCloseSelection = { viewModel.exitSelectionMode() },
                     onSelectAll = { viewModel.selectAll() },
-                    onAddToPlaylist = { viewModel.addToPlaylist() },
+                    onAddToPlaylist = { viewModel.addToPlaylistClicked() },
                     onDelete = { viewModel.deleteSelected() },
                     onPlaySelected = { viewModel.playSelected() }
                 )
@@ -179,6 +179,16 @@ fun HomeScreen(
                     .fillMaxSize()
                     .padding(padding)
             ) {
+                // Dialog
+                if (uiState.showAddToPlaylistDialog) {
+                    com.gemini.music.ui.component.AddToPlaylistDialog(
+                        playlists = uiState.playlists,
+                        onDismiss = { viewModel.dismissAddToPlaylistDialog() },
+                        onPlaylistSelected = { playlist -> viewModel.addSelectedToPlaylist(playlist) },
+                        onCreateNewPlaylist = { name -> viewModel.createPlaylist(name) }
+                    )
+                }
+
                 Column {
                     // Second Row: Controls
                     ControlRow(
