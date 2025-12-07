@@ -21,7 +21,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.FolderOpen
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.LinearProgressIndicator
+import com.gemini.music.domain.model.ScanStatus
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -180,6 +183,64 @@ fun SettingsScreen(
                 Text("Rescan Library Now")
             }
         }
+    }
+
+    // Scan Progress Dialog
+    val scanStatus = uiState.scanStatus
+    if (scanStatus !is ScanStatus.Idle) {
+        AlertDialog(
+            onDismissRequest = {
+                if (scanStatus !is ScanStatus.Scanning) {
+                    viewModel.resetScanStatus()
+                }
+            },
+            title = {
+                Text(
+                    text = when (scanStatus) {
+                        is ScanStatus.Scanning -> "Scanning Library..."
+                        is ScanStatus.Completed -> "Scan Completed"
+                        is ScanStatus.Failed -> "Scan Failed"
+                        else -> ""
+                    }
+                )
+            },
+            text = {
+                Column {
+                    when (scanStatus) {
+                        is ScanStatus.Scanning -> {
+                            val progress = scanStatus.progress
+                            val total = scanStatus.total
+                            val message = scanStatus.currentFile
+
+                            if (total > 0) {
+                                LinearProgressIndicator(
+                                    progress = { progress.toFloat() / total },
+                                    modifier = Modifier.fillMaxWidth(),
+                                )
+                            } else {
+                                LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+                            }
+                            Spacer(Modifier.height(8.dp))
+                            Text(message)
+                        }
+                        is ScanStatus.Completed -> {
+                            Text("Successfully added ${scanStatus.totalAdded} songs to the library.")
+                        }
+                        is ScanStatus.Failed -> {
+                            Text("Error: ${scanStatus.error}")
+                        }
+                        else -> {}
+                    }
+                }
+            },
+            confirmButton = {
+                if (scanStatus !is ScanStatus.Scanning) {
+                    androidx.compose.material3.TextButton(onClick = { viewModel.resetScanStatus() }) {
+                        Text("OK")
+                    }
+                }
+            }
+        )
     }
 }
 

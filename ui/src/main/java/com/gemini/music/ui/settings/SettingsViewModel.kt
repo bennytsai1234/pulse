@@ -78,4 +78,8 @@ class SettingsViewModel @Inject constructor(
             }
         }
     }
+
+    fun resetScanStatus() {
+        _scanStatus.value = ScanStatus.Idle
+    }
 }

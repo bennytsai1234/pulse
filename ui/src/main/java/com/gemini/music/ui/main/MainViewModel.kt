@@ -8,6 +8,7 @@ import com.gemini.music.domain.usecase.GetPlaybackProgressUseCase
 import com.gemini.music.domain.usecase.PlayQueueItemUseCase
 import com.gemini.music.domain.usecase.RemoveQueueItemUseCase
 import com.gemini.music.domain.usecase.TogglePlayPauseUseCase
+import com.gemini.music.domain.usecase.GetSongWaveformUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -22,7 +23,7 @@ class MainViewModel @Inject constructor(
     private val togglePlayPauseUseCase: TogglePlayPauseUseCase,
     private val playQueueItemUseCase: PlayQueueItemUseCase,
     private val removeQueueItemUseCase: RemoveQueueItemUseCase,
-    private val audioWaveformExtractor: com.gemini.music.data.source.AudioWaveformExtractor
+    private val getSongWaveformUseCase: GetSongWaveformUseCase
 ) : ViewModel() {
 
     val musicState: StateFlow<MusicState> = getMusicStateUseCase()
@@ -37,18 +38,22 @@ class MainViewModel @Inject constructor(
     private val _waveform = kotlinx.coroutines.flow.MutableStateFlow<List<Float>>(emptyList())
     val waveform: StateFlow<List<Float>> = _waveform
 
-    private var currentSongUri: String? = null
+    private var currentSongDataPath: String? = null
 
     init {
         viewModelScope.launch {
             musicState.collect { state ->
                 val song = state.currentSong
-                if (song != null && song.contentUri != currentSongUri) {
-                    currentSongUri = song.contentUri
+                if (song != null && song.dataPath != currentSongDataPath) {
+                    currentSongDataPath = song.dataPath
                     _waveform.value = emptyList() // Clear previous
-                     val uri = android.net.Uri.parse(song.contentUri)
-                     val ints = audioWaveformExtractor.extractWaveform(uri)
-                     _waveform.value = ints.map { it / 100f } // Normalize 0..1
+                    try {
+                        val rawWaveform = getSongWaveformUseCase(song.dataPath)
+                        val maxValue = rawWaveform.maxOrNull() ?: 1
+                        _waveform.value = rawWaveform.map { it.toFloat() / maxValue }
+                    } catch (e: Exception) {
+                        _waveform.value = emptyList()
+                    }
                 }
             }
         }
