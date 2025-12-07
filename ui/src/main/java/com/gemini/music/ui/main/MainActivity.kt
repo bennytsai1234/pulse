@@ -68,25 +68,6 @@ class MainActivity : ComponentActivity() {
                  UserPreferencesRepository.THEME_DARK -> true
                  else -> isSystemDark
             }
-            
-            // Trigger scan on resume (to handle permission grant return)
-            val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
-            androidx.compose.runtime.DisposableEffect(lifecycleOwner) {
-                val observer = androidx.lifecycle.LifecycleEventObserver { _, event ->
-                    if (event == androidx.lifecycle.Lifecycle.Event.ON_RESUME) {
-                         // We need a way to signal the ViewModel to scan.
-                         // But we don't have the VM instance here.
-                         // Instead, we will rely on the fact that HomeViewModel calls scan in init{}.
-                         // AND we adding a LaunchedEffect in HomeScreen to re-scan if empty?
-                         // actually, passing an Intent/Event is cleaner, but let's stick to simple UI patterns.
-                         // Best practical fix: Verify permission again in HomeViewModel.
-                    }
-                }
-                lifecycleOwner.lifecycle.addObserver(observer)
-                onDispose {
-                    lifecycleOwner.lifecycle.removeObserver(observer)
-                }
-            }
 
             GeminiTheme(darkTheme = darkTheme) {
                 Surface(modifier = Modifier.fillMaxSize()) {
