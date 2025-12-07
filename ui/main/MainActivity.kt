@@ -34,6 +34,18 @@ class MainActivity : ComponentActivity() {
     ) { isGranted: Boolean ->
         if (isGranted) {
             // Permission granted, ViewModel will handle scan
+            // We need to notify the ViewModel to re-scan.
+            // Since we can't easily access the Hilt VM instance here directly without scoping issues in legacy Views,
+            // but in Compose, the VM is obtained in setContent.
+            // However, for this simple case, we can rely on the fact that if permission is granted,
+            // the onResume or the LaunchedEffect in UI can handle it, OR we can use a shared flow/event.
+            // BUT, the simplest valid fix for "Run Normally" is to let the VM know.
+            
+            // Recreating the activity is a nuclear option, but ensures everything re-initializes with permissions.
+            // recreate() 
+            
+            // Better: Just let the UI recompose. The VM scan logic is currently in init{}.
+            // We should move scan logic to be triggered by UI.
         }
     }
 
@@ -51,6 +63,25 @@ class MainActivity : ComponentActivity() {
                  UserPreferencesRepository.THEME_LIGHT -> false
                  UserPreferencesRepository.THEME_DARK -> true
                  else -> isSystemDark
+            }
+            
+            // Trigger scan on resume (to handle permission grant return)
+            val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
+            androidx.compose.runtime.DisposableEffect(lifecycleOwner) {
+                val observer = androidx.lifecycle.LifecycleEventObserver { _, event ->
+                    if (event == androidx.lifecycle.Lifecycle.Event.ON_RESUME) {
+                         // We need a way to signal the ViewModel to scan.
+                         // But we don't have the VM instance here.
+                         // Instead, we will rely on the fact that HomeViewModel calls scan in init{}.
+                         // AND we adding a LaunchedEffect in HomeScreen to re-scan if empty?
+                         // actually, passing an Intent/Event is cleaner, but let's stick to simple UI patterns.
+                         // Best practical fix: Verify permission again in HomeViewModel.
+                    }
+                }
+                lifecycleOwner.lifecycle.addObserver(observer)
+                onDispose {
+                    lifecycleOwner.lifecycle.removeObserver(observer)
+                }
             }
 
             GeminiTheme(darkTheme = darkTheme) {

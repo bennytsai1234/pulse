@@ -109,10 +109,10 @@ fun NowPlayingScreen(
         modifier = Modifier.fillMaxSize()
     ) {
         // 1. Background Image with Blur (Immersive layer)
-        if (uiState.song != null) {
+        uiState.song?.let { song ->
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
-                    .data(uiState.song.albumArtUri)
+                    .data(song.albumArtUri)
                     .crossfade(true)
                     .build(),
                 contentDescription = null,
@@ -308,7 +308,7 @@ fun HeroImage(
         label = "ImageScale"
     )
 
-    val shadowElevation by animateFloatAsState(
+    val animatedShadowElevation by animateFloatAsState(
         targetValue = if (isPlaying) 24f else 8f,
         animationSpec = tween(durationMillis = 500),
         label = "ShadowElevation"
@@ -342,7 +342,7 @@ fun HeroImage(
                 .graphicsLayer {
                     scaleX = scale
                     scaleY = scale
-                    shadowElevation = shadowElevation
+                    shadowElevation = animatedShadowElevation
                     shape = RoundedCornerShape(28.dp)
                     clip = true
                 }

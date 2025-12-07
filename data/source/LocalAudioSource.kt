@@ -45,61 +45,68 @@ class LocalAudioSource @Inject constructor(
         val selectionArgs = arrayOf(minDurationMs.toString())
         val sortOrder = "${MediaStore.Audio.Media.TITLE} ASC"
 
-        context.contentResolver.query(
-            collection,
-            projection,
-            selection,
-            selectionArgs,
-            sortOrder
-        )?.use { cursor ->
-            val idColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID)
-            val titleColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE)
-            val artistColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST)
-            val albumColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM)
-            val albumIdColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM_ID)
-            val durationColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION)
-            val trackColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TRACK)
-            val yearColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.YEAR)
-            val dateAddedColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATE_ADDED)
-            val dataColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA)
+        try {
+            context.contentResolver.query(
+                collection,
+                projection,
+                selection,
+                selectionArgs,
+                sortOrder
+            )?.use { cursor ->
+                val idColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID)
+                val titleColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE)
+                val artistColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST)
+                val albumColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM)
+                val albumIdColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM_ID)
+                val durationColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION)
+                val trackColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TRACK)
+                val yearColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.YEAR)
+                val dateAddedColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATE_ADDED)
+                val dataColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA)
 
-            while (cursor.moveToNext()) {
-                val dataPath = cursor.getString(dataColumn) ?: ""
-                
-                // Path filtering
-                if (includedPaths.isNotEmpty()) {
-                    val isIncluded = includedPaths.any { path -> dataPath.startsWith(path) }
-                    if (!isIncluded) continue
-                }
+                while (cursor.moveToNext()) {
+                    val dataPath = cursor.getString(dataColumn) ?: ""
+                    
+                    // Path filtering
+                    if (includedPaths.isNotEmpty()) {
+                        val isIncluded = includedPaths.any { path -> dataPath.startsWith(path) }
+                        if (!isIncluded) continue
+                    }
 
-                val id = cursor.getLong(idColumn)
-                val title = cursor.getString(titleColumn) ?: "Unknown Track"
-                val artist = cursor.getString(artistColumn) ?: "Unknown Artist"
-                val album = cursor.getString(albumColumn) ?: "Unknown Album"
-                val albumId = cursor.getLong(albumIdColumn)
-                val duration = cursor.getLong(durationColumn)
-                val track = cursor.getInt(trackColumn)
-                val year = cursor.getInt(yearColumn)
-                val dateAdded = cursor.getLong(dateAddedColumn)
+                    val id = cursor.getLong(idColumn)
+                    val title = cursor.getString(titleColumn) ?: "Unknown Track"
+                    val artist = cursor.getString(artistColumn) ?: "Unknown Artist"
+                    val album = cursor.getString(albumColumn) ?: "Unknown Album"
+                    val albumId = cursor.getLong(albumIdColumn)
+                    val duration = cursor.getLong(durationColumn)
+                    val track = cursor.getInt(trackColumn)
+                    val year = cursor.getInt(yearColumn)
+                    val dateAdded = cursor.getLong(dateAddedColumn)
 
-                val contentUri = ContentUris.withAppendedId(collection, id)
+                    val contentUri = ContentUris.withAppendedId(collection, id)
 
-                songs.add(
-                    Song(
-                        id = id,
-                        title = title,
-                        artist = artist,
-                        album = album,
-                        albumId = albumId,
-                        duration = duration,
-                        contentUri = contentUri.toString(),
-                        dataPath = dataPath,
-                        trackNumber = track,
-                        year = year,
-                        dateAdded = dateAdded
+                    songs.add(
+                        Song(
+                            id = id,
+                            title = title,
+                            artist = artist,
+                            album = album,
+                            albumId = albumId,
+                            duration = duration,
+                            contentUri = contentUri.toString(),
+                            dataPath = dataPath,
+                            trackNumber = track,
+                            year = year,
+                            dateAdded = dateAdded
+                        )
                     )
-                )
+                }
             }
+        } catch (e: SecurityException) {
+            // Log error or handle permission denial gracefully
+            e.printStackTrace()
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
         return@withContext songs
     }
