@@ -105,18 +105,9 @@ fun HomeScreen(
     val scope = rememberCoroutineScope()
     val listState = rememberLazyListState()
 
-    // Re-scan when coming back to foreground (Permission might be granted)
-    val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
-    androidx.compose.runtime.DisposableEffect(lifecycleOwner) {
-        val observer = androidx.lifecycle.LifecycleEventObserver { _, event ->
-            if (event == androidx.lifecycle.Lifecycle.Event.ON_RESUME) {
-                viewModel.scanMusic()
-            }
-        }
-        lifecycleOwner.lifecycle.addObserver(observer)
-        onDispose {
-            lifecycleOwner.lifecycle.removeObserver(observer)
-        }
+    // Trigger scan when screen is first composed
+    androidx.compose.runtime.LaunchedEffect(Unit) {
+        viewModel.scanMusic()
     }
 
     // Back Handler for Selection Mode or Drawer
