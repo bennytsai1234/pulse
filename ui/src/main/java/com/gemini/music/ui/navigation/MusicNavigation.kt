@@ -11,6 +11,7 @@ import com.gemini.music.ui.home.HomeScreen
 import com.gemini.music.ui.nowplaying.NowPlayingScreen
 import com.gemini.music.ui.search.SearchScreen
 import com.gemini.music.ui.settings.SettingsScreen
+import com.gemini.music.ui.albums.AlbumsScreen
 
 sealed class Screen(val route: String) {
     data object Home : Screen("home")
@@ -26,6 +27,7 @@ sealed class Screen(val route: String) {
         const val playlistIdArg = "playlistId"
         fun createRoute(playlistId: Long) = "playlist_detail/$playlistId"
     }
+    data object Albums : Screen("albums")
 }
 
 @Composable
@@ -47,6 +49,9 @@ fun MusicNavigation(navController: NavHostController) {
                 },
                 onPlaylistClick = {
                     navController.navigate(Screen.PlaylistList.route)
+                },
+                onAlbumsClick = {
+                    navController.navigate(Screen.Albums.route)
                 }
             )
         }
@@ -59,6 +64,14 @@ fun MusicNavigation(navController: NavHostController) {
         composable(Screen.Search.route) {
             SearchScreen(
                 onBackClick = { navController.popBackStack() }
+            )
+        }
+        composable(Screen.Albums.route) {
+            AlbumsScreen(
+                onBackClick = { navController.popBackStack() },
+                onAlbumClick = { albumId ->
+                     navController.navigate(Screen.AlbumDetail.createRoute(albumId))
+                }
             )
         }
         composable(

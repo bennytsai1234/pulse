@@ -21,6 +21,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.FolderOpen
+import androidx.compose.material.icons.rounded.Language
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.LinearProgressIndicator
@@ -55,6 +56,11 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.gemini.music.data.repository.UserPreferencesRepository
 import com.gemini.music.core.common.util.StorageUtils
+import androidx.compose.ui.res.stringResource
+import com.gemini.music.ui.R
+import androidx.core.os.LocaleListCompat
+import androidx.appcompat.app.AppCompatDelegate
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -81,7 +87,7 @@ fun SettingsScreen(
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("Settings") },
+                title = { Text(stringResource(R.string.settings)) },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = "Back")
@@ -98,7 +104,7 @@ fun SettingsScreen(
             // Theme Mode
             HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))
             ListItem(
-                headlineContent = { Text("Theme Mode") },
+                headlineContent = { Text(stringResource(R.string.theme_mode)) },
                 trailingContent = {
                     ThemeModeSelector(
                         currentMode = uiState.themeMode,
@@ -107,9 +113,18 @@ fun SettingsScreen(
                 }
             )
 
+            // Language
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.language)) },
+                leadingContent = { Icon(Icons.Rounded.Language, null) },
+                trailingContent = {
+                    LanguageSelector()
+                }
+            )
+
             // Min Duration Slider
             Text(
-                text = "Minimum Duration: ${uiState.minAudioDuration / 1000}s",
+                text = stringResource(R.string.min_duration, uiState.minAudioDuration / 1000),
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.padding(16.dp)
             )
@@ -121,7 +136,7 @@ fun SettingsScreen(
                 modifier = Modifier.padding(horizontal = 16.dp)
             )
             Text(
-                text = "Audio files shorter than this will be ignored.",
+                text = stringResource(R.string.min_duration_desc),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(horizontal = 16.dp)
@@ -138,19 +153,19 @@ fun SettingsScreen(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = "Included Folders",
+                    text = stringResource(R.string.included_folders),
                     style = MaterialTheme.typography.titleMedium
                 )
                 Button(onClick = { folderPickerLauncher.launch(null) }) {
                     Icon(Icons.Rounded.FolderOpen, contentDescription = null)
                     Spacer(Modifier.width(8.dp))
-                    Text("Add Folder")
+                    Text(stringResource(R.string.add_folder))
                 }
             }
             
             if (uiState.includedFolders.isEmpty()) {
                 Text(
-                    text = "Scanning all folders (Default)",
+                    text = stringResource(R.string.scanning_default),
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.padding(16.dp)
                 )
@@ -180,7 +195,7 @@ fun SettingsScreen(
                     .fillMaxWidth()
                     .padding(16.dp)
             ) {
-                Text("Rescan Library Now")
+                Text(stringResource(R.string.rescan_library))
             }
         }
     }
@@ -221,13 +236,13 @@ fun SettingsScreen(
                                 LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
                             }
                             Spacer(Modifier.height(8.dp))
-                            Text(message)
+                            Text(stringResource(R.string.scanning)) // Simplified for now
                         }
                         is ScanStatus.Completed -> {
-                            Text("Successfully added ${scanStatus.totalAdded} songs to the library.")
+                            Text(stringResource(R.string.scan_success_message, scanStatus.totalAdded))
                         }
                         is ScanStatus.Failed -> {
-                            Text("Error: ${scanStatus.error}")
+                            Text(stringResource(R.string.scan_error_message, scanStatus.error))
                         }
                         else -> {}
                     }
@@ -286,6 +301,57 @@ fun ThemeModeSelector(
                         }
                     )
                 }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun LanguageSelector() {
+    val currentLocales = AppCompatDelegate.getApplicationLocales()
+    val currentTag = if (!currentLocales.isEmpty) currentLocales[0]?.toLanguageTag() else "en-US"
+    
+    var expanded by remember { mutableStateOf(false) }
+
+    Box(modifier = Modifier.width(150.dp)) {
+        ExposedDropdownMenuBox(
+            expanded = expanded,
+            onExpandedChange = { expanded = !expanded }
+        ) {
+            TextField(
+                value = if (currentTag?.contains("zh") == true) "繁體中文" else "English",
+                onValueChange = {},
+                readOnly = true,
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                modifier = Modifier.menuAnchor(),
+                colors = ExposedDropdownMenuDefaults.textFieldColors(
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent,
+                    disabledIndicatorColor = Color.Transparent
+                )
+            )
+            
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false }
+            ) {
+                DropdownMenuItem(
+                    text = { Text("English") },
+                    onClick = {
+                        val appLocale = LocaleListCompat.forLanguageTags("en-US")
+                        AppCompatDelegate.setApplicationLocales(appLocale)
+                        expanded = false
+                    }
+                )
+                DropdownMenuItem(
+                    text = { Text("繁體中文") },
+                    onClick = {
+                        val appLocale = LocaleListCompat.forLanguageTags("zh-TW")
+                        AppCompatDelegate.setApplicationLocales(appLocale)
+                        expanded = false
+                    }
+                )
             }
         }
     }

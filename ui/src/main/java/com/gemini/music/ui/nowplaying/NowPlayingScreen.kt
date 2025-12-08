@@ -105,57 +105,38 @@ fun NowPlayingScreen(
         )
     )
 
-    // Use the album art as the immersive background
+    // Use a clean, dynamic color gradient background
     Box(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black) // Base fallback
     ) {
-        // 1. Background Image with Blur (Immersive layer)
-        uiState.song?.let { song ->
-            AsyncImage(
-                model = ImageRequest.Builder(LocalContext.current)
-                    .data(song.albumArtUri)
-                    .crossfade(true)
-                    .build(),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .graphicsLayer { 
-                        alpha = 0.6f 
-                        // Simulate blur for older APIs by scaling up, or use Modifier.blur on API 31+
-                        // For a consistent "Glass" look without RenderEffect, we use a dark overlay + alpha
-                    }
-                    // .blur(radius = 50.dp) // Uncomment if API 31+ is guaranteed or fallback is handled
-            )
-        }
-        
-        // 2. Gradient Overlay for readability and style
+        // 1. Main Gradient Background
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .background(
                     Brush.verticalGradient(
                         colors = listOf(
-                            Color.Black.copy(alpha = 0.4f), // Top slightly dark
-                            Color.Black.copy(alpha = 0.8f), // Middle dark
-                            Color(0xFF050505)   // Bottom almost black
+                            animatedColor.copy(alpha = 0.8f), // Top: Dominant color
+                            Color(0xFF121212)    // Bottom: Deep dark/black
                         )
                     )
                 )
         )
 
-        // 3. Dynamic Color Glow (Ambient light)
+        // 2. Subtle Radial Glow for depth
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .background(
                     Brush.radialGradient(
                         colors = listOf(
-                            uiState.backgroundColor.copy(alpha = 0.4f),
+                            animatedColor.copy(alpha = 0.4f),
                             Color.Transparent
                         ),
-                        center = Offset.Unspecified,
-                        radius = 1000f
+                        center = Offset(0.5f, -0.2f), // Glow from top center
+                        radius = 2000f
                     )
                 )
         )

@@ -76,7 +76,7 @@ fun MainScreen(
             val availableHeight = maxHeight
             val sheetAnchors = remember(availableHeight, density) {
                 DraggableAnchors {
-                    PlayerSheetValue.Collapsed at with(density) { (availableHeight - 80.dp).toPx() }
+                    PlayerSheetValue.Collapsed at with(density) { (availableHeight - 72.dp).toPx() }
                     PlayerSheetValue.Expanded at 0f
                 }
             }
@@ -94,7 +94,7 @@ fun MainScreen(
             MusicNavigation(navController = navController)
 
             if (isPlayerVisible) {
-                Spacer(modifier = Modifier.height(80.dp).align(Alignment.BottomStart).fillMaxWidth())
+                Spacer(modifier = Modifier.height(72.dp).align(Alignment.BottomStart).fillMaxWidth())
 
                 SwipeablePlayerSheet(
                     state = sheetState,

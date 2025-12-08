@@ -69,6 +69,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -89,6 +90,7 @@ import com.gemini.music.domain.model.Song
 import com.gemini.music.ui.component.EmptyState
 import com.gemini.music.ui.component.SongListItem
 import kotlinx.coroutines.launch
+import androidx.compose.ui.res.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -98,7 +100,8 @@ fun HomeScreen(
     onSettingsClick: () -> Unit,
     onSearchClick: () -> Unit,
     onAlbumClick: (Long) -> Unit,
-    onPlaylistClick: () -> Unit
+    onPlaylistClick: () -> Unit,
+    onAlbumsClick: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
@@ -125,19 +128,22 @@ fun HomeScreen(
             ModalDrawerSheet {
                 Spacer(Modifier.height(12.dp))
                 Text(
-                    "Library",
+                    stringResource(com.gemini.music.ui.R.string.library),
                     modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
                     style = MaterialTheme.typography.titleSmall
                 )
                 NavigationDrawerItem(
-                    label = { Text("Albums") },
+                    label = { Text(stringResource(com.gemini.music.ui.R.string.albums)) },
                     selected = false,
-                    onClick = { /* TODO */ },
+                    onClick = { 
+                        scope.launch { drawerState.close() }
+                        onAlbumsClick()
+                    },
                     icon = { Icon(Icons.Rounded.Folder, null) },
                     modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
                 )
                 NavigationDrawerItem(
-                    label = { Text("Playlists") },
+                    label = { Text(stringResource(com.gemini.music.ui.R.string.playlists)) },
                     selected = false,
                     onClick = {
                         scope.launch { drawerState.close() }
@@ -149,7 +155,7 @@ fun HomeScreen(
                 // Add more items...
                 Spacer(Modifier.weight(1f))
                 NavigationDrawerItem(
-                    label = { Text("Settings") },
+                    label = { Text(stringResource(com.gemini.music.ui.R.string.settings)) },
                     selected = false,
                     onClick = {
                         scope.launch { drawerState.close() }
@@ -196,16 +202,17 @@ fun HomeScreen(
                     // Second Row: Controls
                     ControlRow(
                         songCount = uiState.songs.size,
+                        currentSortOption = uiState.sortOption,
                         onShuffleClick = { viewModel.shuffleAll() },
-                        onSortClick = { /* TODO: Show Dropdown */ },
+                        onSortOptionSelected = { viewModel.setSortOption(it) },
                         onSelectModeClick = { viewModel.enterSelectionMode() }
                     )
 
                     if (uiState.songs.isEmpty() && !uiState.isLoading) {
                         EmptyState(
                             icon = androidx.compose.material.icons.Icons.Rounded.Menu, // Placeholder
-                            title = "No Songs",
-                            message = "Add some music!"
+                            title = stringResource(com.gemini.music.ui.R.string.no_songs),
+                            message = stringResource(com.gemini.music.ui.R.string.no_songs_message)
                         )
                     } else {
                         SongList(
@@ -232,8 +239,7 @@ fun HomeScreen(
                 }
                 
                 // A-Z Scroller Overlay
-                val showScroller by remember { derivedStateOf { uiState.songs.size > 20 } }
-                if (showScroller) {
+                if (uiState.songs.isNotEmpty()) {
                     FastScroller(
                         listState = listState,
                         songs = uiState.songs,
@@ -261,7 +267,7 @@ fun HomeTopBar(
     CenterAlignedTopAppBar(
         title = {
             Text(
-                text = if (isSelectionMode) "$selectedCount Selected" else "Songs",
+                text = if (isSelectionMode) stringResource(com.gemini.music.ui.R.string.selected_count, selectedCount) else stringResource(com.gemini.music.ui.R.string.songs),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
@@ -307,10 +313,13 @@ fun HomeTopBar(
 @Composable
 fun ControlRow(
     songCount: Int,
+    currentSortOption: SortOption,
     onShuffleClick: () -> Unit,
-    onSortClick: () -> Unit,
+    onSortOptionSelected: (SortOption) -> Unit,
     onSelectModeClick: () -> Unit
 ) {
+    var showSortMenu by remember { androidx.compose.runtime.mutableStateOf(false) }
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -331,11 +340,11 @@ fun ControlRow(
             ) {
                 Icon(Icons.Rounded.Shuffle, contentDescription = null, modifier = Modifier.size(16.dp))
                 Spacer(Modifier.width(8.dp))
-                Text("Shuffle", style = MaterialTheme.typography.labelLarge)
+                Text(stringResource(com.gemini.music.ui.R.string.shuffle), style = MaterialTheme.typography.labelLarge)
             }
             Spacer(Modifier.width(12.dp))
             Text(
-                text = "$songCount songs",
+                text = "$songCount " + stringResource(com.gemini.music.ui.R.string.songs),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -343,9 +352,41 @@ fun ControlRow(
 
         // Right: Sort & Select
         Row {
-            IconButton(onClick = onSortClick) {
-                Icon(Icons.Rounded.Sort, contentDescription = "Sort")
+            Box {
+                IconButton(onClick = { showSortMenu = true }) {
+                    Icon(Icons.Rounded.Sort, contentDescription = "Sort")
+                }
+                
+                androidx.compose.material3.DropdownMenu(
+                    expanded = showSortMenu,
+                    onDismissRequest = { showSortMenu = false }
+                ) {
+                    SortOption.values().forEach { option ->
+                        androidx.compose.material3.DropdownMenuItem(
+                            text = { 
+                                val label = when(option) {
+                                    SortOption.TITLE -> stringResource(com.gemini.music.ui.R.string.sort_title)
+                                    SortOption.ARTIST -> stringResource(com.gemini.music.ui.R.string.sort_artist)
+                                    SortOption.ALBUM -> stringResource(com.gemini.music.ui.R.string.sort_album)
+                                    SortOption.DATE_ADDED -> stringResource(com.gemini.music.ui.R.string.sort_date_added)
+                                    SortOption.DURATION -> stringResource(com.gemini.music.ui.R.string.sort_duration)
+                                }
+                                Text(label) 
+                            },
+                            onClick = {
+                                onSortOptionSelected(option)
+                                showSortMenu = false
+                            },
+                            trailingIcon = {
+                                if (option == currentSortOption) {
+                                    Icon(Icons.Rounded.CheckCircle, contentDescription = null)
+                                }
+                            }
+                        )
+                    }
+                }
             }
+            
             IconButton(onClick = onSelectModeClick) {
                 Icon(Icons.Rounded.CheckCircle, contentDescription = "Select")
             }
@@ -402,9 +443,10 @@ fun FastScroller(
     
     Column(
         modifier = modifier
-            .width(24.dp)
+            .width(32.dp)
             .fillMaxHeight()
-            .padding(vertical = 32.dp),
+            .padding(vertical = 32.dp)
+            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f), RoundedCornerShape(topStart = 16.dp, bottomStart = 16.dp)),
         verticalArrangement = Arrangement.SpaceEvenly,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -412,15 +454,18 @@ fun FastScroller(
             Text(
                 text = char.toString(),
                 style = MaterialTheme.typography.labelSmall,
-                fontSize = 10.sp,
+                fontSize = 11.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.clickable {
-                    // Find index of first song starting with this char
-                    val index = songs.indexOfFirst { it.title.startsWith(char, ignoreCase = true) }
-                    if (index != -1) {
-                        scope.launch { listState.scrollToItem(index) }
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier
+                    .padding(2.dp)
+                    .clickable {
+                        // Find index of first song starting with this char
+                        val index = songs.indexOfFirst { it.title.startsWith(char, ignoreCase = true) }
+                        if (index != -1) {
+                            scope.launch { listState.scrollToItem(index) }
+                        }
                     }
-                }
             )
         }
     }

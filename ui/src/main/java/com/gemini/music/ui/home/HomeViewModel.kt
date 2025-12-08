@@ -24,7 +24,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 enum class SortOption {
-    TITLE, ARTIST, DATE_ADDED
+    TITLE, ARTIST, ALBUM, DATE_ADDED, DURATION
 }
 
 data class HomeUiState(
@@ -88,11 +88,13 @@ class HomeViewModel @Inject constructor(
         _dataFlow,
         _controlsFlow
     ) { data, controls ->
-        // Apply Sorting
+    // Apply Sorting
         val sortedSongs = when (controls.sortOption) {
             SortOption.TITLE -> data.songs.sortedBy { it.title }
             SortOption.ARTIST -> data.songs.sortedBy { it.artist }
-            SortOption.DATE_ADDED -> data.recent 
+            SortOption.ALBUM -> data.songs.sortedBy { it.album }
+            SortOption.DATE_ADDED -> data.songs.sortedByDescending { it.dateAdded } // Default to newest
+            SortOption.DURATION -> data.songs.sortedByDescending { it.duration }
         }
 
         HomeUiState(

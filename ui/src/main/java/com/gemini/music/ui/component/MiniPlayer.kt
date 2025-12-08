@@ -53,18 +53,17 @@ fun MiniPlayer(
 ) {
     val isClickable = song != null
 
-    // Floating Style Container
+    // Drawer/Sheet Style Container
     Surface(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 12.dp, vertical = 8.dp) // Floating margin
-            .height(72.dp) // Slightly more compact height
+            .height(72.dp) // Standard height
             .clickable(enabled = isClickable, onClick = onClick),
         color = MaterialTheme.colorScheme.surfaceVariant, // Uses our defined dark gray
         contentColor = MaterialTheme.colorScheme.onSurface,
-        tonalElevation = 0.dp, // Remove tonal elevation to keep colors consistent
-        shadowElevation = 6.dp, // Soft shadow
-        shape = RoundedCornerShape(16.dp)
+        tonalElevation = 8.dp, // Higher elevation for drawer feel
+        shadowElevation = 8.dp,
+        shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp) // Rounded only at top
     ) {
         if (song == null) {
             EmptyMiniPlayer()
@@ -105,14 +104,14 @@ private fun EmptyMiniPlayer() {
             verticalArrangement = Arrangement.Center
         ) {
             Text(
-                text = "未播放音樂", // Placeholder text
+                text = androidx.compose.ui.res.stringResource(com.gemini.music.ui.R.string.mini_player_no_music), // Placeholder text
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.SemiBold,
                 maxLines = 1,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Text(
-                text = "請選擇歌曲播放", // Placeholder text
+                text = androidx.compose.ui.res.stringResource(com.gemini.music.ui.R.string.mini_player_select_song), // Placeholder text
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,

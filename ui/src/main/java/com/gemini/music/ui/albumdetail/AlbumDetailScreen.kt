@@ -88,8 +88,8 @@ fun AlbumDetailScreen(
         } else if (album == null) {
             EmptyState(
                 icon = Icons.Rounded.Shuffle, // Placeholder icon
-                title = "Album Not Found",
-                message = "The album you're looking for doesn't exist."
+                title = androidx.compose.ui.res.stringResource(com.gemini.music.ui.R.string.album_not_found),
+                message = androidx.compose.ui.res.stringResource(com.gemini.music.ui.R.string.album_not_found_message)
             )
         } else {
             LazyColumn(
@@ -156,7 +156,7 @@ fun AlbumDetailHeader(
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            text = "${album.songCount} songs",
+            text = "${album.songCount} " + androidx.compose.ui.res.stringResource(com.gemini.music.ui.R.string.songs),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -178,7 +178,7 @@ fun AlbumDetailHeader(
                 ) {
                     Icon(Icons.Rounded.PlayArrow, contentDescription = "Play All", tint = MaterialTheme.colorScheme.onPrimary)
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Play All", color = MaterialTheme.colorScheme.onPrimary)
+                    Text(androidx.compose.ui.res.stringResource(com.gemini.music.ui.R.string.play_all), color = MaterialTheme.colorScheme.onPrimary)
                 }
             }
             Surface(
@@ -193,7 +193,7 @@ fun AlbumDetailHeader(
                 ) {
                     Icon(Icons.Rounded.Shuffle, contentDescription = "Shuffle All", tint = MaterialTheme.colorScheme.onSecondaryContainer)
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Shuffle", color = MaterialTheme.colorScheme.onSecondaryContainer)
+                    Text(androidx.compose.ui.res.stringResource(com.gemini.music.ui.R.string.shuffle), color = MaterialTheme.colorScheme.onSecondaryContainer)
                 }
             }
         }
