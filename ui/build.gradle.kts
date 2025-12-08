@@ -37,7 +37,7 @@ dependencies {
     implementation(project(":player"))
     implementation(project(":core:designsystem"))
     implementation(project(":core:common"))
-    implementation(project(":data"))
+
 
     // Hilt
     implementation(libs.hilt.android)

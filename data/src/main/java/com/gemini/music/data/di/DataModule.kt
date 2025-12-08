@@ -27,4 +27,9 @@ abstract class DataModule {
     abstract fun bindWaveformRepository(
         waveformRepositoryImpl: com.gemini.music.data.repository.WaveformRepositoryImpl
     ): com.gemini.music.domain.repository.WaveformRepository
+
+    @Binds
+    abstract fun bindUserPreferencesRepository(
+        userPreferencesRepositoryImpl: com.gemini.music.data.repository.UserPreferencesRepositoryImpl
+    ): com.gemini.music.domain.repository.UserPreferencesRepository
 }

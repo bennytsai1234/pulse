@@ -59,7 +59,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.gemini.music.data.repository.UserPreferencesRepository
+import com.gemini.music.domain.repository.UserPreferencesRepository
 import com.gemini.music.core.common.util.StorageUtils
 import androidx.compose.ui.res.stringResource
 import com.gemini.music.ui.R

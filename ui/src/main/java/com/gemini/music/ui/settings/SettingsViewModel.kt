@@ -2,7 +2,7 @@ package com.gemini.music.ui.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.gemini.music.data.repository.UserPreferencesRepository
+import com.gemini.music.domain.repository.UserPreferencesRepository
 import com.gemini.music.domain.repository.MusicRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
