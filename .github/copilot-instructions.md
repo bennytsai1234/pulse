@@ -39,26 +39,36 @@
 *   **分支策略**: 應採用 Git Flow 或 GitHub Flow 等主流分支策略。
 
 
-### **第三章：專案架構規範 (Project Architecture)**
+### **第三章：通用專案架構規範 (Generic Project Architecture)**
 
-本專案採用 **Clean Architecture** 與 **Modularization** (模組化) 設計。為確保架構的一致性，各模組皆有其專屬的行為準則 (`gemini.md`)，請務必遵守。
+本專案建議採用 **Clean Architecture** 與 **Modularization** (模組化) 設計。以下為通用的分層建議：
 
-#### **§1 模組職責**
-*   **[Domain Layer](domain/gemini.md)**: 核心業務邏輯，不依賴 Android (Pure Kotlin)。定義所有 Entities 與 Repository Interfaces。
-*   **[Data Layer](data/gemini.md)**: 資料實作層 (Room, Retrofit, Datastore)。實作 Repository Interfaces。
-*   **[UI Layer](ui/gemini.md)**: 使用者介面 (Compose, ViewModel)。僅透過 UseCases 與 Domain 互動。
-*   **[Player Layer](player/gemini.md)**: 媒體播放實作 (Media3)。實作 `MusicController` 介面。
+#### **§1 模組職責 (Module Responsibilities)**
+*   **Domain Layer** (Pure Kotlin): 
+    *   核心業務邏輯。
+    *   定義 Entities (資料模型) 與 Repository Interfaces (介面)。
+    *   不應依賴 Android Framework。
+*   **Data Layer** (Android/Kotlin): 
+    *   負責資料實作 (Repository Implementation)。
+    *   管理資料來源 (API, Database, Preferences)。
+    *   實作 Domain 層定義的介面。
+*   **UI Layer** (Compose/Android View): 
+    *   負責使用者介面與互動。
+    *   使用 ViewModel 管理狀態 (State) 與事件 (Event)。
+    *   僅透過 UseCases 與 Domain 層互動。
+*   **Feature Modules** (Optional): 
+    *   針對特定功能 (如 Player, Camera, Chat) 建立獨立模組，實作 Domain 層定義的相關介面。
 
 #### **§2 依賴關係 (Dependency Graph)**
 ```mermaid
 graph TD
     UI --> Domain
     Data --> Domain
-    Player --> Domain
+    Feature[Feature Modules] --> Domain
     UI --x Data
-    UI --x Player
+    UI --x Feature
 ```
-Ui 模組嚴禁直接依賴 Data 模組。
+*   **Rule**: UI 層嚴禁直接依賴 Data 層。所有資料存取必須透過 Domain 層。
 
 ---
 ---
