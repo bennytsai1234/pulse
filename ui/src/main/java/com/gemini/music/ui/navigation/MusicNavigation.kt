@@ -13,6 +13,19 @@ import com.gemini.music.ui.search.SearchScreen
 import com.gemini.music.ui.settings.SettingsScreen
 import com.gemini.music.ui.albums.AlbumsScreen
 
+/**
+ * Safe popBackStack that checks if we can actually navigate back
+ * Prevents crashes and black screens from rapid double-tapping back
+ */
+fun NavHostController.safePopBackStack(): Boolean {
+    return if (this.currentBackStackEntry != null && 
+               this.previousBackStackEntry != null) {
+        this.popBackStack()
+    } else {
+        false
+    }
+}
+
 sealed class Screen(val route: String) {
     data object Home : Screen("home")
     data object NowPlaying : Screen("now_playing")
@@ -60,27 +73,27 @@ fun MusicNavigation(navController: NavHostController) {
         }
         composable(Screen.Settings.route) {
             SettingsScreen(
-                onBackClick = { navController.popBackStack() }
+                onBackClick = { navController.safePopBackStack() }
             )
         }
         composable(Screen.Search.route) {
             SearchScreen(
-                onBackClick = { navController.popBackStack() }
+                onBackClick = { navController.safePopBackStack() }
             )
         }
         composable(Screen.Queue.route) {
             com.gemini.music.ui.queue.QueueScreen(
-                onBackClick = { navController.popBackStack() }
+                onBackClick = { navController.safePopBackStack() }
             )
         }
         composable(Screen.Favorites.route) {
             com.gemini.music.ui.favorites.FavoritesScreen(
-                onBackClick = { navController.popBackStack() }
+                onBackClick = { navController.safePopBackStack() }
             )
         }
         composable(Screen.Albums.route) {
             AlbumsScreen(
-                onBackClick = { navController.popBackStack() },
+                onBackClick = { navController.safePopBackStack() },
                 onAlbumClick = { albumId ->
                      navController.navigate(Screen.AlbumDetail.createRoute(albumId))
                 }
@@ -91,7 +104,7 @@ fun MusicNavigation(navController: NavHostController) {
             arguments = listOf(navArgument(Screen.AlbumDetail.albumIdArg) { type = NavType.LongType })
         ) {
             AlbumDetailScreen(
-                onBackClick = { navController.popBackStack() },
+                onBackClick = { navController.safePopBackStack() },
                 onSongClick = { _ -> 
                     // Just play, don't navigate
                 }
@@ -99,7 +112,7 @@ fun MusicNavigation(navController: NavHostController) {
         }
         composable(Screen.PlaylistList.route) {
             com.gemini.music.ui.playlist.list.PlaylistListScreen(
-                onBackClick = { navController.popBackStack() },
+                onBackClick = { navController.safePopBackStack() },
                 onPlaylistClick = { id: Long ->
                     navController.navigate(Screen.PlaylistDetail.createRoute(id))
                 }
@@ -110,7 +123,7 @@ fun MusicNavigation(navController: NavHostController) {
             arguments = listOf(navArgument(Screen.PlaylistDetail.playlistIdArg) { type = NavType.LongType })
         ) {
             com.gemini.music.ui.playlist.detail.PlaylistDetailScreen(
-                onBackClick = { navController.popBackStack() }
+                onBackClick = { navController.safePopBackStack() }
             )
         }
     }
