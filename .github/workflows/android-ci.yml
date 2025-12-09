@@ -1,0 +1,109 @@
+name: Android CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  build-and-test:
+    name: Build & Test
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Cache Gradle packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      # ===== Domain Layer Tests (Pure Kotlin) =====
+      - name: Run Domain Layer Tests
+        run: ./gradlew :domain:test --no-daemon
+
+      # ===== Data Layer Tests (Robolectric) =====
+      - name: Run Data Layer Tests
+        run: ./gradlew :data:testDebugUnitTest --no-daemon
+
+      # ===== UI Layer Tests (ViewModel) =====
+      - name: Run UI Layer Tests
+        run: ./gradlew :ui:testDebugUnitTest --no-daemon
+
+      # ===== Build Debug APK =====
+      - name: Build Debug APK
+        run: ./gradlew :app:assembleDebug --no-daemon
+
+      # ===== Upload Test Reports =====
+      - name: Upload Domain Test Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: domain-test-report
+          path: domain/build/reports/tests/
+
+      - name: Upload Data Test Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: data-test-report
+          path: data/build/reports/tests/
+
+      - name: Upload UI Test Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ui-test-report
+          path: ui/build/reports/tests/
+
+      # ===== Upload APK =====
+      - name: Upload Debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: debug-apk
+          path: app/build/outputs/apk/debug/app-debug.apk
+
+  lint:
+    name: Lint Check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Run Lint
+        run: ./gradlew lint --no-daemon
+
+      - name: Upload Lint Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lint-report
+          path: app/build/reports/lint-results-debug.html
