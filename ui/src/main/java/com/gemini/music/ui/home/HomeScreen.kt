@@ -165,7 +165,16 @@ fun HomeScreen(
                     icon = { Icon(Icons.Rounded.Favorite, null) },
                     modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
                 )
-                // Add more items...
+                NavigationDrawerItem(
+                    label = { Text("Recently Added") },
+                    selected = false,
+                    onClick = {
+                        // TODO: Navigate to Recently Added screen or show in drawer
+                        scope.launch { drawerState.close() }
+                    },
+                    icon = { Icon(Icons.Rounded.Folder, null) },
+                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+                )
                 // Add more items...
                 Spacer(Modifier.height(24.dp))
                 NavigationDrawerItem(
@@ -213,13 +222,7 @@ fun HomeScreen(
                 }
 
                 Column {
-                    // Recently Added
-                    if (uiState.recentlyAdded.isNotEmpty() && !uiState.isSelectionMode) {
-                        RecentlyAddedRow(
-                            songs = uiState.recentlyAdded,
-                            onSongClick = { song -> viewModel.playSong(song) }
-                        )
-                    }
+                    // Removed RecentlyAdded from main view - now in drawer menu
 
                     // Second Row: Controls
                     ControlRow(
@@ -286,15 +289,20 @@ fun HomeTopBar(
     onDelete: () -> Unit,
     onPlaySelected: () -> Unit
 ) {
-    CenterAlignedTopAppBar(
-        title = {
-            Text(
-                text = if (isSelectionMode) stringResource(com.gemini.music.ui.R.string.selected_count, selectedCount) else stringResource(com.gemini.music.ui.R.string.songs),
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold
-            )
-        },
-        navigationIcon = {
+    // Use compact TopAppBar by setting smaller height
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(48.dp),
+        color = MaterialTheme.colorScheme.background
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 4.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Navigation Icon
             if (isSelectionMode) {
                 IconButton(onClick = onCloseSelection) {
                     Icon(Icons.Rounded.Close, contentDescription = "Close")
@@ -304,8 +312,16 @@ fun HomeTopBar(
                     Icon(Icons.Rounded.Menu, contentDescription = "Menu")
                 }
             }
-        },
-        actions = {
+            
+            // Title
+            Text(
+                text = if (isSelectionMode) stringResource(com.gemini.music.ui.R.string.selected_count, selectedCount) else stringResource(com.gemini.music.ui.R.string.songs),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.weight(1f)
+            )
+            
+            // Actions
             if (isSelectionMode) {
                 IconButton(onClick = onPlaySelected) {
                     Icon(Icons.Rounded.PlayArrow, contentDescription = "Play")
@@ -324,12 +340,8 @@ fun HomeTopBar(
                     Icon(Icons.Rounded.Search, contentDescription = "Search")
                 }
             }
-        },
-        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-            containerColor = MaterialTheme.colorScheme.background,
-            titleContentColor = MaterialTheme.colorScheme.onBackground
-        )
-    )
+        }
+    }
 }
 
 @Composable
@@ -459,31 +471,44 @@ fun FastScroller(
     songs: List<Song>,
     modifier: Modifier = Modifier
 ) {
-    // A simple implementation: A-Z chars
-    val alphabet = ('A'..'Z').toList()
     val scope = rememberCoroutineScope()
+    
+    // Get available letters from songs
+    val availableLetters = remember(songs) {
+        songs.mapNotNull { song ->
+            song.title.firstOrNull()?.uppercaseChar()?.takeIf { it.isLetter() }
+        }.distinct().sorted()
+    }
+    
+    // If no letters available, don't show scroller
+    if (availableLetters.isEmpty()) return
     
     Column(
         modifier = modifier
-            .width(32.dp)
+            .width(24.dp)
             .fillMaxHeight()
-            .padding(vertical = 32.dp)
-            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f), RoundedCornerShape(topStart = 16.dp, bottomStart = 16.dp)),
+            .padding(top = 8.dp, bottom = 8.dp, end = 4.dp)
+            .background(
+                MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f), 
+                RoundedCornerShape(12.dp)
+            ),
         verticalArrangement = Arrangement.SpaceEvenly,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        alphabet.forEach { char ->
+        availableLetters.forEach { char ->
             Text(
                 text = char.toString(),
                 style = MaterialTheme.typography.labelSmall,
-                fontSize = 11.sp,
+                fontSize = if (availableLetters.size > 20) 9.sp else 10.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                fontWeight = FontWeight.Bold,
+                fontWeight = FontWeight.Medium,
                 modifier = Modifier
-                    .padding(2.dp)
+                    .padding(vertical = 1.dp)
                     .clickable {
                         // Find index of first song starting with this char
-                        val index = songs.indexOfFirst { it.title.startsWith(char, ignoreCase = true) }
+                        val index = songs.indexOfFirst { 
+                            it.title.firstOrNull()?.uppercaseChar() == char 
+                        }
                         if (index != -1) {
                             scope.launch { listState.scrollToItem(index) }
                         }
