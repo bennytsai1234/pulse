@@ -72,4 +72,20 @@ dependencies {
     
     // SplashScreen
     implementation(libs.androidx.core.splashscreen)
+
+    // ===== Testing Dependencies =====
+    // JUnit
+    testImplementation("junit:junit:4.13.2")
+
+    // MockK for mocking
+    testImplementation("io.mockk:mockk:1.13.10")
+
+    // Coroutines Test
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+
+    // Turbine for Flow testing
+    testImplementation("app.cash.turbine:turbine:1.1.0")
+
+    // AndroidX Arch Testing (for InstantTaskExecutorRule)
+    testImplementation("androidx.arch.core:core-testing:2.2.0")
 }

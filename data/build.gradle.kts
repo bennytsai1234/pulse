@@ -52,4 +52,27 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter.gson)
     implementation(libs.okhttp.logging)
+
+    // ===== Testing Dependencies =====
+    // JUnit
+    testImplementation("junit:junit:4.13.2")
+
+    // Robolectric for Android unit tests
+    testImplementation("org.robolectric:robolectric:4.11.1")
+
+    // Room Testing
+    testImplementation("androidx.room:room-testing:2.6.1")
+
+    // AndroidX Test Core
+    testImplementation("androidx.test:core-ktx:1.5.0")
+    testImplementation("androidx.arch.core:core-testing:2.2.0")
+
+    // MockK for mocking
+    testImplementation("io.mockk:mockk:1.13.10")
+
+    // Coroutines Test
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+
+    // Turbine for Flow testing
+    testImplementation("app.cash.turbine:turbine:1.1.0")
 }
