@@ -110,6 +110,9 @@ fun HomeScreen(
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val listState = rememberLazyListState()
+    
+    // State for expanding Recently Added in drawer
+    var isRecentlyAddedExpanded by remember { androidx.compose.runtime.mutableStateOf(false) }
 
     // Trigger scan when screen is first composed
     androidx.compose.runtime.LaunchedEffect(Unit) {
@@ -165,17 +168,98 @@ fun HomeScreen(
                     icon = { Icon(Icons.Rounded.Favorite, null) },
                     modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
                 )
+                
+                // Recently Added - Expandable Section
                 NavigationDrawerItem(
-                    label = { Text("Recently Added") },
-                    selected = false,
-                    onClick = {
-                        // TODO: Navigate to Recently Added screen or show in drawer
-                        scope.launch { drawerState.close() }
+                    label = { 
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text("Recently Added")
+                            if (uiState.recentlyAdded.isNotEmpty()) {
+                                Text(
+                                    "(${uiState.recentlyAdded.size})",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
                     },
-                    icon = { Icon(Icons.Rounded.Folder, null) },
+                    selected = isRecentlyAddedExpanded,
+                    onClick = { isRecentlyAddedExpanded = !isRecentlyAddedExpanded },
+                    icon = { 
+                        Icon(
+                            if (isRecentlyAddedExpanded) Icons.Rounded.Folder else Icons.Rounded.Folder, 
+                            null
+                        ) 
+                    },
                     modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
                 )
-                // Add more items...
+                
+                // Show Recently Added songs when expanded
+                AnimatedVisibility(
+                    visible = isRecentlyAddedExpanded && uiState.recentlyAdded.isNotEmpty()
+                ) {
+                    Column(
+                        modifier = Modifier.padding(start = 32.dp)
+                    ) {
+                        uiState.recentlyAdded.take(5).forEach { song ->
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        viewModel.playSong(song)
+                                        scope.launch { drawerState.close() }
+                                    }
+                                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                // Album art
+                                Card(
+                                    shape = RoundedCornerShape(4.dp),
+                                    modifier = Modifier.size(40.dp)
+                                ) {
+                                    AsyncImage(
+                                        model = ImageRequest.Builder(LocalContext.current)
+                                            .data(song.albumArtUri)
+                                            .crossfade(true)
+                                            .build(),
+                                        contentDescription = null,
+                                        contentScale = ContentScale.Crop,
+                                        modifier = Modifier.fillMaxSize()
+                                    )
+                                }
+                                Spacer(Modifier.width(12.dp))
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        text = song.title,
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis
+                                    )
+                                    Text(
+                                        text = song.artist,
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis
+                                    )
+                                }
+                            }
+                        }
+                        if (uiState.recentlyAdded.size > 5) {
+                            Text(
+                                text = "+${uiState.recentlyAdded.size - 5} more",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                            )
+                        }
+                    }
+                }
+                
                 Spacer(Modifier.height(24.dp))
                 NavigationDrawerItem(
                     label = { Text(stringResource(com.gemini.music.ui.R.string.settings)) },
