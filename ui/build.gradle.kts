@@ -34,7 +34,8 @@ android {
 
 dependencies {
     implementation(project(":domain"))
-    implementation(project(":player"))
+    // NOTE: UI 不應直接依賴 :player 模組 (Clean Architecture)
+    // MusicController 介面定義在 :domain，實作透過 Hilt 在 :app 層級注入
     implementation(project(":core:designsystem"))
     implementation(project(":core:common"))
 
