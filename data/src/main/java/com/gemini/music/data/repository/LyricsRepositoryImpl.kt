@@ -37,7 +37,8 @@ class LyricsRepositoryImpl @Inject constructor(
             // 優先使用同步歌詞
             val lyricsText = response.syncedLyrics ?: response.plainLyrics
             if (!lyricsText.isNullOrBlank()) {
-                // TODO: 這裡可以考慮緩存歌詞到本地文件
+                // Cache lyrics to local file
+                saveLyricsToLocal(song.dataPath, lyricsText)
                 return@withContext LrcParser.parse(lyricsText)
             }
         } catch (e: Exception) {
@@ -63,5 +64,20 @@ class LyricsRepositoryImpl @Inject constructor(
             e.printStackTrace()
         }
         return emptyList()
+    }
+
+    private fun saveLyricsToLocal(audioPath: String, lyricsContent: String) {
+        try {
+            val audioFile = File(audioPath)
+            val parentDir = audioFile.parentFile ?: return
+            val nameWithoutExtension = audioFile.nameWithoutExtension
+            val lrcFile = File(parentDir, "$nameWithoutExtension.lrc")
+
+            if (!lrcFile.exists()) {
+                lrcFile.writeText(lyricsContent)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 }
