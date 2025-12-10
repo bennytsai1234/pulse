@@ -53,6 +53,7 @@ class HomeViewModel @Inject constructor(
     private val scanLocalMusicUseCase: ScanLocalMusicUseCase,
     private val playSongUseCase: PlaySongUseCase,
     private val toggleShuffleUseCase: ToggleShuffleUseCase,
+    private val deleteSongUseCase: com.gemini.music.domain.usecase.DeleteSongUseCase,
     private val musicRepository: MusicRepository // Direct Access for Playlist MVP
 ) : ViewModel() {
 
@@ -61,6 +62,10 @@ class HomeViewModel @Inject constructor(
     private val _selectedSongIds = MutableStateFlow<Set<Long>>(emptySet())
     private val _sortOption = MutableStateFlow(SortOption.TITLE)
     private val _showAddToPlaylistDialog = MutableStateFlow(false)
+    
+    // Error Handling for Deletion (Android 10+)
+    private val _recoverableAction = MutableStateFlow<android.app.RecoverableSecurityException?>(null)
+    val recoverableAction: StateFlow<android.app.RecoverableSecurityException?> = _recoverableAction.asStateFlow()
 
     // Group Data Flows
     private val _dataFlow = combine(
@@ -249,8 +254,42 @@ class HomeViewModel @Inject constructor(
     }
     
     fun deleteSelected() {
-        // TODO: Implement deletion logic with SAF
-        exitSelectionMode()
+        viewModelScope.launch {
+             val selectedIds = _selectedSongIds.value
+             val songsToDelete = uiState.value.songs.filter { it.id in selectedIds }
+             
+             // Process sequentially to handle permissions one by one (though ideally batching is better but harder with RecoverableSecurityException loop)
+             // For simplicity, we try to delete all. If one fails with RecoverableSecurityException, we stop and ask user.
+             // User will have to retry deletion.
+             
+             songsToDelete.forEach { song ->
+                 try {
+                     deleteSongUseCase(song)
+                     // If success, remove from selection so we don't try to delete again on retry
+                     toggleSongSelection(song.id)
+                 } catch (e: android.app.RecoverableSecurityException) {
+                     // Pause and ask for permission
+                     _recoverableAction.value = e
+                     return@launch // Stop processing to handle this one
+                 } catch (e: Exception) {
+                     e.printStackTrace()
+                     // Ignore other errors or show toast?
+                 }
+             }
+             
+             if (_selectedSongIds.value.isEmpty()) {
+                 exitSelectionMode()
+             }
+        }
+    }
+    
+    fun handleRecoverableAction(resultCode: Int) {
+        // If result is OK, user granted permission.
+        // We could retry the deletion here.
+        // For now, we clear the exception so UI can reset.
+        _recoverableAction.value = null
+        // Ideally we would retry the last failed operation. 
+        // Simplest UX: User clicks delete again.
     }
 
     // --- Sorting ---

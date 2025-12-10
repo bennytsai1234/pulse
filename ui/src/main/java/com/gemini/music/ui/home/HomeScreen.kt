@@ -100,6 +100,9 @@ import com.gemini.music.ui.component.EmptyState
 import com.gemini.music.ui.component.SongListItem
 import kotlinx.coroutines.launch
 import androidx.compose.ui.res.stringResource
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.IntentSenderRequest
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -113,12 +116,27 @@ fun HomeScreen(
     onFavoritesClick: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val recoverableAction by viewModel.recoverableAction.collectAsState()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val listState = rememberLazyListState()
     
     // State for expanding Recently Added in drawer
     var isRecentlyAddedExpanded by remember { androidx.compose.runtime.mutableStateOf(false) }
+
+    // Launcher for Android 10+ deletion permission
+    val intentSenderLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartIntentSenderForResult()
+    ) { result ->
+        viewModel.handleRecoverableAction(result.resultCode)
+    }
+
+    androidx.compose.runtime.LaunchedEffect(recoverableAction) {
+        recoverableAction?.let { exception ->
+            val intentSenderRequest = IntentSenderRequest.Builder(exception.userAction.actionIntent.intentSender).build()
+            intentSenderLauncher.launch(intentSenderRequest)
+        }
+    }
 
     // Trigger scan when screen is first composed
     androidx.compose.runtime.LaunchedEffect(Unit) {

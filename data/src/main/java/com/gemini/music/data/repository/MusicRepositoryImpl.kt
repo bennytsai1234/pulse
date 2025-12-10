@@ -175,16 +175,20 @@ class MusicRepositoryImpl @Inject constructor(
     }
 
     override suspend fun toggleFavorite(songId: Long) {
-        // Collect first, then decide. 
-        // Note: collect is a suspend function. But isFavorite returns a Flow. 
-        // Ideally we check existence and then insert/delete.
-        // Or simpler: DAO has no toggle. We check flow.first().
-        
         val isFav = favoriteDao.isFavorite(songId).first()
         if (isFav) {
             favoriteDao.removeFavorite(songId)
         } else {
             favoriteDao.addFavorite(com.gemini.music.data.database.FavoriteEntity(songId))
         }
+    }
+
+    override suspend fun deleteSong(song: Song) {
+        // 1. Delete from Storage (MediaStore)
+        // This might throw RecoverableSecurityException which should be handled by UI
+        localAudioSource.deleteSong(song)
+        
+        // 2. If successful (no exception), delete from local DB
+        songDao.deleteSong(id = song.id)
     }
 }

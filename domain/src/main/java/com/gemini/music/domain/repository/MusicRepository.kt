@@ -51,4 +51,7 @@ interface MusicRepository {
     fun getFavoriteSongs(): Flow<List<Song>>
     fun isSongFavorite(songId: Long): Flow<Boolean>
     suspend fun toggleFavorite(songId: Long)
+
+    // --- File Management ---
+    suspend fun deleteSong(song: Song)
 }

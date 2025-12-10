@@ -110,4 +110,17 @@ class LocalAudioSource @Inject constructor(
         }
         return@withContext songs
     }
+
+    suspend fun deleteSong(song: Song) = withContext(Dispatchers.IO) {
+        try {
+            val uri = android.net.Uri.parse(song.contentUri)
+            context.contentResolver.delete(uri, null, null)
+        } catch (e: SecurityException) {
+            // Re-throw so the UI layer can handle RecoverableSecurityException on Android 10+
+            throw e
+        } catch (e: Exception) {
+            e.printStackTrace()
+            throw e
+        }
+    }
 }
