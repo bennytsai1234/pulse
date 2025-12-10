@@ -1,6 +1,8 @@
 package com.gemini.music.data.repository
 
 import com.gemini.music.core.common.parser.LrcParser
+import com.gemini.music.data.database.LyricsDao
+import com.gemini.music.data.database.LyricsEntity
 import com.gemini.music.data.network.LrcLibApi
 import com.gemini.music.domain.model.LyricLine
 import com.gemini.music.domain.model.Song
@@ -13,15 +15,22 @@ import javax.inject.Singleton
 
 @Singleton
 class LyricsRepositoryImpl @Inject constructor(
-    private val lrcLibApi: LrcLibApi
+    private val lrcLibApi: LrcLibApi,
+    private val lyricsDao: LyricsDao
 ) : LyricsRepository {
 
     override suspend fun getLyrics(song: Song): List<LyricLine> = withContext(Dispatchers.IO) {
-        // 1. 本地查找
+        // 1. 本地 .lrc 檔案查找 (最高優先級)
         val localLyrics = getLocalLyrics(song.dataPath)
         if (localLyrics.isNotEmpty()) return@withContext localLyrics
 
-        // 2. 網絡查找
+        // 2. Room 資料庫快取查找
+        val cachedLyrics = lyricsDao.getLyrics(song.id)
+        if (cachedLyrics != null) {
+            return@withContext LrcParser.parse(cachedLyrics.lyricsContent)
+        }
+
+        // 3. 網絡查找
         try {
             val durationSeconds = (song.duration / 1000).toInt()
             // LrcLib API requires duration between 1 and 3600 seconds.
@@ -36,9 +45,21 @@ class LyricsRepositoryImpl @Inject constructor(
 
             // 優先使用同步歌詞
             val lyricsText = response.syncedLyrics ?: response.plainLyrics
+            val isSynced = response.syncedLyrics != null
+            
             if (!lyricsText.isNullOrBlank()) {
-                // Cache lyrics to local file
+                // Cache to Room database (always reliable)
+                lyricsDao.insertLyrics(
+                    LyricsEntity(
+                        songId = song.id,
+                        lyricsContent = lyricsText,
+                        isSynced = isSynced
+                    )
+                )
+                
+                // Also try to save to local .lrc file (may fail due to permissions)
                 saveLyricsToLocal(song.dataPath, lyricsText)
+                
                 return@withContext LrcParser.parse(lyricsText)
             }
         } catch (e: Exception) {
@@ -77,7 +98,9 @@ class LyricsRepositoryImpl @Inject constructor(
                 lrcFile.writeText(lyricsContent)
             }
         } catch (e: Exception) {
+            // Silently fail - Room cache is the fallback
             e.printStackTrace()
         }
     }
 }
+
