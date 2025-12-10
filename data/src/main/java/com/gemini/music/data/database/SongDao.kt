@@ -36,4 +36,7 @@ interface SongDao {
         clearAll()
         insertAll(songs)
     }
+
+    @Query("DELETE FROM songs WHERE id = :id")
+    suspend fun deleteSong(id: Long)
 }
