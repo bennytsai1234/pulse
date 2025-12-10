@@ -30,7 +30,7 @@ class GetPlaybackProgressUseCase @Inject constructor(
                      emit(current.toFloat() / duration.toFloat())
                  }
             }
-            delay(1000L) // Update every second
+            delay(50L) // Update every 50ms (20fps) for smoother UI
         }
     }
 }
