@@ -1,5 +1,6 @@
 package com.gemini.music.ui.main
 
+import android.graphics.Bitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gemini.music.domain.model.MusicState
@@ -9,9 +10,12 @@ import com.gemini.music.domain.usecase.PlayQueueItemUseCase
 import com.gemini.music.domain.usecase.RemoveQueueItemUseCase
 import com.gemini.music.domain.usecase.TogglePlayPauseUseCase
 import com.gemini.music.domain.usecase.GetSongWaveformUseCase
+import com.gemini.music.ui.theme.DynamicThemeState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -35,8 +39,12 @@ class MainViewModel @Inject constructor(
             initialValue = 0f
         )
 
-    private val _waveform = kotlinx.coroutines.flow.MutableStateFlow<List<Float>>(emptyList())
-    val waveform: StateFlow<List<Float>> = _waveform
+    private val _waveform = MutableStateFlow<List<Float>>(emptyList())
+    val waveform: StateFlow<List<Float>> = _waveform.asStateFlow()
+
+    // Dynamic Theme State - 全局動態主題
+    private val _dynamicThemeState = MutableStateFlow(DynamicThemeState())
+    val dynamicThemeState: StateFlow<DynamicThemeState> = _dynamicThemeState.asStateFlow()
 
     private var currentSongDataPath: String? = null
 
@@ -59,6 +67,15 @@ class MainViewModel @Inject constructor(
         }
     }
 
+    /**
+     * 更新動態主題顏色 - 從專輯封面 Bitmap 提取
+     */
+    fun updateDynamicTheme(bitmap: Bitmap?) {
+        viewModelScope.launch {
+            _dynamicThemeState.value.extractColorsFromBitmap(bitmap)
+        }
+    }
+
     fun togglePlayPause() {
         togglePlayPauseUseCase()
     }
@@ -71,3 +88,4 @@ class MainViewModel @Inject constructor(
         removeQueueItemUseCase(index)
     }
 }
+

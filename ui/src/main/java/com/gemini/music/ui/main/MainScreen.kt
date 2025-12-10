@@ -50,6 +50,8 @@ fun MainScreen(
     val progress by viewModel.progress.collectAsState()
 
 
+    val dynamicThemeState by viewModel.dynamicThemeState.collectAsState()
+
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
     
     // Hide mini player on Settings, Search, and Queue
@@ -101,6 +103,7 @@ fun MainScreen(
                             song = musicState.currentSong,
                             isPlaying = musicState.isPlaying,
                             progress = progress,
+                            dynamicTheme = dynamicThemeState,
                             onPlayPauseClick = { viewModel.togglePlayPause() },
                             onQueueClick = { 
                                 // Navigate to Queue

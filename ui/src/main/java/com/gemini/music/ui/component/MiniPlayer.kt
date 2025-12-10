@@ -1,5 +1,7 @@
 package com.gemini.music.ui.component
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
@@ -27,9 +29,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -39,6 +43,8 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.gemini.music.domain.model.Song
+import com.gemini.music.ui.theme.DynamicThemeState
+import com.gemini.music.ui.theme.animatedColors
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -46,12 +52,29 @@ fun MiniPlayer(
     song: Song?,
     isPlaying: Boolean,
     progress: Float,
+    dynamicTheme: DynamicThemeState? = null,
     onPlayPauseClick: () -> Unit,
     onQueueClick: () -> Unit,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val isClickable = song != null
+    
+    // Get animated dynamic colors if available
+    val animatedColors = dynamicTheme?.animatedColors()
+    
+    // Animated background color
+    val backgroundColor by animateColorAsState(
+        targetValue = animatedColors?.surface ?: MaterialTheme.colorScheme.surfaceVariant,
+        animationSpec = tween(durationMillis = 500),
+        label = "MiniPlayerBg"
+    )
+    
+    val accentColor by animateColorAsState(
+        targetValue = animatedColors?.accent ?: MaterialTheme.colorScheme.primary,
+        animationSpec = tween(durationMillis = 500),
+        label = "MiniPlayerAccent"
+    )
 
     // Drawer/Sheet Style Container
     Surface(
@@ -59,7 +82,7 @@ fun MiniPlayer(
             .fillMaxWidth()
             .height(72.dp) // Standard height
             .clickable(enabled = isClickable, onClick = onClick),
-        color = MaterialTheme.colorScheme.surfaceVariant, // Uses our defined dark gray
+        color = backgroundColor,
         contentColor = MaterialTheme.colorScheme.onSurface,
         tonalElevation = 8.dp, // Higher elevation for drawer feel
         shadowElevation = 8.dp,
@@ -72,6 +95,7 @@ fun MiniPlayer(
                 song = song,
                 isPlaying = isPlaying,
                 progress = progress,
+                accentColor = accentColor,
                 onPlayPauseClick = onPlayPauseClick,
                 onQueueClick = onQueueClick
             )
@@ -104,14 +128,14 @@ private fun EmptyMiniPlayer() {
             verticalArrangement = Arrangement.Center
         ) {
             Text(
-                text = androidx.compose.ui.res.stringResource(com.gemini.music.ui.R.string.mini_player_no_music), // Placeholder text
+                text = androidx.compose.ui.res.stringResource(com.gemini.music.ui.R.string.mini_player_no_music),
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.SemiBold,
                 maxLines = 1,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Text(
-                text = androidx.compose.ui.res.stringResource(com.gemini.music.ui.R.string.mini_player_select_song), // Placeholder text
+                text = androidx.compose.ui.res.stringResource(com.gemini.music.ui.R.string.mini_player_select_song),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,
@@ -125,7 +149,7 @@ private fun EmptyMiniPlayer() {
                 imageVector = Icons.AutoMirrored.Rounded.QueueMusic,
                 contentDescription = "Queue (disabled)",
                 modifier = Modifier.size(24.dp),
-                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f) // Greyed out
+                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
             )
         }
 
@@ -135,7 +159,7 @@ private fun EmptyMiniPlayer() {
                 imageVector = Icons.Rounded.PlayArrow,
                 contentDescription = "Play (disabled)",
                 modifier = Modifier.size(32.dp),
-                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f) // Greyed out
+                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
             )
         }
     }
@@ -147,6 +171,7 @@ private fun FullMiniPlayer(
     song: Song,
     isPlaying: Boolean,
     progress: Float,
+    accentColor: Color,
     onPlayPauseClick: () -> Unit,
     onQueueClick: () -> Unit
 ) {
@@ -167,7 +192,7 @@ private fun FullMiniPlayer(
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .size(48.dp)
-                    .clip(RoundedCornerShape(12.dp)) // Match outer curve logic
+                    .clip(RoundedCornerShape(12.dp))
                     .background(MaterialTheme.colorScheme.surfaceVariant)
             )
 
@@ -204,25 +229,25 @@ private fun FullMiniPlayer(
                 )
             }
 
-            // Play/Pause Button
+            // Play/Pause Button - uses dynamic accent color
             IconButton(onClick = onPlayPauseClick) {
                 Icon(
                     imageVector = if (isPlaying) Icons.Rounded.Pause else Icons.Rounded.PlayArrow,
                     contentDescription = if (isPlaying) "Pause" else "Play",
                     modifier = Modifier.size(32.dp),
-                    tint = MaterialTheme.colorScheme.primary
+                    tint = accentColor
                 )
             }
         }
 
-        // Progress Bar (Bottom)
+        // Progress Bar (Bottom) - uses dynamic accent color
         LinearProgressIndicator(
             progress = { progress },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(2.dp)
                 .align(Alignment.BottomCenter),
-            color = MaterialTheme.colorScheme.primary,
+            color = accentColor,
             trackColor = Color.Transparent,
         )
     }
