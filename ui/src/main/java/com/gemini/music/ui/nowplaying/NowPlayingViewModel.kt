@@ -7,8 +7,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.palette.graphics.Palette
 import com.gemini.music.domain.model.LyricLine
+import com.gemini.music.domain.model.Playlist
 import com.gemini.music.domain.model.RepeatMode
 import com.gemini.music.domain.model.Song
+import com.gemini.music.domain.repository.MusicRepository
 import com.gemini.music.domain.usecase.CycleRepeatModeUseCase
 import com.gemini.music.domain.usecase.FormattedPlaybackState
 import com.gemini.music.domain.usecase.GetFormattedPlaybackStateUseCase
@@ -51,7 +53,8 @@ data class NowPlayingUiState(
     val shuffleModeEnabled: Boolean = false,
     val repeatMode: RepeatMode = RepeatMode.OFF,
     val queue: List<Song> = emptyList(),
-    val isFavorite: Boolean = false
+    val isFavorite: Boolean = false,
+    val playlists: List<Playlist> = emptyList()
 )
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -70,7 +73,8 @@ class NowPlayingViewModel @Inject constructor(
     private val removeQueueItemUseCase: RemoveQueueItemUseCase,
     private val getSongWaveformUseCase: com.gemini.music.domain.usecase.GetSongWaveformUseCase,
     private val toggleFavoriteUseCase: com.gemini.music.domain.usecase.favorites.ToggleFavoriteUseCase,
-    private val isSongFavoriteUseCase: com.gemini.music.domain.usecase.favorites.IsSongFavoriteUseCase
+    private val isSongFavoriteUseCase: com.gemini.music.domain.usecase.favorites.IsSongFavoriteUseCase,
+    private val musicRepository: MusicRepository
 ) : ViewModel() {
 
     private val _paletteColors = MutableStateFlow(listOf(Color(0xFF1E1E1E), Color.Black))
@@ -127,11 +131,15 @@ class NowPlayingViewModel @Inject constructor(
         formattedPlaybackStateFlow,
         _paletteColors,
         _onPaletteColor,
-        combine(lyricsFlow, waveformFlow, isFavoriteFlow) { lyrics, waveform, isFavorite -> 
-            Triple(lyrics, waveform, isFavorite) 
+        combine(lyricsFlow, waveformFlow, isFavoriteFlow, musicRepository.getPlaylists()) { lyrics, waveform, isFavorite, playlists -> 
+            object {
+                val lyrics = lyrics
+                val waveform = waveform
+                val isFavorite = isFavorite
+                val playlists = playlists
+            }
         }
     ) { state, formattedState, palette, onPalette, supplemental ->
-        val (lyrics, waveform, isFavorite) = supplemental
         NowPlayingUiState(
             song = state.currentSong,
             isPlaying = state.isPlaying,
@@ -142,9 +150,10 @@ class NowPlayingViewModel @Inject constructor(
             currentTime = formattedState.currentTime,
             totalTime = formattedState.totalTime,
             currentLyricIndex = formattedState.currentLyricIndex,
-            lyrics = lyrics,
-            waveform = waveform,
-            isFavorite = isFavorite,
+            lyrics = supplemental.lyrics,
+            waveform = supplemental.waveform,
+            isFavorite = supplemental.isFavorite,
+            playlists = supplemental.playlists,
             backgroundColor = palette.firstOrNull() ?: Color(0xFF1E1E1E),
             gradientColors = palette,
             onBackgroundColor = onPalette
@@ -172,6 +181,23 @@ class NowPlayingViewModel @Inject constructor(
                 if (song != null) {
                     viewModelScope.launch {
                         toggleFavoriteUseCase(song.id)
+                    }
+                }
+            }
+            is NowPlayingEvent.AddToPlaylist -> {
+                val song = uiState.value.song
+                if (song != null) {
+                    viewModelScope.launch {
+                        musicRepository.addSongToPlaylist(event.playlistId, song.id)
+                    }
+                }
+            }
+            is NowPlayingEvent.CreatePlaylistAndAdd -> {
+                val song = uiState.value.song
+                if (song != null) {
+                    viewModelScope.launch {
+                        val newId = musicRepository.createPlaylist(event.name)
+                        musicRepository.addSongToPlaylist(newId, song.id)
                     }
                 }
             }
@@ -209,4 +235,6 @@ sealed class NowPlayingEvent {
     data class UpdatePalette(val bitmap: Bitmap?) : NowPlayingEvent()
     data class PlayQueueItem(val index: Int) : NowPlayingEvent()
     data class RemoveFromQueue(val index: Int) : NowPlayingEvent()
+    data class AddToPlaylist(val playlistId: Long) : NowPlayingEvent()
+    data class CreatePlaylistAndAdd(val name: String) : NowPlayingEvent()
 }

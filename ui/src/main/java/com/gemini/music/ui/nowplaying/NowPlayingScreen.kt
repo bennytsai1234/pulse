@@ -84,6 +84,7 @@ import coil.request.ImageRequest
 import coil.request.SuccessResult
 import com.gemini.music.domain.model.LyricLine
 import com.gemini.music.domain.model.RepeatMode
+import com.gemini.music.ui.component.AddToPlaylistDialog
 import com.gemini.music.ui.component.WaveformSeekBar
 
 import androidx.compose.material.icons.automirrored.rounded.QueueMusic
@@ -100,6 +101,8 @@ fun NowPlayingScreen(
     var showLyrics by remember { mutableStateOf(false) }
 
     var showMoreOptions by remember { mutableStateOf(false) }
+    
+    var showAddToPlaylist by remember { mutableStateOf(false) }
 
     if (showMoreOptions) {
         ModalBottomSheet(
@@ -127,7 +130,7 @@ fun NowPlayingScreen(
                         .fillMaxWidth()
                         .clickable { 
                             showMoreOptions = false
-                            // TODO: Trigger Add to Playlist Dialog
+                            showAddToPlaylist = true
                         }
                         .padding(horizontal = 24.dp, vertical = 12.dp),
                     verticalAlignment = Alignment.CenterVertically
@@ -165,6 +168,21 @@ fun NowPlayingScreen(
                 Spacer(modifier = Modifier.height(32.dp))
             }
         }
+    }
+
+    if (showAddToPlaylist) {
+        AddToPlaylistDialog(
+            playlists = uiState.playlists,
+            onDismiss = { showAddToPlaylist = false },
+            onPlaylistSelected = { playlist ->
+                viewModel.onEvent(NowPlayingEvent.AddToPlaylist(playlist.id))
+                showAddToPlaylist = false
+            },
+            onCreateNewPlaylist = { name ->
+                viewModel.onEvent(NowPlayingEvent.CreatePlaylistAndAdd(name))
+                showAddToPlaylist = false
+            }
+        )
     }
 
     val startColor by animateColorAsState(
