@@ -17,7 +17,8 @@ import javax.inject.Inject
 class QueueViewModel @Inject constructor(
     getMusicStateUseCase: GetMusicStateUseCase,
     private val playQueueItemUseCase: PlayQueueItemUseCase,
-    private val removeQueueItemUseCase: RemoveQueueItemUseCase
+    private val removeQueueItemUseCase: RemoveQueueItemUseCase,
+    private val moveQueueItemUseCase: com.gemini.music.domain.usecase.MoveQueueItemUseCase
 ) : ViewModel() {
 
     val uiState: StateFlow<QueueUiState> = getMusicStateUseCase()
@@ -40,6 +41,10 @@ class QueueViewModel @Inject constructor(
 
     fun removeItem(index: Int) {
         removeQueueItemUseCase(index)
+    }
+
+    fun moveItem(from: Int, to: Int) {
+        moveQueueItemUseCase(from, to)
     }
 }
 
