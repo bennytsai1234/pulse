@@ -86,6 +86,7 @@ import com.gemini.music.domain.model.LyricLine
 import com.gemini.music.domain.model.RepeatMode
 import com.gemini.music.ui.component.AddToPlaylistDialog
 import com.gemini.music.ui.component.WaveformSeekBar
+import com.gemini.music.ui.component.KaraokeLyrics
 
 import androidx.compose.material.icons.automirrored.rounded.QueueMusic
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
@@ -269,17 +270,16 @@ fun NowPlayingScreen(
                     .fillMaxWidth()
             ) { isLyrics ->
                 if (isLyrics) {
-                    LyricsView(
+                    // Use KaraokeLyrics for enhanced word-by-word highlighting
+                    val currentPositionMs = ((uiState.song?.duration ?: 0L) * uiState.progress).toLong()
+                    KaraokeLyrics(
                         lyrics = uiState.lyrics,
-                        currentIndex = uiState.currentLyricIndex,
-                        onTap = { showLyrics = false },
-                        onSeek = { timestamp ->
-                             val duration = uiState.song?.duration ?: 1L
-                             if (duration > 0) {
-                                 val progress = timestamp.toFloat() / duration.toFloat()
-                                 viewModel.onEvent(NowPlayingEvent.SeekTo(progress))
-                             }
-                        }
+                        currentPosition = currentPositionMs,
+                        highlightColor = uiState.backgroundColor,
+                        normalColor = Color.White.copy(alpha = 0.5f),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .clickable { showLyrics = false }
                     )
                 } else {
                     HeroImage(

@@ -44,6 +44,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.gemini.music.domain.model.Album
+import com.gemini.music.ui.component.SharedAlbumCover
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -124,23 +125,15 @@ fun AlbumCard(
                 .fillMaxWidth()
                 .padding(12.dp)
         ) {
-            Box(
+            // Use SharedAlbumCover for shared element transition
+            SharedAlbumCover(
+                albumId = album.id,
+                artUri = album.artUri,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .aspectRatio(1f)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(MaterialTheme.colorScheme.surface)
-            ) {
-                AsyncImage(
-                    model = ImageRequest.Builder(LocalContext.current)
-                        .data(album.artUri)
-                        .crossfade(true)
-                        .build(),
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize()
-                )
-            }
+                    .aspectRatio(1f),
+                cornerRadius = 12.dp
+            )
             
             Spacer(modifier = Modifier.height(12.dp))
             
@@ -162,3 +155,4 @@ fun AlbumCard(
         }
     }
 }
+

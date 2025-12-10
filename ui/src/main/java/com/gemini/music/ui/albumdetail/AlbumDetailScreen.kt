@@ -125,17 +125,12 @@ fun AlbumDetailHeader(
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        AsyncImage(
-            model = ImageRequest.Builder(LocalContext.current)
-                .data(album.artUri)
-                .crossfade(true)
-                .build(),
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .size(200.dp)
-                .clip(RoundedCornerShape(12.dp))
-                .background(MaterialTheme.colorScheme.surfaceVariant)
+        // Use SharedAlbumCover for shared element transition
+        com.gemini.music.ui.component.SharedAlbumCover(
+            albumId = album.id,
+            artUri = album.artUri,
+            modifier = Modifier.size(200.dp),
+            cornerRadius = 12.dp
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
