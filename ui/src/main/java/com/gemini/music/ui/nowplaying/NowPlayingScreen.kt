@@ -43,6 +43,10 @@ import androidx.compose.material.icons.rounded.RepeatOne
 import androidx.compose.material.icons.rounded.Shuffle
 import androidx.compose.material.icons.rounded.SkipNext
 import androidx.compose.material.icons.rounded.SkipPrevious
+import androidx.compose.material.icons.rounded.Album
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -84,6 +88,7 @@ import com.gemini.music.ui.component.WaveformSeekBar
 
 import androidx.compose.material.icons.automirrored.rounded.QueueMusic
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NowPlayingScreen(
     onBackClick: () -> Unit,
@@ -93,6 +98,74 @@ fun NowPlayingScreen(
     val uiState by viewModel.uiState.collectAsState()
     
     var showLyrics by remember { mutableStateOf(false) }
+
+    var showMoreOptions by remember { mutableStateOf(false) }
+
+    if (showMoreOptions) {
+        ModalBottomSheet(
+            onDismissRequest = { showMoreOptions = false },
+            sheetState = rememberModalBottomSheetState(),
+            containerColor = Color(0xFF1E1E1E),
+            contentColor = Color.White
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Text(
+                    text = "Options",
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp),
+                    color = Color.White.copy(alpha = 0.5f)
+                )
+                
+                // Add to Playlist
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { 
+                            showMoreOptions = false
+                            // TODO: Trigger Add to Playlist Dialog
+                        }
+                        .padding(horizontal = 24.dp, vertical = 12.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Rounded.QueueMusic,
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Spacer(modifier = Modifier.size(16.dp))
+                    Text(text = "Add to Playlist", style = MaterialTheme.typography.bodyLarge)
+                }
+
+                // Go to Album (Mock)
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { 
+                            showMoreOptions = false
+                        }
+                        .padding(horizontal = 24.dp, vertical = 12.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = androidx.compose.material.icons.Icons.Rounded.Album,
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Spacer(modifier = Modifier.size(16.dp))
+                    Text(text = "Go to Album", style = MaterialTheme.typography.bodyLarge)
+                }
+                
+                Spacer(modifier = Modifier.height(32.dp))
+            }
+        }
+    }
 
     val startColor by animateColorAsState(
         targetValue = uiState.gradientColors.getOrElse(0) { Color(0xFF1E1E1E) },
@@ -150,7 +223,7 @@ fun NowPlayingScreen(
                 onBackClick = onBackClick,
                 onQueueClick = onQueueClick,
                 onLyricsClick = { showLyrics = !showLyrics },
-                onMoreClick = { /* TODO */ },
+                onMoreClick = { showMoreOptions = true },
                 isLyricsVisible = showLyrics,
                 modifier = Modifier.statusBarsPadding()
             )
