@@ -94,6 +94,7 @@ import androidx.compose.material.icons.automirrored.rounded.QueueMusic
 fun NowPlayingScreen(
     onBackClick: () -> Unit,
     onQueueClick: () -> Unit,
+    onAlbumClick: (albumId: Long) -> Unit = {},
     viewModel: NowPlayingViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -145,18 +146,21 @@ fun NowPlayingScreen(
                     Text(text = "Add to Playlist", style = MaterialTheme.typography.bodyLarge)
                 }
 
-                // Go to Album (Mock)
+                // Go to Album
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable { 
                             showMoreOptions = false
+                            uiState.song?.albumId?.let { albumId ->
+                                onAlbumClick(albumId)
+                            }
                         }
                         .padding(horizontal = 24.dp, vertical = 12.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
-                        imageVector = androidx.compose.material.icons.Icons.Rounded.Album,
+                        imageVector = Icons.Rounded.Album,
                         contentDescription = null,
                         tint = Color.White,
                         modifier = Modifier.size(24.dp)

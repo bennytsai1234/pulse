@@ -125,6 +125,10 @@ fun MainScreen(
                                 // Better to collapse or just navigate on top.
                                 // If we navigate, BackHandler of Navigation takes over.
                                 navController.navigate(Screen.Queue.route)
+                            },
+                            onAlbumClick = { albumId ->
+                                scope.launch { sheetState.animateTo(PlayerSheetValue.Collapsed) }
+                                navController.navigate(Screen.AlbumDetail.createRoute(albumId))
                             }
                         )
                     }
