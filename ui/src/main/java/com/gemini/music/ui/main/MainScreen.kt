@@ -61,7 +61,7 @@ fun MainScreen(
     Scaffold(
         modifier = Modifier.fillMaxSize(),
     ) { innerPadding ->
-        BoxWithConstraints(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
+        BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
             val availableHeight = maxHeight
             val sheetAnchors = remember(availableHeight, density) {
                 DraggableAnchors {
@@ -90,7 +90,9 @@ fun MainScreen(
                 }
             }
 
-            MusicNavigation(navController = navController)
+            Box(modifier = Modifier.padding(innerPadding)) {
+                MusicNavigation(navController = navController)
+            }
 
             if (isPlayerVisible) {
                 Spacer(modifier = Modifier.height(72.dp).align(Alignment.BottomStart).fillMaxWidth())
