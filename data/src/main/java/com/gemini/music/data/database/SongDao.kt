@@ -14,6 +14,9 @@ interface SongDao {
 
     @Query("SELECT * FROM songs WHERE id = :id")
     fun getSong(id: Long): Flow<SongEntity?>
+    
+    @Query("SELECT * FROM songs WHERE id = :id")
+    suspend fun getSongSync(id: Long): SongEntity?
 
     @Query("SELECT * FROM songs WHERE title LIKE '%' || :query || '%' OR artist LIKE '%' || :query || '%'")
     fun searchSongs(query: String): Flow<List<SongEntity>>
@@ -26,6 +29,9 @@ interface SongDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(songs: List<SongEntity>)
+    
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertSong(song: SongEntity)
 
     @Query("DELETE FROM songs")
     suspend fun clearAll()
@@ -40,3 +46,4 @@ interface SongDao {
     @Query("DELETE FROM songs WHERE id = :id")
     suspend fun deleteSong(id: Long)
 }
+

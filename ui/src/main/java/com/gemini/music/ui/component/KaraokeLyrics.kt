@@ -50,12 +50,24 @@ import com.gemini.music.domain.model.LyricWord
 fun KaraokeLyrics(
     lyrics: List<LyricLine>,
     currentPosition: Long,
+    isLoading: Boolean = false,
+    hasError: Boolean = false,
+    onRetry: () -> Unit = {},
     highlightColor: Color = MaterialTheme.colorScheme.primary,
     normalColor: Color = Color.White.copy(alpha = 0.5f),
     modifier: Modifier = Modifier
 ) {
+    if (isLoading) {
+        LoadingLyricsView(modifier)
+        return
+    }
+    
     if (lyrics.isEmpty()) {
-        EmptyLyricsView(modifier)
+        EmptyLyricsView(
+            modifier = modifier,
+            hasError = hasError,
+            onRetry = onRetry
+        )
         return
     }
 
@@ -270,7 +282,11 @@ private fun StandardLyricLine(
 }
 
 @Composable
-private fun EmptyLyricsView(modifier: Modifier = Modifier) {
+private fun EmptyLyricsView(
+    modifier: Modifier = Modifier,
+    hasError: Boolean = false,
+    onRetry: () -> Unit = {}
+) {
     Box(
         modifier = modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
@@ -286,8 +302,41 @@ private fun EmptyLyricsView(modifier: Modifier = Modifier) {
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = "No lyrics available",
+                text = if (hasError) "Failed to load lyrics" else "No lyrics available",
                 style = MaterialTheme.typography.bodyLarge,
+                color = Color.White.copy(alpha = 0.5f)
+            )
+            if (hasError) {
+                Spacer(modifier = Modifier.height(16.dp))
+                androidx.compose.material3.TextButton(onClick = onRetry) {
+                    Text(
+                        text = "Tap to Retry",
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun LoadingLyricsView(modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            androidx.compose.material3.CircularProgressIndicator(
+                color = Color.White.copy(alpha = 0.5f),
+                modifier = Modifier.padding(16.dp)
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "Loading lyrics...",
+                style = MaterialTheme.typography.bodyMedium,
                 color = Color.White.copy(alpha = 0.5f)
             )
         }

@@ -5,11 +5,13 @@ import com.gemini.music.data.database.SongDao
 import com.gemini.music.data.database.asDomainModel
 import com.gemini.music.data.database.asEntity
 import com.gemini.music.data.source.LocalAudioSource
+import com.gemini.music.data.source.TagEditorSource
 import com.gemini.music.domain.model.Album
 import com.gemini.music.domain.model.Artist
 import com.gemini.music.domain.model.Playlist
 import com.gemini.music.domain.model.ScanStatus
 import com.gemini.music.domain.model.Song
+import com.gemini.music.domain.model.SongTags
 import com.gemini.music.domain.repository.MusicRepository
 import com.gemini.music.domain.repository.UserPreferencesRepository
 import kotlinx.coroutines.Dispatchers
@@ -18,10 +20,12 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class MusicRepositoryImpl @Inject constructor(
     private val localAudioSource: LocalAudioSource,
+    private val tagEditorSource: TagEditorSource,
     private val songDao: SongDao,
     private val playlistDao: PlaylistDao,
     private val favoriteDao: com.gemini.music.data.database.FavoriteDao,
@@ -211,5 +215,31 @@ class MusicRepositoryImpl @Inject constructor(
         
         // 2. If successful (no exception), delete from local DB
         songDao.deleteSong(id = song.id)
+    }
+    
+    // --- Tag Editing Implementation ---
+    
+    override suspend fun getSongTags(songId: Long): SongTags? = withContext(Dispatchers.IO) {
+        val song = songDao.getSongSync(songId)
+        song?.let { tagEditorSource.readTags(it.dataPath, songId) }
+    }
+    
+    override suspend fun updateSongTags(tags: SongTags): Boolean = withContext(Dispatchers.IO) {
+        val success = tagEditorSource.writeTags(tags)
+        if (success) {
+            // Update the database with the new tags
+            val existingSong = songDao.getSongSync(tags.songId)
+            existingSong?.let {
+                val updatedEntity = it.copy(
+                    title = tags.title,
+                    artist = tags.artist,
+                    album = tags.album,
+                    year = tags.year.toIntOrNull() ?: 0,
+                    trackNumber = tags.trackNumber.toIntOrNull() ?: 0
+                )
+                songDao.insertSong(updatedEntity)
+            }
+        }
+        success
     }
 }

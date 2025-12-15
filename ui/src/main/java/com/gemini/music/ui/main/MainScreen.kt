@@ -142,6 +142,10 @@ fun MainScreen(
                                 scope.launch { sheetState.animateTo(PlayerSheetValue.Collapsed) }
                                 navController.navigate(Screen.Equalizer.createRoute(0))
                             },
+                            onEditTagsClick = { songId ->
+                                scope.launch { sheetState.animateTo(PlayerSheetValue.Collapsed) }
+                                navController.navigate(Screen.TagEditor.createRoute(songId))
+                            },
                             onArtworkLoaded = { bitmap ->
                                 viewModel.updateDynamicTheme(bitmap)
                             }

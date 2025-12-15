@@ -23,6 +23,11 @@ import com.gemini.music.ui.nowplaying.NowPlayingScreen
 import com.gemini.music.ui.search.SearchScreen
 import com.gemini.music.ui.settings.SettingsScreen
 import com.gemini.music.ui.albums.AlbumsScreen
+import com.gemini.music.ui.stats.StatsScreen
+import com.gemini.music.ui.settings.PlaybackSettingsScreen
+import com.gemini.music.ui.folder.FolderBrowserScreen
+import com.gemini.music.ui.discover.DiscoverScreen
+import com.gemini.music.ui.lyrics.LyricsEditorScreen
 
 /**
  * Safe popBackStack that checks if we can actually navigate back
@@ -73,6 +78,18 @@ sealed class Screen(val route: String) {
     data object ArtistDetail : Screen("artist_detail/{artistName}") {
         const val artistNameArg = "artistName"
         fun createRoute(artistName: String) = "artist_detail/${java.net.URLEncoder.encode(artistName, "UTF-8")}"
+    }
+    data object TagEditor : Screen("tag_editor/{songId}") {
+        const val songIdArg = "songId"
+        fun createRoute(songId: Long) = "tag_editor/$songId"
+    }
+    data object Stats : Screen("stats")
+    data object PlaybackSettings : Screen("playback_settings")
+    data object Folders : Screen("folders")
+    data object Discover : Screen("discover")
+    data object LyricsEditor : Screen("lyrics_editor/{songId}") {
+        const val songIdArg = "songId"
+        fun createRoute(songId: Long) = "lyrics_editor/$songId"
     }
 }
 
@@ -130,6 +147,15 @@ fun MusicNavigation(navController: NavHostController) {
                             },
                             onFavoritesClick = {
                                 navController.navigate(Screen.Favorites.route)
+                            },
+                            onDiscoverClick = {
+                                navController.navigate(Screen.Discover.route)
+                            },
+                            onStatsClick = {
+                                navController.navigate(Screen.Stats.route)
+                            },
+                            onFoldersClick = {
+                                navController.navigate(Screen.Folders.route)
                             }
                         )
                     }
@@ -236,7 +262,66 @@ fun MusicNavigation(navController: NavHostController) {
                         )
                     }
                 }
+                composable(
+                    route = Screen.TagEditor.route,
+                    arguments = listOf(navArgument(Screen.TagEditor.songIdArg) { type = NavType.LongType })
+                ) {
+                    CompositionLocalProvider(LocalAnimatedContentScope provides this) {
+                        com.gemini.music.ui.tageditor.TagEditorScreen(
+                            onNavigateBack = { navController.safePopBackStack() }
+                        )
+                    }
+                }
+                
+                // Stats Screen
+                composable(route = Screen.Stats.route) {
+                    CompositionLocalProvider(LocalAnimatedContentScope provides this) {
+                        StatsScreen(
+                            onBackClick = { navController.safePopBackStack() }
+                        )
+                    }
+                }
+                
+                // Playback Settings Screen
+                composable(route = Screen.PlaybackSettings.route) {
+                    CompositionLocalProvider(LocalAnimatedContentScope provides this) {
+                        PlaybackSettingsScreen(
+                            onBackClick = { navController.safePopBackStack() }
+                        )
+                    }
+                }
+                
+                // Folder Browser Screen
+                composable(route = Screen.Folders.route) {
+                    CompositionLocalProvider(LocalAnimatedContentScope provides this) {
+                        FolderBrowserScreen(
+                            onBackClick = { navController.safePopBackStack() }
+                        )
+                    }
+                }
+                
+                // Discover Screen (Recommendations)
+                composable(route = Screen.Discover.route) {
+                    CompositionLocalProvider(LocalAnimatedContentScope provides this) {
+                        DiscoverScreen()
+                    }
+                }
+                
+                // Lyrics Editor Screen
+                composable(
+                    route = Screen.LyricsEditor.route,
+                    arguments = listOf(navArgument(Screen.LyricsEditor.songIdArg) { type = NavType.LongType })
+                ) {
+                    CompositionLocalProvider(LocalAnimatedContentScope provides this) {
+                        LyricsEditorScreen(
+                            onBackClick = { navController.safePopBackStack() }
+                        )
+                    }
+                }
             }
         }
     }
 }
+
+
+

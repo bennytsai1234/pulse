@@ -40,9 +40,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.PlaylistAdd
 import androidx.compose.material.icons.automirrored.rounded.Sort
 import androidx.compose.material.icons.rounded.Album
+import androidx.compose.material.icons.rounded.Analytics
 import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Delete
+import androidx.compose.material.icons.rounded.Explore
 import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.FavoriteBorder
 import androidx.compose.material.icons.rounded.Folder
@@ -103,7 +105,10 @@ fun HomeScreen(
     onSearchClick: () -> Unit,
     onPlaylistClick: () -> Unit,
     onAlbumsClick: () -> Unit,
-    onFavoritesClick: () -> Unit
+    onFavoritesClick: () -> Unit,
+    onDiscoverClick: () -> Unit = {},
+    onStatsClick: () -> Unit = {},
+    onFoldersClick: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val recoverableAction by viewModel.recoverableAction.collectAsState()
@@ -190,6 +195,43 @@ fun HomeScreen(
                         onFavoritesClick()
                     },
                     icon = { Icon(Icons.Rounded.Favorite, null) },
+                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+                )
+                
+                Spacer(Modifier.height(12.dp))
+                Text(
+                    "探索",
+                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
+                    style = MaterialTheme.typography.titleSmall
+                )
+                NavigationDrawerItem(
+                    label = { Text("為你推薦") },
+                    selected = false,
+                    onClick = {
+                        scope.launch { drawerState.close() }
+                        onDiscoverClick()
+                    },
+                    icon = { Icon(Icons.Rounded.Explore, null) },
+                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+                )
+                NavigationDrawerItem(
+                    label = { Text("資料夾") },
+                    selected = false,
+                    onClick = {
+                        scope.launch { drawerState.close() }
+                        onFoldersClick()
+                    },
+                    icon = { Icon(Icons.Rounded.Folder, null) },
+                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+                )
+                NavigationDrawerItem(
+                    label = { Text("聆聽統計") },
+                    selected = false,
+                    onClick = {
+                        scope.launch { drawerState.close() }
+                        onStatsClick()
+                    },
+                    icon = { Icon(Icons.Rounded.Analytics, null) },
                     modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
                 )
                 

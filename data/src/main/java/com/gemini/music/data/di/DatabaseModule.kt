@@ -52,4 +52,26 @@ object DatabaseModule {
     fun provideSearchHistoryDao(database: GeminiDatabase): com.gemini.music.data.database.SearchHistoryDao {
         return database.searchHistoryDao()
     }
+    
+    @Provides
+    fun provideCustomEqPresetDao(database: GeminiDatabase): com.gemini.music.data.database.CustomEqPresetDao {
+        return database.customEqPresetDao()
+    }
+    
+    @Provides
+    fun providePlaybackHistoryDao(database: GeminiDatabase): com.gemini.music.data.database.PlaybackHistoryDao {
+        return database.playbackHistoryDao()
+    }
+    
+    @Provides
+    fun provideScrobbleDao(database: GeminiDatabase): com.gemini.music.data.database.ScrobbleDao {
+        return database.scrobbleDao()
+    }
+    
+    @Provides
+    fun provideCustomLyricsDao(database: GeminiDatabase): com.gemini.music.data.database.CustomLyricsDao {
+        return database.customLyricsDao()
+    }
 }
+
+

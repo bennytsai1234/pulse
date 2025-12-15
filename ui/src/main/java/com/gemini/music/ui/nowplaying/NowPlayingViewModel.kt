@@ -48,6 +48,8 @@ data class NowPlayingUiState(
     val gradientColors: List<Color> = listOf(Color(0xFF1E1E1E), Color.Black),
     val onBackgroundColor: Color = Color.White,
     val lyrics: List<LyricLine> = emptyList(),
+    val lyricsLoading: Boolean = false,
+    val lyricsError: Boolean = false,
     val currentLyricIndex: Int = -1,
     val waveform: List<Float> = emptyList(), // Normalized amplitudes
     val shuffleModeEnabled: Boolean = false,
@@ -95,16 +97,30 @@ class NowPlayingViewModel @Inject constructor(
             }
         }
 
-    private val lyricsFlow = musicState.map { it.currentSong }
-        .distinctUntilChanged()
+    private val _lyricsRetryTrigger = MutableStateFlow(0)
+    private data class LyricsResult(
+        val lyrics: List<LyricLine> = emptyList(),
+        val isLoading: Boolean = false,
+        val hasError: Boolean = false
+    )
+    
+    private val lyricsResultFlow = combine(
+        musicState.map { it.currentSong }.distinctUntilChanged(),
+        _lyricsRetryTrigger
+    ) { song, _ -> song }
         .flatMapLatest { song ->
             if (song != null) {
-                // Fetch lyrics asynchronously
                 kotlinx.coroutines.flow.flow {
-                     emit(getLyricsUseCase(song))
+                    emit(LyricsResult(isLoading = true))
+                    try {
+                        val result = getLyricsUseCase(song)
+                        emit(LyricsResult(lyrics = result, hasError = result.isEmpty()))
+                    } catch (e: Exception) {
+                        emit(LyricsResult(hasError = true))
+                    }
                 }
             } else {
-                flowOf(emptyList())
+                flowOf(LyricsResult())
             }
         }
     
@@ -124,7 +140,7 @@ class NowPlayingViewModel @Inject constructor(
              }
         }
 
-    private val formattedPlaybackStateFlow: StateFlow<FormattedPlaybackState> = lyricsFlow.flatMapLatest { lyrics ->
+    private val formattedPlaybackStateFlow: StateFlow<FormattedPlaybackState> = lyricsResultFlow.map { it.lyrics }.flatMapLatest { lyrics ->
         getFormattedPlaybackStateUseCase(lyrics)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), FormattedPlaybackState())
 
@@ -133,9 +149,9 @@ class NowPlayingViewModel @Inject constructor(
         formattedPlaybackStateFlow,
         _paletteColors,
         _onPaletteColor,
-        combine(lyricsFlow, waveformFlow, isFavoriteFlow, musicRepository.getPlaylists()) { lyrics, waveform, isFavorite, playlists -> 
+        combine(lyricsResultFlow, waveformFlow, isFavoriteFlow, musicRepository.getPlaylists()) { lyricsResult, waveform, isFavorite, playlists -> 
             object {
-                val lyrics = lyrics
+                val lyricsResult = lyricsResult
                 val waveform = waveform
                 val isFavorite = isFavorite
                 val playlists = playlists
@@ -152,7 +168,9 @@ class NowPlayingViewModel @Inject constructor(
             currentTime = formattedState.currentTime,
             totalTime = formattedState.totalTime,
             currentLyricIndex = formattedState.currentLyricIndex,
-            lyrics = supplemental.lyrics,
+            lyrics = supplemental.lyricsResult.lyrics,
+            lyricsLoading = supplemental.lyricsResult.isLoading,
+            lyricsError = supplemental.lyricsResult.hasError && supplemental.lyricsResult.lyrics.isEmpty(),
             waveform = supplemental.waveform,
             isFavorite = supplemental.isFavorite,
             playlists = supplemental.playlists,
@@ -229,6 +247,9 @@ class NowPlayingViewModel @Inject constructor(
                     cancelSleepTimerUseCase()
                 }
             }
+            is NowPlayingEvent.RetryLoadLyrics -> {
+                _lyricsRetryTrigger.value++
+            }
         }
     }
 
@@ -272,4 +293,5 @@ sealed class NowPlayingEvent {
     data class CreatePlaylistAndAdd(val name: String) : NowPlayingEvent()
     data class SetSleepTimer(val minutes: Int) : NowPlayingEvent()
     data object CancelSleepTimer : NowPlayingEvent()
+    data object RetryLoadLyrics : NowPlayingEvent()
 }

@@ -15,6 +15,8 @@ import androidx.core.content.ContextCompat
 import androidx.navigation.compose.rememberNavController
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.foundation.isSystemInDarkTheme
 import com.gemini.music.domain.repository.UserPreferencesRepository
 import com.gemini.music.core.designsystem.GeminiTheme
@@ -24,18 +26,31 @@ import javax.inject.Inject
 
 import androidx.activity.enableEdgeToEdge
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     @Inject
     lateinit var userPreferencesRepository: UserPreferencesRepository
+    
+    // Observable permission state for the UI
+    private val _permissionGranted = MutableStateFlow(false)
+    val permissionGranted: StateFlow<Boolean> = _permissionGranted.asStateFlow()
 
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
-        // Handle permissions
-        // Optional: Trigger UI update or VM scan
+        val allGranted = permissions.values.all { it }
+        _permissionGranted.value = allGranted
+        
+        if (allGranted) {
+            // Permission granted - trigger rescan via broadcast or event
+            sendBroadcast(android.content.Intent("com.gemini.music.action.PERMISSION_GRANTED"))
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,11 +60,16 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         
-        checkPermissions()
+        // Initial permission check
+        _permissionGranted.value = hasRequiredPermissions()
+        if (!_permissionGranted.value) {
+            requestPermissions()
+        }
 
         setContent {
             val themeMode by userPreferencesRepository.themeMode.collectAsState(initial = UserPreferencesRepository.THEME_SYSTEM)
             val isSystemDark = isSystemInDarkTheme()
+            val hasPermission by permissionGranted.collectAsState()
             
             val darkTheme = when (themeMode) {
                  UserPreferencesRepository.THEME_LIGHT -> false
@@ -59,13 +79,40 @@ class MainActivity : AppCompatActivity() {
 
             GeminiTheme(darkTheme = darkTheme) {
                 Surface(modifier = Modifier.fillMaxSize()) {
-                    MainScreen()
+                    if (hasPermission) {
+                        MainScreen()
+                    } else {
+                        PermissionRequiredScreen(
+                            onRequestPermission = { requestPermissions() }
+                        )
+                    }
                 }
             }
         }
     }
+    
+    override fun onResume() {
+        super.onResume()
+        // Check if permissions were revoked while app was in background
+        val currentlyGranted = hasRequiredPermissions()
+        if (_permissionGranted.value && !currentlyGranted) {
+            // Permission was revoked!
+            _permissionGranted.value = false
+        } else if (!_permissionGranted.value && currentlyGranted) {
+            // Permission was granted outside the app (Settings)
+            _permissionGranted.value = true
+        }
+    }
+    
+    private fun hasRequiredPermissions(): Boolean {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_AUDIO) == PackageManager.PERMISSION_GRANTED
+        } else {
+            ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+        }
+    }
 
-    private fun checkPermissions() {
+    private fun requestPermissions() {
         val permissions = mutableListOf<String>()
         
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {

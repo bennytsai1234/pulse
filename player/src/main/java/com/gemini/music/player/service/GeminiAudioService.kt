@@ -7,7 +7,9 @@ import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.session.LibraryResult
 import androidx.media3.session.MediaLibraryService
+import androidx.media3.session.MediaLibraryService.LibraryParams
 import androidx.media3.session.MediaSession
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -72,6 +74,79 @@ class GeminiAudioService : MediaLibraryService() {
             }
             return super.onCustomCommand(session, controller, customCommand, args)
         }
+        
+        // ==================== Android Auto 媒體瀏覽支援 ====================
+        
+        override fun onGetLibraryRoot(
+            session: MediaLibrarySession,
+            browser: MediaSession.ControllerInfo,
+            params: LibraryParams?
+        ): com.google.common.util.concurrent.ListenableFuture<LibraryResult<androidx.media3.common.MediaItem>> {
+            // Root item for Android Auto browsing
+            val rootItem = androidx.media3.common.MediaItem.Builder()
+                .setMediaId(MEDIA_ROOT_ID)
+                .setMediaMetadata(
+                    androidx.media3.common.MediaMetadata.Builder()
+                        .setIsBrowsable(true)
+                        .setIsPlayable(false)
+                        .setMediaType(androidx.media3.common.MediaMetadata.MEDIA_TYPE_FOLDER_MIXED)
+                        .setTitle("Gemini Music")
+                        .build()
+                )
+                .build()
+            return com.google.common.util.concurrent.Futures.immediateFuture(
+                LibraryResult.ofItem(rootItem, params)
+            )
+        }
+
+        override fun onGetChildren(
+            session: MediaLibrarySession,
+            browser: MediaSession.ControllerInfo,
+            parentId: String,
+            page: Int,
+            pageSize: Int,
+            params: LibraryParams?
+        ): com.google.common.util.concurrent.ListenableFuture<LibraryResult<com.google.common.collect.ImmutableList<androidx.media3.common.MediaItem>>> {
+            val children = when (parentId) {
+                MEDIA_ROOT_ID -> {
+                    // Top-level categories for Android Auto
+                    listOf(
+                        buildBrowsableMediaItem(MEDIA_RECENT_ID, "Recently Played", androidx.media3.common.MediaMetadata.MEDIA_TYPE_FOLDER_PLAYLISTS),
+                        buildBrowsableMediaItem(MEDIA_ALL_SONGS_ID, "All Songs", androidx.media3.common.MediaMetadata.MEDIA_TYPE_FOLDER_ALBUMS),
+                        buildBrowsableMediaItem(MEDIA_ALBUMS_ID, "Albums", androidx.media3.common.MediaMetadata.MEDIA_TYPE_FOLDER_ALBUMS),
+                        buildBrowsableMediaItem(MEDIA_ARTISTS_ID, "Artists", androidx.media3.common.MediaMetadata.MEDIA_TYPE_FOLDER_ARTISTS)
+                    )
+                }
+                // TODO: Implement actual content loading from MusicRepository
+                // For now, return empty for sub-categories until we inject repository
+                else -> emptyList()
+            }
+            return com.google.common.util.concurrent.Futures.immediateFuture(
+                LibraryResult.ofItemList(children, params)
+            )
+        }
+        
+        private fun buildBrowsableMediaItem(id: String, title: String, mediaType: Int): androidx.media3.common.MediaItem {
+            return androidx.media3.common.MediaItem.Builder()
+                .setMediaId(id)
+                .setMediaMetadata(
+                    androidx.media3.common.MediaMetadata.Builder()
+                        .setIsBrowsable(true)
+                        .setIsPlayable(false)
+                        .setMediaType(mediaType)
+                        .setTitle(title)
+                        .build()
+                )
+                .build()
+        }
+    }
+    
+    companion object {
+        const val MEDIA_ROOT_ID = "gemini_root"
+        const val MEDIA_RECENT_ID = "recent"
+        const val MEDIA_ALL_SONGS_ID = "all_songs"
+        const val MEDIA_ALBUMS_ID = "albums"
+        const val MEDIA_ARTISTS_ID = "artists"
     }
 
     private fun startSleepTimer(minutes: Int) {

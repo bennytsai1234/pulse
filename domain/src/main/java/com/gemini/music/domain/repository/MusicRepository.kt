@@ -5,6 +5,7 @@ import com.gemini.music.domain.model.Artist
 import com.gemini.music.domain.model.Playlist
 import com.gemini.music.domain.model.ScanStatus
 import com.gemini.music.domain.model.Song
+import com.gemini.music.domain.model.SongTags
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -55,4 +56,9 @@ interface MusicRepository {
 
     // --- File Management ---
     suspend fun deleteSong(song: Song)
+    
+    // --- Tag Editing ---
+    suspend fun getSongTags(songId: Long): SongTags?
+    suspend fun updateSongTags(tags: SongTags): Boolean
 }
+

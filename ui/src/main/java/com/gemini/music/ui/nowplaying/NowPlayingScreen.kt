@@ -36,6 +36,7 @@ import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.FavoriteBorder
 import androidx.compose.material.icons.rounded.KeyboardArrowDown
 import androidx.compose.material.icons.rounded.Description
+import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.material.icons.rounded.Pause
 import androidx.compose.material.icons.rounded.PlayArrow
@@ -126,6 +127,7 @@ fun NowPlayingScreen(
     onQueueClick: () -> Unit,
     onAlbumClick: (albumId: Long) -> Unit = {},
     onInternalEqualizerClick: () -> Unit = {},
+    onEditTagsClick: (songId: Long) -> Unit = {},
     onArtworkLoaded: (Bitmap?) -> Unit = {},
     viewModel: NowPlayingViewModel = hiltViewModel()
 ) {
@@ -192,6 +194,15 @@ fun NowPlayingScreen(
                     onClick = {
                         showMoreOptions = false
                         showSleepTimer = true
+                    }
+                )
+                
+                OptionItem(
+                    icon = Icons.Rounded.Edit,
+                    text = "Edit Tags",
+                    onClick = {
+                        showMoreOptions = false
+                        uiState.song?.id?.let { onEditTagsClick(it) }
                     }
                 )
                 
@@ -317,6 +328,9 @@ fun NowPlayingScreen(
                     KaraokeLyrics(
                         lyrics = uiState.lyrics,
                         currentPosition = (uiState.progress * (uiState.song?.duration ?: 1L)).toLong(),
+                        isLoading = uiState.lyricsLoading,
+                        hasError = uiState.lyricsError,
+                        onRetry = { viewModel.onEvent(NowPlayingEvent.RetryLoadLyrics) },
                         modifier = Modifier.fillMaxSize()
                     )
                 } else {
