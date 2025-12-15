@@ -23,13 +23,17 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Upload
+import androidx.compose.material.icons.outlined.MusicNote
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -71,6 +75,7 @@ fun LyricsEditorScreen(
     var showImportDialog by remember { mutableStateOf(false) }
     var showOffsetDialog by remember { mutableStateOf(false) }
     var showAddLineDialog by remember { mutableStateOf(false) }
+    var showMoreMenu by remember { mutableStateOf(false) }
     var editingLine by remember { mutableStateOf<EditableLyricLine?>(null) }
     
     // Handle messages
@@ -115,6 +120,38 @@ fun LyricsEditorScreen(
                     if (uiState.hasUnsavedChanges) {
                         IconButton(onClick = { viewModel.saveLyrics() }) {
                             Icon(Icons.Default.Save, contentDescription = "儲存")
+                        }
+                    }
+                    // More options (embed/extract)
+                    Box {
+                        IconButton(onClick = { showMoreMenu = true }) {
+                            Icon(Icons.Default.MusicNote, contentDescription = "更多選項")
+                        }
+                        DropdownMenu(
+                            expanded = showMoreMenu,
+                            onDismissRequest = { showMoreMenu = false }
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text("嵌入歌詞到檔案") },
+                                onClick = {
+                                    viewModel.embedToFile()
+                                    showMoreMenu = false
+                                },
+                                leadingIcon = {
+                                    Icon(Icons.Default.MusicNote, null)
+                                },
+                                enabled = uiState.lyrics != null
+                            )
+                            DropdownMenuItem(
+                                text = { Text("從檔案提取歌詞") },
+                                onClick = {
+                                    viewModel.extractFromFile()
+                                    showMoreMenu = false
+                                },
+                                leadingIcon = {
+                                    Icon(Icons.Outlined.MusicNote, null)
+                                }
+                            )
                         }
                     }
                 }

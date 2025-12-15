@@ -173,9 +173,12 @@
     *   時段推薦 (Time-based Recommendations)
 *   ✅ **探索頁面 (Discover Screen)**: 全新的個人化推薦介面。
 *   ✅ **歌詞編輯器 (Lyrics Editor)**: 離線歌詞編輯、時間戳調整、LRC 匯入/匯出。
-*   ✅ **Scrobbling 基礎架構**: Scrobble 記錄追蹤，為未來 Last.fm 整合做準備。
-*   🔲 **Last.fm 整合**: 連接 Last.fm 帳戶，同步 Scrobble 記錄。
-*   🔲 **歌詞嵌入**: 將編輯後的歌詞嵌入到音訊檔案中。
+*   ✅ **歌詞嵌入/提取**: 將編輯後的歌詞嵌入到音訊檔案 ID3 標籤中，或從檔案中提取嵌入的歌詞。
+*   ✅ **Scrobbling 整合**: 
+    *   播放服務自動記錄 Scrobble（符合 50% 或 4 分鐘標準）。
+    *   Last.fm API 整合架構（認證、Scrobble、Now Playing）。
+    *   待同步 Scrobble 隊列管理。
+*   🔲 **Last.fm 帳戶連接 UI**: 設定頁面中新增 Last.fm 帳戶連接介面。
 
 #### **長期目標 (Long-term)**
 *   **雲端備份與同步 (Cloud Backup)**: 整合 Google Drive，備份播放清單與最愛歌曲設定。

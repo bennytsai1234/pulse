@@ -1,25 +1,50 @@
 package com.gemini.music.data.repository
 
+import android.content.Context
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.preferencesDataStore
 import com.gemini.music.data.database.ScrobbleDao
 import com.gemini.music.data.database.ScrobbleEntity
+import com.gemini.music.data.source.LastFmService
 import com.gemini.music.domain.model.ScrobbleEntry
 import com.gemini.music.domain.model.ScrobbleStatus
 import com.gemini.music.domain.repository.ScrobbleRepository
+import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
+private val Context.lastFmDataStore by preferencesDataStore(name = "lastfm_prefs")
+
 @Singleton
 class ScrobbleRepositoryImpl @Inject constructor(
-    private val scrobbleDao: ScrobbleDao
+    @ApplicationContext private val context: Context,
+    private val scrobbleDao: ScrobbleDao,
+    private val lastFmService: LastFmService
 ) : ScrobbleRepository {
     
-    // TODO: 整合 Last.fm API 後設為 true
+    companion object {
+        private val KEY_SESSION = stringPreferencesKey("lastfm_session_key")
+        private val KEY_USERNAME = stringPreferencesKey("lastfm_username")
+    }
+    
     private val _isExternalServiceConnected = MutableStateFlow(false)
+    
+    init {
+        // Check if session exists on init
+        CoroutineScope(Dispatchers.IO).launch {
+            val session = getStoredSessionKey()
+            _isExternalServiceConnected.value = session != null
+        }
+    }
     
     override fun getScrobbles(): Flow<List<ScrobbleEntry>> {
         return scrobbleDao.getAllScrobbles().map { entities ->
@@ -36,6 +61,25 @@ class ScrobbleRepositoryImpl @Inject constructor(
     override suspend fun recordScrobble(entry: ScrobbleEntry) {
         withContext(Dispatchers.IO) {
             scrobbleDao.insert(entry.toEntity())
+            
+            // 如果已連接 Last.fm，嘗試立即 scrobble
+            val sessionKey = getStoredSessionKey()
+            if (sessionKey != null) {
+                val success = lastFmService.scrobble(
+                    sessionKey = sessionKey,
+                    artist = entry.artist,
+                    track = entry.title,
+                    album = entry.album,
+                    timestamp = entry.timestamp / 1000 // Last.fm uses seconds
+                )
+                if (success) {
+                    scrobbleDao.updateStatus(
+                        listOf(entry.id),
+                        ScrobbleStatus.SCROBBLED.name,
+                        System.currentTimeMillis()
+                    )
+                }
+            }
         }
     }
     
@@ -73,13 +117,78 @@ class ScrobbleRepositoryImpl @Inject constructor(
     }
     
     override suspend fun syncToExternalService(): Int {
-        // TODO: 實作 Last.fm API 整合
-        // 目前返回 0，表示無外部服務連接
-        return 0
+        return withContext(Dispatchers.IO) {
+            val sessionKey = getStoredSessionKey() ?: return@withContext 0
+            
+            val pending = scrobbleDao.getPendingScrobblesSync()
+            var successCount = 0
+            
+            for (entry in pending) {
+                val success = lastFmService.scrobble(
+                    sessionKey = sessionKey,
+                    artist = entry.artist,
+                    track = entry.title,
+                    album = entry.album,
+                    timestamp = entry.timestamp / 1000
+                )
+                if (success) {
+                    scrobbleDao.updateStatus(
+                        listOf(entry.id),
+                        ScrobbleStatus.SCROBBLED.name,
+                        System.currentTimeMillis()
+                    )
+                    successCount++
+                }
+            }
+            
+            successCount
+        }
     }
     
     override fun isExternalServiceConnected(): Flow<Boolean> {
         return _isExternalServiceConnected
+    }
+    
+    // === Last.fm Authentication ===
+    
+    suspend fun getAuthToken(): String? {
+        return lastFmService.getAuthToken()
+    }
+    
+    fun getAuthUrl(token: String): String {
+        return lastFmService.getAuthUrl(token)
+    }
+    
+    suspend fun completeAuthentication(token: String): Boolean {
+        return withContext(Dispatchers.IO) {
+            val session = lastFmService.getSession(token) ?: return@withContext false
+            
+            context.lastFmDataStore.edit { prefs ->
+                prefs[KEY_SESSION] = session.key
+                prefs[KEY_USERNAME] = session.name
+            }
+            
+            _isExternalServiceConnected.value = true
+            true
+        }
+    }
+    
+    suspend fun logout() {
+        withContext(Dispatchers.IO) {
+            context.lastFmDataStore.edit { prefs ->
+                prefs.remove(KEY_SESSION)
+                prefs.remove(KEY_USERNAME)
+            }
+            _isExternalServiceConnected.value = false
+        }
+    }
+    
+    suspend fun getUsername(): String? {
+        return context.lastFmDataStore.data.first()[KEY_USERNAME]
+    }
+    
+    private suspend fun getStoredSessionKey(): String? {
+        return context.lastFmDataStore.data.first()[KEY_SESSION]
     }
     
     // === Mapping Functions ===
@@ -112,3 +221,4 @@ class ScrobbleRepositoryImpl @Inject constructor(
         )
     }
 }
+

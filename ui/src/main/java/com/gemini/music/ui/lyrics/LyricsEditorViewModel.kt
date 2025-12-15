@@ -159,6 +159,49 @@ class LyricsEditorViewModel @Inject constructor(
         }
     }
     
+    /**
+     * 將歌詞嵌入到音訊檔案中
+     */
+    fun embedToFile() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isSaving = true) }
+            val success = lyricsEditRepository.embedLyricsToFile(songId)
+            _uiState.update {
+                it.copy(
+                    isSaving = false,
+                    successMessage = if (success) "歌詞已嵌入到音訊檔案" else null,
+                    error = if (!success) "嵌入歌詞失敗，請確認檔案可寫入" else null
+                )
+            }
+        }
+    }
+    
+    /**
+     * 從音訊檔案中提取嵌入的歌詞
+     */
+    fun extractFromFile() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
+            val extracted = lyricsEditRepository.extractEmbeddedLyrics(songId)
+            if (extracted != null) {
+                lyricsEditRepository.saveLyrics(extracted)
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        successMessage = "已從音訊檔案中提取歌詞"
+                    )
+                }
+            } else {
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        error = "音訊檔案中沒有嵌入的歌詞"
+                    )
+                }
+            }
+        }
+    }
+    
     fun clearMessages() {
         _uiState.update { it.copy(error = null, successMessage = null) }
     }
