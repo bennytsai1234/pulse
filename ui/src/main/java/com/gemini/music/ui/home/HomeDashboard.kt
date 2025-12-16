@@ -13,6 +13,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.QueueMusic
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -168,7 +169,7 @@ private fun DashboardQuickAccess(
     onFoldersClick: () -> Unit
 ) {
     val items = listOf(
-        QuickAccessData(Icons.Rounded.QueueMusic, "播放清單", onPlaylistClick, Color(0xFF6C63FF)),
+        QuickAccessData(Icons.AutoMirrored.Rounded.QueueMusic, "播放清單", onPlaylistClick, Color(0xFF6C63FF)),
         QuickAccessData(Icons.Rounded.Album, "專輯", onAlbumsClick, Color(0xFF00BCD4)),
         QuickAccessData(Icons.Rounded.Favorite, "最愛", onFavoritesClick, Color(0xFFE91E63)),
         QuickAccessData(Icons.Rounded.Explore, "探索", onDiscoverClick, Color(0xFFFF9800)),
@@ -425,31 +426,15 @@ private fun RecentlyAddedCard(
                 .clip(RoundedCornerShape(GeminiCorners.albumArtLarge)),
             contentAlignment = Alignment.Center
         ) {
-            if (song.albumArtUri != null) {
-                AsyncImage(
-                    model = ImageRequest.Builder(context)
-                        .data(song.albumArtUri)
-                        .crossfade(true)
-                        .build(),
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize()
-                )
-            } else {
-                Surface(
-                    color = MaterialTheme.colorScheme.surfaceVariant,
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    Box(contentAlignment = Alignment.Center) {
-                        Icon(
-                            imageVector = Icons.Rounded.MusicNote,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
-                            modifier = Modifier.size(32.dp)
-                        )
-                    }
-                }
-            }
+            AsyncImage(
+                model = ImageRequest.Builder(context)
+                    .data(song.albumArtUri)
+                    .crossfade(true)
+                    .build(),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
+            )
             
             // 播放按鈕覆層
             Box(

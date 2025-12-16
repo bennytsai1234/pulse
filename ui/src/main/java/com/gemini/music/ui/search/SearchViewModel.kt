@@ -101,11 +101,11 @@ class SearchViewModel @Inject constructor(
         }
     }
     
-    fun onAlbumClick(album: Album) {
+    fun onAlbumClick(@Suppress("UNUSED_PARAMETER") album: Album) {
         addToHistory(_searchQuery.value)
     }
 
-    fun onArtistClick(artist: Artist) {
+    fun onArtistClick(@Suppress("UNUSED_PARAMETER") artist: Artist) {
         addToHistory(_searchQuery.value)
     }
     

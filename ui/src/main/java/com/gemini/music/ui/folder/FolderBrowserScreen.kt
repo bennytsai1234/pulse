@@ -33,8 +33,8 @@ import androidx.compose.material.icons.rounded.GridView
 import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material.icons.rounded.MusicNote
 import androidx.compose.material.icons.rounded.Search
-import androidx.compose.material.icons.rounded.Sort
-import androidx.compose.material.icons.rounded.ViewList
+import androidx.compose.material.icons.automirrored.rounded.Sort
+import androidx.compose.material.icons.automirrored.rounded.ViewList
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -76,7 +76,6 @@ import com.gemini.music.domain.model.Song
 fun FolderBrowserScreen(
     onBackClick: () -> Unit,
     onSongClick: (Song) -> Unit = {},
-    onPlayFolder: (String) -> Unit = {},
     viewModel: FolderBrowserViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -120,7 +119,7 @@ fun FolderBrowserScreen(
                     }) {
                         Icon(
                             if (uiState.viewMode == FolderViewMode.GRID)
-                                Icons.Rounded.ViewList
+                                Icons.AutoMirrored.Rounded.ViewList
                             else
                                 Icons.Rounded.GridView,
                             contentDescription = "Toggle View"
@@ -131,7 +130,7 @@ fun FolderBrowserScreen(
                     var showSortMenu by remember { mutableStateOf(false) }
                     Box {
                         IconButton(onClick = { showSortMenu = true }) {
-                            Icon(Icons.Rounded.Sort, contentDescription = "Sort")
+                            Icon(Icons.AutoMirrored.Rounded.Sort, contentDescription = "Sort")
                         }
                         DropdownMenu(
                             expanded = showSortMenu,
@@ -495,20 +494,12 @@ private fun SongListItem(
                 .background(MaterialTheme.colorScheme.surfaceVariant),
             contentAlignment = Alignment.Center
         ) {
-            if (song.albumArtUri != null) {
-                AsyncImage(
-                    model = song.albumArtUri,
-                    contentDescription = null,
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop
-                )
-            } else {
-                Icon(
-                    Icons.Rounded.MusicNote,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
+            AsyncImage(
+                model = song.albumArtUri,
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
+            )
         }
         
         Spacer(modifier = Modifier.width(12.dp))

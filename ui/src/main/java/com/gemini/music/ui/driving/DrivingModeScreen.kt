@@ -265,6 +265,7 @@ private fun DrivingModeHeader(
     }
 }
 
+@Suppress("UNUSED_PARAMETER") // Seek 功能在駕駛模式下簡化，暫不實現拖曳
 @Composable
 private fun DrivingModeProgressBar(
     currentPosition: Long,

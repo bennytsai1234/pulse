@@ -229,11 +229,12 @@ fun HomeScreenRedesigned(
                                 key = { it.id }
                             ) { song ->
                                 val isSelected = uiState.selectedSongIds.contains(song.id)
+                                val isCurrentlyPlaying = uiState.currentPlayingSongId == song.id && uiState.isPlaying
                                 GeminiSongListItem(
                                     title = song.title,
                                     subtitle = "${song.artist} · ${song.album}",
                                     albumArtUri = song.albumArtUri,
-                                    isPlaying = false, // TODO: 連接播放狀態
+                                    isPlaying = isCurrentlyPlaying,
                                     isFavorite = song.isFavorite,
                                     duration = formatDuration(song.duration),
                                     showDuration = true,

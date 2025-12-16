@@ -13,6 +13,7 @@ import com.gemini.music.domain.usecase.PlaySongUseCase
 import com.gemini.music.domain.usecase.ScanLocalMusicUseCase
 import com.gemini.music.domain.usecase.ToggleShuffleUseCase
 import com.gemini.music.domain.model.Playlist
+import com.gemini.music.domain.repository.MusicController
 import com.gemini.music.domain.repository.MusicRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -48,7 +49,10 @@ data class HomeUiState(
     // Dialogs
     val showAddToPlaylistDialog: Boolean = false,
     // Sorting
-    val sortOption: SortOption = SortOption.TITLE
+    val sortOption: SortOption = SortOption.TITLE,
+    // 播放狀態
+    val currentPlayingSongId: Long? = null,
+    val isPlaying: Boolean = false
 )
 
 @HiltViewModel
@@ -62,6 +66,7 @@ class HomeViewModel @Inject constructor(
     private val deleteSongUseCase: com.gemini.music.domain.usecase.DeleteSongUseCase,
     private val getFavoriteSongsUseCase: com.gemini.music.domain.usecase.favorites.GetFavoriteSongsUseCase,
     private val musicRepository: MusicRepository, // Direct Access for Playlist MVP
+    private val musicController: MusicController,
     private val savedStateHandle: androidx.lifecycle.SavedStateHandle
 ) : ViewModel() {
 
@@ -115,8 +120,9 @@ class HomeViewModel @Inject constructor(
     // Combine Data with UI State
     val uiState: StateFlow<HomeUiState> = combine(
         _dataFlow,
-        _controlsFlow
-    ) { data, controls ->
+        _controlsFlow,
+        musicController.musicState
+    ) { data, controls, playState ->
         // Select source list based on filter
         val sourceList = if (controls.filterFavorites) data.favorites else data.songs
 
@@ -140,7 +146,9 @@ class HomeViewModel @Inject constructor(
             isSelectionMode = controls.isSelectionMode,
             selectedSongIds = controls.selectedSongIds,
             showAddToPlaylistDialog = controls.showAddToPlaylistDialog,
-            sortOption = controls.sortOption
+            sortOption = controls.sortOption,
+            currentPlayingSongId = playState.currentSong?.id,
+            isPlaying = playState.isPlaying
         )
     }
     .flowOn(Dispatchers.Default) // Perform sorting and combination on Background Thread
