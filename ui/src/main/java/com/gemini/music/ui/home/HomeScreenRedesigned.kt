@@ -4,12 +4,10 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.PlaylistPlay
@@ -28,7 +26,7 @@ import com.gemini.music.core.designsystem.component.GeminiSongListItem
 import com.gemini.music.domain.model.Song
 
 /**
- * 簡化版首頁 - 只有歌曲列表和主要按鍵
+ * 簡化版首頁 - 左上角選單包含各功能入口
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -47,6 +45,9 @@ fun HomeScreenRedesigned(
     val uiState by viewModel.uiState.collectAsState()
     val recoverableAction by viewModel.recoverableAction.collectAsState()
     val listState = rememberLazyListState()
+    
+    // 選單狀態
+    var showMenu by remember { mutableStateOf(false) }
 
     // Launcher for Android 10+ deletion permission
     val intentSenderLauncher = rememberLauncherForActivityResult(
@@ -88,10 +89,83 @@ fun HomeScreenRedesigned(
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
-            // 簡潔頂部欄
-            SimpleTopBar(
-                onSearchClick = onSearchClick,
-                onSettingsClick = onSettingsClick
+            TopAppBar(
+                title = {
+                    Text(
+                        text = "Gemini Music",
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold
+                    )
+                },
+                navigationIcon = {
+                    Box {
+                        IconButton(onClick = { showMenu = true }) {
+                            Icon(
+                                imageVector = Icons.Rounded.Menu,
+                                contentDescription = "選單"
+                            )
+                        }
+                        // 下拉選單
+                        DropdownMenu(
+                            expanded = showMenu,
+                            onDismissRequest = { showMenu = false }
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text("專輯") },
+                                leadingIcon = { Icon(Icons.Rounded.Album, null) },
+                                onClick = {
+                                    showMenu = false
+                                    onAlbumsClick()
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = { Text("播放清單") },
+                                leadingIcon = { Icon(Icons.AutoMirrored.Rounded.PlaylistPlay, null) },
+                                onClick = {
+                                    showMenu = false
+                                    onPlaylistClick()
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = { Text("最愛") },
+                                leadingIcon = { Icon(Icons.Rounded.Favorite, null) },
+                                onClick = {
+                                    showMenu = false
+                                    onFavoritesClick()
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = { Text("資料夾") },
+                                leadingIcon = { Icon(Icons.Rounded.Folder, null) },
+                                onClick = {
+                                    showMenu = false
+                                    onFoldersClick()
+                                }
+                            )
+                            HorizontalDivider()
+                            DropdownMenuItem(
+                                text = { Text("設定") },
+                                leadingIcon = { Icon(Icons.Rounded.Settings, null) },
+                                onClick = {
+                                    showMenu = false
+                                    onSettingsClick()
+                                }
+                            )
+                        }
+                    }
+                },
+                actions = {
+                    IconButton(onClick = onSearchClick) {
+                        Icon(
+                            imageVector = Icons.Rounded.Search,
+                            contentDescription = "搜尋"
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background,
+                    titleContentColor = MaterialTheme.colorScheme.onBackground
+                )
             )
         }
     ) { padding ->
@@ -100,14 +174,6 @@ fun HomeScreenRedesigned(
                 .fillMaxSize()
                 .padding(padding)
         ) {
-            // 快速操作按鈕列
-            QuickActionRow(
-                onPlaylistClick = onPlaylistClick,
-                onAlbumsClick = onAlbumsClick,
-                onFavoritesClick = onFavoritesClick,
-                onFoldersClick = onFoldersClick
-            )
-            
             // 歌曲控制列
             SongControlRow(
                 songCount = uiState.songs.size,
@@ -156,7 +222,7 @@ fun HomeScreenRedesigned(
                             isFavorite = song.isFavorite,
                             duration = formatDuration(song.duration),
                             showDuration = true,
-                            showFavorite = false, // 隱藏最愛按鈕，簡化UI
+                            showFavorite = false,
                             isSelected = isSelected,
                             onClick = {
                                 if (uiState.isSelectionMode) {
@@ -173,112 +239,6 @@ fun HomeScreenRedesigned(
                 }
             }
         }
-    }
-}
-
-/**
- * 簡潔頂部欄
- */
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun SimpleTopBar(
-    onSearchClick: () -> Unit,
-    onSettingsClick: () -> Unit
-) {
-    TopAppBar(
-        title = {
-            Text(
-                text = "Gemini Music",
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold
-            )
-        },
-        actions = {
-            IconButton(onClick = onSearchClick) {
-                Icon(
-                    imageVector = Icons.Rounded.Search,
-                    contentDescription = "搜尋"
-                )
-            }
-            IconButton(onClick = onSettingsClick) {
-                Icon(
-                    imageVector = Icons.Rounded.Settings,
-                    contentDescription = "設定"
-                )
-            }
-        },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.background,
-            titleContentColor = MaterialTheme.colorScheme.onBackground
-        )
-    )
-}
-
-/**
- * 快速操作按鈕列 - 四個主要入口
- */
-@Composable
-private fun QuickActionRow(
-    onPlaylistClick: () -> Unit,
-    onAlbumsClick: () -> Unit,
-    onFavoritesClick: () -> Unit,
-    onFoldersClick: () -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 12.dp),
-        horizontalArrangement = Arrangement.SpaceEvenly
-    ) {
-        QuickActionButton(
-            icon = Icons.Rounded.Album,
-            label = "專輯",
-            onClick = onAlbumsClick
-        )
-        QuickActionButton(
-            icon = Icons.AutoMirrored.Rounded.PlaylistPlay,
-            label = "播放清單",
-            onClick = onPlaylistClick
-        )
-        QuickActionButton(
-            icon = Icons.Rounded.Favorite,
-            label = "最愛",
-            onClick = onFavoritesClick
-        )
-        QuickActionButton(
-            icon = Icons.Rounded.Folder,
-            label = "資料夾",
-            onClick = onFoldersClick
-        )
-    }
-}
-
-@Composable
-private fun QuickActionButton(
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
-    label: String,
-    onClick: () -> Unit
-) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        FilledTonalIconButton(
-            onClick = onClick,
-            modifier = Modifier.size(56.dp),
-            shape = RoundedCornerShape(16.dp)
-        ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = label,
-                modifier = Modifier.size(28.dp)
-            )
-        }
-        Spacer(modifier = Modifier.height(4.dp))
-        Text(
-            text = label,
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
     }
 }
 

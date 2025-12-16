@@ -240,11 +240,11 @@ fun NowPlayingScreen(
         )
     }
 
-    // MAIN UI STRUCTURE
+    // MAIN UI STRUCTURE - Material You 風格
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF121212)) // 純色深色背景
+            .background(MaterialTheme.colorScheme.surface)
     ) {
 
         // 3. Main Content
@@ -266,7 +266,7 @@ fun NowPlayingScreen(
                     Icon(
                         imageVector = Icons.Rounded.KeyboardArrowDown,
                         contentDescription = "Collapse",
-                        tint = Color.White,
+                        tint = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier.size(32.dp)
                     )
                 }
@@ -278,7 +278,7 @@ fun NowPlayingScreen(
                     style = MaterialTheme.typography.labelMedium,
                     fontWeight = FontWeight.Bold,
                     letterSpacing = 2.sp,
-                    color = Color.White.copy(alpha = 0.7f)
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 
                 Spacer(Modifier.weight(1f))
@@ -287,7 +287,7 @@ fun NowPlayingScreen(
                     Icon(
                         imageVector = Icons.Rounded.MoreVert,
                         contentDescription = "Options",
-                        tint = Color.White
+                        tint = MaterialTheme.colorScheme.onSurface
                     )
                 }
             }
@@ -336,7 +336,7 @@ fun NowPlayingScreen(
                         text = uiState.song?.title ?: "Unknown Title",
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White,
+                        color = MaterialTheme.colorScheme.onSurface,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -344,7 +344,7 @@ fun NowPlayingScreen(
                     Text(
                         text = uiState.song?.artist ?: "Unknown Artist",
                         style = MaterialTheme.typography.titleMedium,
-                        color = Color.White.copy(alpha = 0.7f),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -367,21 +367,20 @@ fun NowPlayingScreen(
                         value = uiState.progress,
                         onValueChange = { viewModel.onEvent(NowPlayingEvent.SeekTo(it)) },
                         colors = SliderDefaults.colors(
-                            thumbColor = Color.White,
-                            activeTrackColor = Color.White,
-                            inactiveTrackColor = Color.White.copy(alpha = 0.3f)
+                            thumbColor = MaterialTheme.colorScheme.primary,
+                            activeTrackColor = MaterialTheme.colorScheme.primary,
+                            inactiveTrackColor = MaterialTheme.colorScheme.surfaceVariant
                         ),
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
                 
-                // Time Labels
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text(text = uiState.currentTime, style = MaterialTheme.typography.labelMedium, color = Color.White.copy(alpha = 0.7f))
-                    Text(text = uiState.totalTime, style = MaterialTheme.typography.labelMedium, color = Color.White.copy(alpha = 0.7f))
+                    Text(text = uiState.currentTime, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(text = uiState.totalTime, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
 
                 Spacer(Modifier.height(16.dp))
@@ -443,6 +442,11 @@ fun PlayerControls(
     onFavoriteToggle: () -> Unit,
     onQueueClick: () -> Unit
 ) {
+    val onSurface = MaterialTheme.colorScheme.onSurface
+    val onSurfaceVariant = MaterialTheme.colorScheme.onSurfaceVariant
+    val primary = MaterialTheme.colorScheme.primary
+    val onPrimary = MaterialTheme.colorScheme.onPrimary
+    
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceAround,
@@ -453,7 +457,7 @@ fun PlayerControls(
             Icon(
                 imageVector = Icons.Rounded.Shuffle,
                 contentDescription = "Shuffle",
-                tint = if (shuffleEnabled) Color.White else Color.White.copy(alpha = 0.5f),
+                tint = if (shuffleEnabled) primary else onSurfaceVariant,
                 modifier = Modifier.size(24.dp)
             )
         }
@@ -463,7 +467,7 @@ fun PlayerControls(
             Icon(
                 imageVector = Icons.Rounded.SkipPrevious,
                 contentDescription = "Previous",
-                tint = Color.White,
+                tint = onSurface,
                 modifier = Modifier.size(36.dp)
             )
         }
@@ -474,12 +478,12 @@ fun PlayerControls(
             modifier = Modifier
                 .size(72.dp)
                 .clip(CircleShape)
-                .background(Color.White)
+                .background(primary)
         ) {
             Icon(
                 imageVector = if (isPlaying) Icons.Rounded.Pause else Icons.Rounded.PlayArrow,
                 contentDescription = if (isPlaying) "Pause" else "Play",
-                tint = Color.Black,
+                tint = onPrimary,
                 modifier = Modifier.size(48.dp)
             )
         }
@@ -489,7 +493,7 @@ fun PlayerControls(
             Icon(
                 imageVector = Icons.Rounded.SkipNext,
                 contentDescription = "Next",
-                tint = Color.White,
+                tint = onSurface,
                 modifier = Modifier.size(36.dp)
             )
         }
@@ -501,7 +505,7 @@ fun PlayerControls(
                 RepeatMode.ALL -> Icons.Rounded.Repeat
                 RepeatMode.ONE -> Icons.Rounded.RepeatOne
             }
-            val tint = if (repeatMode == RepeatMode.OFF) Color.White.copy(alpha = 0.5f) else Color.White
+            val tint = if (repeatMode == RepeatMode.OFF) onSurfaceVariant else primary
             Icon(
                 imageVector = icon,
                 contentDescription = "Repeat",
@@ -521,7 +525,7 @@ fun PlayerControls(
             Icon(
                 imageVector = if (isFavorite) Icons.Rounded.Favorite else Icons.Rounded.FavoriteBorder,
                 contentDescription = "Favorite",
-                tint = if (isFavorite) Color.Red else Color.White.copy(alpha = 0.7f),
+                tint = if (isFavorite) Color.Red else onSurfaceVariant,
                 modifier = Modifier.size(24.dp)
             )
         }
@@ -530,7 +534,7 @@ fun PlayerControls(
             Icon(
                 imageVector = Icons.Rounded.Description,
                 contentDescription = "Lyrics",
-                tint = Color.White.copy(alpha = 0.7f),
+                tint = onSurfaceVariant,
                 modifier = Modifier.size(24.dp)
             )
         }
@@ -539,7 +543,7 @@ fun PlayerControls(
             Icon(
                 imageVector = Icons.AutoMirrored.Rounded.QueueMusic,
                 contentDescription = "Queue",
-                tint = Color.White.copy(alpha = 0.7f),
+                tint = onSurfaceVariant,
                 modifier = Modifier.size(24.dp)
             )
         }

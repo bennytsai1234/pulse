@@ -318,6 +318,20 @@ fun MusicNavigation(navController: NavHostController) {
                         )
                     }
                 }
+                
+                // Equalizer Screen
+                composable(
+                    route = Screen.Equalizer.route,
+                    arguments = listOf(navArgument(Screen.Equalizer.audioSessionIdArg) { type = NavType.IntType })
+                ) { backStackEntry ->
+                    CompositionLocalProvider(LocalAnimatedContentScope provides this) {
+                        val audioSessionId = backStackEntry.arguments?.getInt(Screen.Equalizer.audioSessionIdArg) ?: 0
+                        com.gemini.music.ui.equalizer.EqualizerScreen(
+                            audioSessionId = audioSessionId,
+                            onBackClick = { navController.safePopBackStack() }
+                        )
+                    }
+                }
             }
         }
     }
