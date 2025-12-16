@@ -258,7 +258,7 @@ fun FolderBrowserScreen(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     items(uiState.searchResults) { song ->
-                        SongListItem(song = song, onClick = { onSongClick(song) })
+                        SongListItem(song = song, onClick = { viewModel.playSong(song, uiState.searchResults) })
                     }
                     if (uiState.searchResults.isEmpty() && !uiState.isSearching) {
                         item {
@@ -337,7 +337,7 @@ fun FolderBrowserScreen(
                                 )
                             }
                             items(content.songs) { song ->
-                                SongListItem(song = song, onClick = { onSongClick(song) })
+                                SongListItem(song = song, onClick = { viewModel.playSong(song) })
                             }
                         }
                         

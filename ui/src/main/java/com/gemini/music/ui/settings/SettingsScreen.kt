@@ -17,6 +17,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.CheckCircle
@@ -26,6 +28,7 @@ import androidx.compose.material.icons.rounded.Language
 import androidx.compose.material.icons.rounded.GraphicEq
 import androidx.compose.material.icons.rounded.Timer
 import androidx.compose.material.icons.rounded.AlarmOff
+import androidx.compose.material.icons.rounded.Speed
 import android.content.Intent
 import android.media.audiofx.AudioEffect
 import android.net.Uri
@@ -75,6 +78,7 @@ import java.util.Locale
 fun SettingsScreen(
     onBackClick: () -> Unit,
     onInternalEqualizerClick: () -> Unit,
+    onPlaybackSettingsClick: () -> Unit = {},
     viewModel: SettingsViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -106,6 +110,7 @@ fun SettingsScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
+                .verticalScroll(rememberScrollState())
         ) {
              // Language
             ListItem(
@@ -156,6 +161,14 @@ fun SettingsScreen(
                 supportingContent = { Text("Stop playback after set time") },
                 leadingContent = { Icon(Icons.Rounded.Timer, null) },
                 modifier = Modifier.clickable { showSleepTimerDialog = true }
+            )
+
+            // Playback Settings
+            ListItem(
+                headlineContent = { Text("Playback Settings") },
+                supportingContent = { Text("Speed, crossfade, and more") },
+                leadingContent = { Icon(Icons.Rounded.Speed, null) },
+                modifier = Modifier.clickable { onPlaybackSettingsClick() }
             )
 
             if (showSleepTimerDialog) {

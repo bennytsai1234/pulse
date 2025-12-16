@@ -13,6 +13,7 @@ import androidx.media3.session.MediaLibraryService.LibraryParams
 import androidx.media3.session.MediaSession
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
 
@@ -27,6 +28,9 @@ class GeminiAudioService : MediaLibraryService() {
     // 我們會在 DI Module 中設定 Gapless 播放與 Audio Focus
     @Inject
     lateinit var player: ExoPlayer
+
+    @Inject
+    lateinit var userPreferencesRepository: com.gemini.music.domain.repository.UserPreferencesRepository
 
     private var mediaLibrarySession: MediaLibrarySession? = null
 
@@ -152,10 +156,35 @@ class GeminiAudioService : MediaLibraryService() {
     private fun startSleepTimer(minutes: Int) {
         cancelSleepTimer()
         sleepTimerJob = serviceScope.launch {
-            kotlinx.coroutines.delay(minutes * 60 * 1000L)
-            if (player.isPlaying) {
-                player.pause()
+            val fadeEnabled = try { userPreferencesRepository.sleepTimerFadeOut.first() } catch (e: Exception) { false }
+            val fadeDuration = try { userPreferencesRepository.sleepTimerFadeDuration.first() } catch (e: Exception) { 0 }
+            
+            // Total sleep time in millis
+            val totalTime = minutes * 60 * 1000L
+            val fadeDurationMs = fadeDuration * 1000L
+            
+            if (!fadeEnabled || fadeDuration <= 0 || totalTime <= fadeDurationMs) {
+                 kotlinx.coroutines.delay(totalTime)
+                 if (player.isPlaying) player.pause()
+            } else {
+                 // Wait until fade starts
+                 kotlinx.coroutines.delay(totalTime - fadeDurationMs)
+                 
+                 // Start fade out
+                 val steps = 20
+                 val stepDuration = fadeDurationMs / steps
+                 val initialVolume = player.volume
+                 
+                 for (i in 0..steps) {
+                      val volume = initialVolume * (1f - i.toFloat() / steps)
+                      player.volume = volume
+                      kotlinx.coroutines.delay(stepDuration)
+                 }
+                 
+                 if (player.isPlaying) player.pause()
+                 player.volume = initialVolume // Restore volume
             }
+            
             sleepTimerJob = null
         }
     }
@@ -167,6 +196,13 @@ class GeminiAudioService : MediaLibraryService() {
 
     override fun onCreate() {
         super.onCreate()
+        
+        // Listen to Playback Speed settings
+        serviceScope.launch {
+             userPreferencesRepository.playbackSpeed.collect { speed ->
+                  player.setPlaybackSpeed(speed)
+             }
+        }
         // 建立 Activity PendingIntent，點擊通知欄時跳轉回 App
         val openActivityIntent = PendingIntent.getActivity(
             this,

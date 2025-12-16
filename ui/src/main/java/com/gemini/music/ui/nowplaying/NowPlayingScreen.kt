@@ -128,6 +128,7 @@ fun NowPlayingScreen(
     onAlbumClick: (albumId: Long) -> Unit = {},
     onInternalEqualizerClick: () -> Unit = {},
     onEditTagsClick: (songId: Long) -> Unit = {},
+    onEditLyricsClick: (songId: Long) -> Unit = {},
     onArtworkLoaded: (Bitmap?) -> Unit = {},
     viewModel: NowPlayingViewModel = hiltViewModel()
 ) {
@@ -206,6 +207,15 @@ fun NowPlayingScreen(
                     }
                 )
                 
+                OptionItem(
+                    icon = Icons.Rounded.Description,
+                    text = "Edit Lyrics",
+                    onClick = {
+                        showMoreOptions = false
+                        uiState.song?.id?.let { onEditLyricsClick(it) }
+                    }
+                )
+                
                 Spacer(modifier = Modifier.height(32.dp))
             }
         }
@@ -240,11 +250,18 @@ fun NowPlayingScreen(
         )
     }
 
-    // MAIN UI STRUCTURE - Material You 風格
+    // MAIN UI STRUCTURE - Material You 風格 with Material3 background
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.surface)
+            .background(
+                Brush.verticalGradient(
+                    colors = listOf(
+                        MaterialTheme.colorScheme.surface,
+                        MaterialTheme.colorScheme.surfaceContainerLowest
+                    )
+                )
+            )
     ) {
 
         // 3. Main Content

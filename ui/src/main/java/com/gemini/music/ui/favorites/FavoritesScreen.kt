@@ -37,11 +37,18 @@ fun FavoritesScreen(
         containerColor = MaterialTheme.colorScheme.background
     ) { padding ->
         if (uiState.songs.isEmpty() && !uiState.isLoading) {
-            GeminiEmptyState(
-                icon = Icons.Rounded.Favorite,
-                title = "尚無最愛歌曲",
-                subtitle = "點擊歌曲旁的愛心圖標來加入最愛"
-            )
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding),
+                contentAlignment = androidx.compose.ui.Alignment.Center
+            ) {
+                GeminiEmptyState(
+                    icon = Icons.Rounded.Favorite,
+                    title = "尚無最愛歌曲",
+                    subtitle = "點擊歌曲旁的愛心圖標來加入最愛"
+                )
+            }
         } else {
             LazyColumn(
                 modifier = Modifier

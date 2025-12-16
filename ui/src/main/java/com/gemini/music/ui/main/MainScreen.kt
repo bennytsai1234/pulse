@@ -50,9 +50,16 @@ fun MainScreen(
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
     
     // Hide mini player on Settings, Search, and Queue
+    // Hide mini player on specific screens
     val isPlayerVisible = currentRoute != Screen.Settings.route && 
                           currentRoute != Screen.Search.route && 
-                          currentRoute != Screen.Queue.route
+                          currentRoute != Screen.Queue.route &&
+                          currentRoute != Screen.PlaybackSettings.route &&
+                          currentRoute != Screen.DrivingMode.route &&
+                          currentRoute != Screen.TagEditor.route &&
+                          currentRoute != Screen.LyricsEditor.route &&
+                          currentRoute?.startsWith("tag_editor") != true &&
+                          currentRoute?.startsWith("lyrics_editor") != true
 
     val density = LocalDensity.current
 
@@ -145,6 +152,10 @@ fun MainScreen(
                             onEditTagsClick = { songId ->
                                 scope.launch { sheetState.animateTo(PlayerSheetValue.Collapsed) }
                                 navController.navigate(Screen.TagEditor.createRoute(songId))
+                            },
+                            onEditLyricsClick = { songId ->
+                                scope.launch { sheetState.animateTo(PlayerSheetValue.Collapsed) }
+                                navController.navigate(Screen.LyricsEditor.createRoute(songId))
                             },
                             onArtworkLoaded = { bitmap ->
                                 viewModel.updateDynamicTheme(bitmap)

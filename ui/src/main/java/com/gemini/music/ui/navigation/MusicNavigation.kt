@@ -28,6 +28,7 @@ import com.gemini.music.ui.settings.PlaybackSettingsScreen
 import com.gemini.music.ui.folder.FolderBrowserScreen
 import com.gemini.music.ui.discover.DiscoverScreen
 import com.gemini.music.ui.lyrics.LyricsEditorScreen
+import com.gemini.music.ui.driving.DrivingModeScreen
 
 /**
  * Safe popBackStack that checks if we can actually navigate back
@@ -91,6 +92,7 @@ sealed class Screen(val route: String) {
         const val songIdArg = "songId"
         fun createRoute(songId: Long) = "lyrics_editor/$songId"
     }
+    data object DrivingMode : Screen("driving_mode")
 }
 
 /**
@@ -156,6 +158,9 @@ fun MusicNavigation(navController: NavHostController) {
                             },
                             onFoldersClick = {
                                 navController.navigate(Screen.Folders.route)
+                            },
+                            onDrivingModeClick = {
+                                navController.navigate(Screen.DrivingMode.route)
                             }
                         )
                     }
@@ -166,6 +171,9 @@ fun MusicNavigation(navController: NavHostController) {
                             onBackClick = { navController.safePopBackStack() },
                             onInternalEqualizerClick = {
                                 navController.navigate(Screen.Equalizer.createRoute(0))
+                            },
+                            onPlaybackSettingsClick = {
+                                navController.navigate(Screen.PlaybackSettings.route)
                             }
                         )
                     }
@@ -329,6 +337,15 @@ fun MusicNavigation(navController: NavHostController) {
                         com.gemini.music.ui.equalizer.EqualizerScreen(
                             audioSessionId = audioSessionId,
                             onBackClick = { navController.safePopBackStack() }
+                        )
+                    }
+                }
+                
+                // Driving Mode Screen
+                composable(route = Screen.DrivingMode.route) {
+                    CompositionLocalProvider(LocalAnimatedContentScope provides this) {
+                        DrivingModeScreen(
+                            onNavigateBack = { navController.safePopBackStack() }
                         )
                     }
                 }

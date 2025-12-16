@@ -6,6 +6,7 @@ import com.gemini.music.domain.model.FolderContent
 import com.gemini.music.domain.model.MusicFolder
 import com.gemini.music.domain.model.Song
 import com.gemini.music.domain.repository.FolderRepository
+import com.gemini.music.domain.repository.MusicController
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -35,7 +36,8 @@ enum class FolderSortBy { NAME, DATE, SONG_COUNT }
 
 @HiltViewModel
 class FolderBrowserViewModel @Inject constructor(
-    private val folderRepository: FolderRepository
+    private val folderRepository: FolderRepository,
+    private val musicController: MusicController
 ) : ViewModel() {
     
     private val _uiState = MutableStateFlow(FolderBrowserUiState())
@@ -160,6 +162,19 @@ class FolderBrowserViewModel @Inject constructor(
             FolderSortBy.SONG_COUNT -> compareBy { it.songCount }
         }
         return if (ascending) comparator else comparator.reversed()
+    }
+    
+    /**
+     * 播放歌曲
+     */
+    fun playSong(song: Song, allSongsInFolder: List<Song> = emptyList()) {
+        val songs = if (allSongsInFolder.isNotEmpty()) {
+            allSongsInFolder
+        } else {
+            _uiState.value.currentContent?.songs ?: listOf(song)
+        }
+        val startIndex = songs.indexOf(song).coerceAtLeast(0)
+        musicController.playSongs(songs, startIndex)
     }
     
     // ==================== Utility ====================
