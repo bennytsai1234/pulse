@@ -180,6 +180,9 @@
     *   待同步 Scrobble 隊列管理。
 *   ✅ **Last.fm 帳戶連接 UI**: 設定頁面中新增 Last.fm 帳戶連接介面，支援登入/登出和同步功能。
 *   ✅ **雲端備份 (Cloud Backup)**: 整合 Google Drive，支援備份/還原播放清單、最愛歌曲與設定 (採用 MVI 架構 + Clean Architecture)。
+*   ✅ **HomeScreen 重新設計**: 全新的主畫面佈局與視覺層級優化。
+*   ✅ **播放設定整合**: 播放速度、淡出效果等設定已整合至 GeminiAudioService。
+*   ✅ **MiniPlayer 可見性控制**: 在特定頁面（如設定）智慧隱藏 MiniPlayer。
 *   🚧 **多主題引擎 (Theme Engine)**: 完整的主題系統架構，支援：
     *   8 種預設調色盤 (Gemini, Ocean, Forest, Sunset, Cherry, Midnight, Gold, Monochrome)
     *   Material You 動態顏色 (Android 12+)
