@@ -97,6 +97,15 @@ fun HomeScreenRedesigned(
         viewModel.exitSelectionMode()
     }
 
+    // State for Sleep Timer
+    var showSleepTimer by remember { mutableStateOf(false) }
+
+    if (showSleepTimer) {
+        com.gemini.music.ui.timer.SleepTimerBottomSheet(
+            onDismiss = { showSleepTimer = false }
+        )
+    }
+
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
@@ -121,6 +130,15 @@ fun HomeScreenRedesigned(
                         expanded = showMenu,
                         onDismissRequest = { showMenu = false }
                     ) {
+                        DropdownMenuItem(
+                            text = { Text("睡眠定時器") },
+                            leadingIcon = { Icon(Icons.Rounded.Timer, null) },
+                            onClick = {
+                                showMenu = false
+                                showSleepTimer = true
+                            }
+                        )
+                        HorizontalDivider()
                         DropdownMenuItem(
                             text = { Text("專輯") },
                             leadingIcon = { Icon(Icons.Rounded.Album, null) },
