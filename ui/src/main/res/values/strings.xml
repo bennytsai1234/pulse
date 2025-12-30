@@ -37,4 +37,23 @@
     <string name="sort_date_added">Date Added</string>
     <string name="sort_duration">Duration</string>
     <string name="equalizer">Equalizer</string>
+
+    <!-- Driving Mode -->
+    <string name="driving_mode">Driving Mode</string>
+    <string name="driving_mode_tts_prefix">TTS: %s</string>
+    <string name="driving_mode_voice_search_unavailable">Voice Search not available</string>
+    <string name="driving_mode_not_playing">Not Playing</string>
+    <string name="driving_mode_album_art_desc">Album Art</string>
+    <string name="driving_mode_exit_desc">Exit Driving Mode</string>
+    <string name="driving_mode_volume_up">Volume +</string>
+    <string name="driving_mode_volume_down">Volume -</string>
+    <string name="driving_mode_queue">Queue</string>
+    <string name="driving_mode_queue_title">Play Queue</string>
+    <string name="driving_mode_close_desc">Close</string>
+    <string name="driving_mode_rewind_10s">-10s</string>
+    <string name="driving_mode_forward_30s">+30s</string>
+    <string name="driving_mode_play_desc">Play</string>
+    <string name="driving_mode_pause_desc">Pause</string>
+    <string name="driving_mode_prev_desc">Previous Track</string>
+    <string name="driving_mode_next_desc">Next Track</string>
 </resources>

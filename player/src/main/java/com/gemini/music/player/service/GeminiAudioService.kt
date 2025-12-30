@@ -90,8 +90,8 @@ class GeminiAudioService : MediaLibraryService() {
 
         // ==================== Android Auto 媒體瀏覽支援 ====================
 
-       @Inject
-        lateinit var musicRepository: com.gemini.music.domain.repository.MusicRepository
+    @Inject
+    lateinit var musicRepository: com.gemini.music.domain.repository.MusicRepository
 
         override fun onGetLibraryRoot(
             session: MediaLibrarySession,
@@ -335,18 +335,41 @@ class GeminiAudioService : MediaLibraryService() {
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
 
-        // 初始化 MediaLibrarySession
         mediaLibrarySession = MediaLibrarySession.Builder(this, player, librarySessionCallback)
             .setSessionActivity(openActivityIntent)
             .build()
 
+        restorePlaybackState()
+
         player.addListener(object : Player.Listener {
             override fun onIsPlayingChanged(isPlaying: Boolean) {
                 updateWidget()
+                if (!isPlaying) {
+                     savePlaybackState()
+                }
             }
 
             override fun onMediaItemTransition(mediaItem: androidx.media3.common.MediaItem?, reason: Int) {
                 updateWidget()
+                savePlaybackState()
+            }
+
+            override fun onPositionDiscontinuity(oldPosition: Player.PositionInfo, newPosition: Player.PositionInfo, reason: Int) {
+                 if (reason == Player.DISCONTINUITY_REASON_SEEK) {
+                     savePlaybackState()
+                 }
+            }
+
+            override fun onPlayerError(error: androidx.media3.common.PlaybackException) {
+                android.util.Log.e("GeminiAudioService", "Player Error: ${error.message}")
+                android.widget.Toast.makeText(applicationContext, "Playback Error: ${error.errorCodeName}", android.widget.Toast.LENGTH_SHORT).show()
+
+                // Attempt to skip to next track if available
+                if (player.hasNextMediaItem()) {
+                    player.seekToNextMediaItem()
+                    player.prepare()
+                    player.play()
+                }
             }
         })
     }
@@ -372,6 +395,7 @@ class GeminiAudioService : MediaLibraryService() {
     }
 
     override fun onTaskRemoved(rootIntent: Intent?) {
+        savePlaybackState()
         // 當使用者從「最近任務」將 App 滑掉時，確保播放器如果沒在播放就停止 Service
         val player = mediaLibrarySession?.player
         if (player == null || !player.playWhenReady || player.playbackState == Player.STATE_ENDED) {
@@ -379,7 +403,52 @@ class GeminiAudioService : MediaLibraryService() {
         }
     }
 
+    private fun restorePlaybackState() {
+        serviceScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+            val queueIds = userPreferencesRepository.lastQueueMediaIds.first()
+            val lastIndex = userPreferencesRepository.lastQueueIndex.first()
+            val lastPosition = userPreferencesRepository.lastPlayedPosition.first()
+
+            if (queueIds.isNotEmpty()) {
+                val allSongs = musicRepository.getSongs().first()
+                val songMap = allSongs.associateBy { it.id.toString() }
+                val queueItems = queueIds.mapNotNull { id -> songMap[id]?.toMediaItem() }
+
+                if (queueItems.isNotEmpty()) {
+                    kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
+                        player.setMediaItems(queueItems, lastIndex, lastPosition)
+                        player.prepare()
+                        player.pause()
+                    }
+                }
+            }
+        }
+    }
+
+    private fun savePlaybackState() {
+        val currentIndex = player.currentMediaItemIndex
+        val currentPosition = player.currentPosition
+        val currentMediaId = player.currentMediaItem?.mediaId
+
+        if (player.mediaItemCount == 0) return
+
+        val queueIds = mutableListOf<String>()
+        for (i in 0 until player.mediaItemCount) {
+            player.getMediaItemAt(i).mediaId.let { queueIds.add(it) }
+        }
+
+        serviceScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+            userPreferencesRepository.setLastQueueMediaIds(queueIds)
+            userPreferencesRepository.setLastQueueIndex(currentIndex)
+            userPreferencesRepository.setLastPlayedPosition(currentPosition)
+            if (currentMediaId != null) {
+                userPreferencesRepository.setLastPlayedMediaId(currentMediaId)
+            }
+        }
+    }
+
     override fun onDestroy() {
+        savePlaybackState()
         mediaLibrarySession?.run {
             player.release()
             release()

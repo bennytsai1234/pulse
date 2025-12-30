@@ -37,4 +37,23 @@
     <string name="sort_date_added">加入日期</string>
     <string name="sort_duration">時長</string>
     <string name="equalizer">等化器</string>
+
+    <!-- Driving Mode -->
+    <string name="driving_mode">駕駛模式</string>
+    <string name="driving_mode_tts_prefix">語音播報: %s</string>
+    <string name="driving_mode_voice_search_unavailable">語音搜尋不可用</string>
+    <string name="driving_mode_not_playing">未播放</string>
+    <string name="driving_mode_album_art_desc">專輯封面</string>
+    <string name="driving_mode_exit_desc">退出駕駛模式</string>
+    <string name="driving_mode_volume_up">音量+</string>
+    <string name="driving_mode_volume_down">音量-</string>
+    <string name="driving_mode_queue">佇列</string>
+    <string name="driving_mode_queue_title">播放佇列</string>
+    <string name="driving_mode_close_desc">關閉</string>
+    <string name="driving_mode_rewind_10s">-10秒</string>
+    <string name="driving_mode_forward_30s">+30秒</string>
+    <string name="driving_mode_play_desc">播放</string>
+    <string name="driving_mode_pause_desc">暫停</string>
+    <string name="driving_mode_prev_desc">上一首</string>
+    <string name="driving_mode_next_desc">下一首</string>
 </resources>

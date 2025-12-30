@@ -36,6 +36,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -43,6 +44,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.gemini.music.ui.R
 
 /**
  * 駕駛模式畫面 - 大按鈕、簡化 UI、專為駕駛設計
@@ -77,7 +79,7 @@ fun DrivingModeScreen(
                     }
                 }
                 is DrivingModeUiEffect.Speak -> {
-                    Toast.makeText(context, "TTS: ${effect.text}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, context.getString(R.string.driving_mode_tts_prefix, effect.text), Toast.LENGTH_SHORT).show()
                 }
                 is DrivingModeUiEffect.LaunchVoiceSearch -> {
                     val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
@@ -86,7 +88,7 @@ fun DrivingModeScreen(
                     try {
                         voiceSearchLauncher.launch(intent)
                     } catch (e: Exception) {
-                        Toast.makeText(context, "Voice Search not available", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, context.getString(R.string.driving_mode_voice_search_unavailable), Toast.LENGTH_SHORT).show()
                     }
                 }
             }
@@ -173,7 +175,7 @@ fun DrivingModeScreen(
                     .data(uiState.albumArtUri)
                     .crossfade(true)
                     .build(),
-                contentDescription = "Album Art",
+                contentDescription = stringResource(R.string.driving_mode_album_art_desc),
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .size(200.dp)
@@ -184,7 +186,7 @@ fun DrivingModeScreen(
 
             // 歌曲資訊
             Text(
-                text = uiState.currentSong?.title ?: "未播放",
+                text = uiState.currentSong?.title ?: stringResource(R.string.driving_mode_not_playing),
                 style = MaterialTheme.typography.headlineMedium,
                 color = Color.White,
                 maxLines = 1,
@@ -277,7 +279,7 @@ private fun DrivingModeHeader(
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
-                text = connectedDevice ?: "駕駛模式",
+                text = connectedDevice ?: stringResource(R.string.driving_mode),
                 style = MaterialTheme.typography.bodyMedium,
                 color = Color.White
             )
@@ -292,7 +294,7 @@ private fun DrivingModeHeader(
         ) {
             Icon(
                 imageVector = Icons.Rounded.Close,
-                contentDescription = "Exit",
+                contentDescription = stringResource(R.string.driving_mode_exit_desc),
                 tint = Color.White
             )
         }
@@ -320,7 +322,7 @@ private fun DrivingModeSeekControls(
             ) {
                 Icon(
                     imageVector = Icons.Rounded.Replay10,
-                    contentDescription = "-10s",
+                    contentDescription = stringResource(R.string.driving_mode_rewind_10s),
                     tint = Color.White,
                     modifier = Modifier.size(32.dp)
                 )
@@ -345,7 +347,7 @@ private fun DrivingModeSeekControls(
             ) {
                 Icon(
                     imageVector = Icons.Rounded.Forward30,
-                    contentDescription = "+30s",
+                    contentDescription = stringResource(R.string.driving_mode_forward_30s),
                     tint = Color.White,
                     modifier = Modifier.size(32.dp)
                 )
@@ -388,6 +390,7 @@ private fun DrivingModeControls(
         DrivingControlButton(
             icon = Icons.Rounded.SkipPrevious,
             size = 80.dp,
+            contentDescription = stringResource(R.string.driving_mode_prev_desc),
             onClick = onPrevious
         )
 
@@ -396,6 +399,7 @@ private fun DrivingModeControls(
             icon = if (isPlaying) Icons.Rounded.Pause else Icons.Rounded.PlayArrow,
             size = 120.dp,
             isPrimary = true,
+            contentDescription = if (isPlaying) stringResource(R.string.driving_mode_pause_desc) else stringResource(R.string.driving_mode_play_desc),
             onClick = onPlayPause
         )
 
@@ -403,6 +407,7 @@ private fun DrivingModeControls(
         DrivingControlButton(
             icon = Icons.Rounded.SkipNext,
             size = 80.dp,
+            contentDescription = stringResource(R.string.driving_mode_next_desc),
             onClick = onNext
         )
     }
@@ -413,6 +418,7 @@ private fun DrivingControlButton(
     icon: ImageVector,
     size: androidx.compose.ui.unit.Dp,
     isPrimary: Boolean = false,
+    contentDescription: String? = null,
     onClick: () -> Unit
 ) {
     Surface(
@@ -426,7 +432,7 @@ private fun DrivingControlButton(
         Box(contentAlignment = Alignment.Center) {
             Icon(
                 imageVector = icon,
-                contentDescription = null,
+                contentDescription = contentDescription,
                 tint = Color.White,
                 modifier = Modifier.size(size * 0.5f)
             )
@@ -446,19 +452,19 @@ private fun DrivingModeSecondaryControls(
     ) {
         DrivingSecondaryButton(
             icon = Icons.AutoMirrored.Rounded.VolumeDown,
-            label = "音量-",
+            label = stringResource(R.string.driving_mode_volume_down),
             onClick = onVolumeDown
         )
 
         DrivingSecondaryButton(
             icon = Icons.AutoMirrored.Rounded.QueueMusic,
-            label = "佇列",
+            label = stringResource(R.string.driving_mode_queue),
             onClick = onQueue
         )
 
         DrivingSecondaryButton(
             icon = Icons.AutoMirrored.Rounded.VolumeUp,
-            label = "音量+",
+            label = stringResource(R.string.driving_mode_volume_up),
             onClick = onVolumeUp
         )
     }
@@ -515,14 +521,14 @@ private fun DrivingModeQueue(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "播放佇列",
+                    text = stringResource(R.string.driving_mode_queue_title),
                     style = MaterialTheme.typography.headlineSmall,
                     color = Color.White
                 )
                 IconButton(onClick = onClose) {
                     Icon(
                         imageVector = Icons.Rounded.Close,
-                        contentDescription = "Close",
+                        contentDescription = stringResource(R.string.driving_mode_close_desc),
                         tint = Color.White
                     )
                 }

@@ -37,7 +37,7 @@ interface MusicRepository {
     // 觸發掃描系統媒體庫並更新資料庫
     fun scanLocalMusic(): Flow<ScanStatus>
 
-    
+
     // --- Playlist Management ---
     fun getPlaylists(): Flow<List<Playlist>>
     fun getPlaylist(playlistId: Long): Flow<Playlist?>
@@ -57,7 +57,12 @@ interface MusicRepository {
 
     // --- File Management ---
     suspend fun deleteSong(song: Song)
-    
+    /**
+     * Batch delete songs.
+     * @return On Android R+, returns IntentSender if permission is needed. Null if success (or pre-R handled).
+     */
+    suspend fun deleteSongs(songs: List<Song>): Any?
+
     // --- Tag Editing ---
     suspend fun getSongTags(songId: Long): SongTags?
     suspend fun updateSongTags(tags: SongTags): Boolean

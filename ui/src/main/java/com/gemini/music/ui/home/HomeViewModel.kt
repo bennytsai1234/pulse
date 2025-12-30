@@ -83,6 +83,8 @@ class HomeViewModel @Inject constructor(
     private val _recoverableAction = MutableStateFlow<android.content.IntentSender?>(null)
     val recoverableAction: StateFlow<android.content.IntentSender?> = _recoverableAction.asStateFlow()
 
+    private var _pendingDeleteSongs: List<Song>? = null
+
     // Group Data Flows - Using nested combine since Kotlin combine supports max 5 flows
     private val _sourcesFlow = combine(
         getSongsUseCase(),
@@ -299,7 +301,15 @@ class HomeViewModel @Inject constructor(
              val selectedIds = _selectedSongIds.value
              val songsToDelete = uiState.value.songs.filter { it.id in selectedIds }
 
-             // Process sequentially to handle permissions one by one (though ideally batching is better but harder with RecoverableSecurityException loop)
+             // API 30+ Batch Deletion
+             val intentSender = musicRepository.deleteSongs(songsToDelete) as? android.content.IntentSender
+             if (intentSender != null) {
+                 _pendingDeleteSongs = songsToDelete
+                 _recoverableAction.value = intentSender
+                 return@launch
+             }
+
+             // Process sequentially to handle permissions one by one (API 29 and below)
              // For simplicity, we try to delete all. If one fails with RecoverableSecurityException, we stop and ask user.
              // User will have to retry deletion.
 
@@ -330,13 +340,18 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun handleRecoverableAction(@Suppress("UNUSED_PARAMETER") resultCode: Int) {
-        // If result is OK, user granted permission.
-        // We could retry the deletion here.
-        // For now, we clear the exception so UI can reset.
+    fun handleRecoverableAction(resultCode: Int) {
+        if (resultCode == android.app.Activity.RESULT_OK) {
+            // Check if we were waiting for a batch deletion (API 30+)
+            _pendingDeleteSongs?.let {
+                // MediaStore deletion is done by system. Now refresh.
+                // We rely on scanMusic() to sync DB.
+                scanMusic()
+                exitSelectionMode()
+            }
+            _pendingDeleteSongs = null
+        }
         _recoverableAction.value = null
-        // Ideally we would retry the last failed operation.
-        // Simplest UX: User clicks delete again.
     }
 
     // --- Sorting ---

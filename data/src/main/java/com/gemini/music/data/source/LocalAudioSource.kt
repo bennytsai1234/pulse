@@ -19,7 +19,7 @@ import javax.inject.Inject
 class LocalAudioSource @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
-    
+
     companion object {
         // 支援的音訊 MIME 類型
         private val AUDIO_MIME_TYPES = listOf(
@@ -38,14 +38,14 @@ class LocalAudioSource @Inject constructor(
             "audio/webm",       // WebM audio
             "audio/*"           // Fallback for other audio types
         )
-        
+
         // 支援的檔案副檔名（作為備用過濾）
         private val AUDIO_EXTENSIONS = listOf(
-            ".mp3", ".m4a", ".flac", ".ogg", ".opus", ".wav", 
+            ".mp3", ".m4a", ".flac", ".ogg", ".opus", ".wav",
             ".aac", ".wma", ".aiff", ".aif", ".webm", ".3gp"
         )
     }
-    
+
     /**
      * 觸發 MediaStore 重新掃描指定路徑或整個外部存儲。
      * 這會讓系統重新索引新添加或修改的媒體檔案。
@@ -54,14 +54,14 @@ class LocalAudioSource @Inject constructor(
         val scanPaths = paths ?: listOf(
             Environment.getExternalStorageDirectory().absolutePath
         )
-        
+
         MediaScannerConnection.scanFile(
             context,
             scanPaths.toTypedArray(),
             null
         ) { _, _ -> }
     }
-    
+
     suspend fun loadMusic(
         minDurationMs: Long = 10000L,
         includedPaths: Set<String> = emptySet()
@@ -117,13 +117,13 @@ class LocalAudioSource @Inject constructor(
                 while (cursor.moveToNext()) {
                     val dataPath = cursor.getString(dataColumn) ?: ""
                     val mimeType = cursor.getString(mimeTypeColumn) ?: ""
-                    
+
                     // MIME 類型過濾（或副檔名過濾作為備用）
                     val isValidAudio = AUDIO_MIME_TYPES.any { mimeType.startsWith(it.replace("/*", "")) } ||
                                        AUDIO_EXTENSIONS.any { dataPath.lowercase().endsWith(it) }
-                    
+
                     if (!isValidAudio) continue
-                    
+
                     // Path filtering (只有當用戶設定了特定資料夾時才過濾)
                     if (includedPaths.isNotEmpty()) {
                         val isIncluded = includedPaths.any { path -> dataPath.startsWith(path) }
@@ -179,6 +179,18 @@ class LocalAudioSource @Inject constructor(
             e.printStackTrace()
             throw e
         }
+    }
+
+    /**
+     * For Android R (API 30) and above, creates a batch delete request.
+     */
+    fun createDeleteRequest(songs: List<Song>): android.content.IntentSender? {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+            val uris = songs.map { android.net.Uri.parse(it.contentUri) }
+            val pendingIntent = MediaStore.createDeleteRequest(context.contentResolver, uris)
+            return pendingIntent.intentSender
+        }
+        return null
     }
 }
 

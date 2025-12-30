@@ -96,12 +96,12 @@ class MusicRepositoryImpl @Inject constructor(
             val includedFolders = userPreferencesRepository.includedFolders.first()
 
             val songsFromSystem = localAudioSource.loadMusic(minDuration, includedFolders)
-            
+
             val total = songsFromSystem.size
             emit(ScanStatus.Scanning(total, total, "Processing $total songs..."))
-            
+
             songDao.updateMusicLibrary(songsFromSystem.map { it.asEntity() })
-            
+
             emit(ScanStatus.Completed(total))
         } catch (e: Exception) {
             emit(ScanStatus.Failed(e.message ?: "Unknown scanning error"))
@@ -112,13 +112,13 @@ class MusicRepositoryImpl @Inject constructor(
 
     override fun getPlaylists(): Flow<List<Playlist>> {
         return playlistDao.getAllPlaylists().map { entities ->
-            entities.map { 
+            entities.map {
                 Playlist(
                     id = it.playlist.playlistId,
                     name = it.playlist.name,
                     songCount = it.songCount,
                     coverArtUri = it.coverAlbumId?.let { albumId -> "content://media/external/audio/albumart/$albumId" }
-                ) 
+                )
             }
         }
     }
@@ -166,7 +166,7 @@ class MusicRepositoryImpl @Inject constructor(
     override suspend fun addSongsToPlaylist(playlistId: Long, songIds: List<Long>) {
         // Find existing max order to append
         var nextOrder = playlistDao.getNextSortOrder(playlistId)
-        
+
         val crossRefs = songIds.map { songId ->
             com.gemini.music.data.database.PlaylistSongCrossRef(
                 playlistId = playlistId,
@@ -186,14 +186,14 @@ class MusicRepositoryImpl @Inject constructor(
 
     override suspend fun moveSongInPlaylist(playlistId: Long, fromIndex: Int, toIndex: Int) {
         if (fromIndex == toIndex) return
-        
+
         val sortOrders = playlistDao.getSongsSortOrderSync(playlistId).toMutableList()
         if (fromIndex !in sortOrders.indices || toIndex !in sortOrders.indices) return
-        
+
         // Move the item in the list
         val item = sortOrders.removeAt(fromIndex)
         sortOrders.add(toIndex, item)
-        
+
         // Update all sort orders based on new positions
         sortOrders.forEachIndexed { index, songSortOrder ->
             playlistDao.updateSongPosition(playlistId, songSortOrder.songId, index)
@@ -229,18 +229,25 @@ class MusicRepositoryImpl @Inject constructor(
         // 1. Delete from Storage (MediaStore)
         // This might throw RecoverableSecurityException which should be handled by UI
         localAudioSource.deleteSong(song)
-        
+
         // 2. If successful (no exception), delete from local DB
         songDao.deleteSong(id = song.id)
     }
-    
+
+    override suspend fun deleteSongs(songs: List<Song>): Any? {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+             return localAudioSource.createDeleteRequest(songs)
+        }
+        return null
+    }
+
     // --- Tag Editing Implementation ---
-    
+
     override suspend fun getSongTags(songId: Long): SongTags? = withContext(Dispatchers.IO) {
         val song = songDao.getSongSync(songId)
         song?.let { tagEditorSource.readTags(it.dataPath, songId) }
     }
-    
+
     override suspend fun updateSongTags(tags: SongTags): Boolean = withContext(Dispatchers.IO) {
         val success = tagEditorSource.writeTags(tags)
         if (success) {
