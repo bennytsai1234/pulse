@@ -1,10 +1,10 @@
 # Tasks: Fix UX Issues Batch
 
 - [x] Investigate and fix dynamic color not activating <!-- id: fix-dynamic-color -->
-  - Investigation: Dynamic color functionality is correctly wired through ThemeSettingsScreen -> ToggleDynamicColorUseCase -> ThemeRepository
-  - The setting is persisted in DataStore properly
-  - Users may need to close and restart the app for changes to take full effect
-  - Recommendation: Consider adding a toast or dialog informing users to restart for theme changes
+  - **ROOT CAUSE**: `NowPlayingScreen` was not extracting album artwork colors to its own ViewModel
+  - **FIXED**: Connected `HeroImage.onImageLoaded` to trigger `NowPlayingEvent.UpdatePalette`
+  - Now album artwork colors are properly extracted and applied to the full-screen player background gradient
+  - Colors are also passed to `MainViewModel` for MiniPlayer theming
 - [x] Add bottom padding to FastScroller to prevent mini player obstruction <!-- id: fix-fast-scroller -->
   - Fixed: Added 80dp bottom padding to FastScroller in HomeScreen.kt
 - [-] Audit and fix sleep timer execution logic <!-- id: fix-sleep-timer -->

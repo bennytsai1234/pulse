@@ -207,7 +207,10 @@ fun NowPlayingScreen(
                         HeroImage(
                             artUri = uiState.song?.albumArtUri,
                             isPlaying = uiState.isPlaying,
-                            onImageLoaded = onArtworkLoaded,
+                            onImageLoaded = { bitmap ->
+                                viewModel.onEvent(NowPlayingEvent.UpdatePalette(bitmap))
+                                onArtworkLoaded(bitmap)
+                            },
                             onClick = { showLyrics = !showLyrics },
                             onSwipeLeft = { viewModel.onEvent(NowPlayingEvent.SkipNext) },
                             onSwipeRight = { viewModel.onEvent(NowPlayingEvent.SkipPrevious) },
