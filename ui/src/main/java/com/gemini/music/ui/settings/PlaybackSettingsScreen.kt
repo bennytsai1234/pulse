@@ -21,7 +21,7 @@ import androidx.compose.material.icons.rounded.Timer
 import androidx.compose.material.icons.rounded.Tune
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CenterAlignedTopAppBar
+import com.gemini.music.core.designsystem.component.GeminiTopBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
@@ -34,7 +34,6 @@ import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -52,24 +51,12 @@ fun PlaybackSettingsScreen(
     viewModel: PlaybackSettingsViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    
+
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(
-                title = { 
-                    Text(
-                        "Playback Settings", 
-                        fontWeight = FontWeight.Bold
-                    ) 
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = "Back")
-                    }
-                },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background
-                )
+            GeminiTopBar(
+                title = "Playback Settings",
+                onNavigationClick = onBackClick
             )
         }
     ) { padding ->
@@ -93,7 +80,7 @@ fun PlaybackSettingsScreen(
                         color = MaterialTheme.colorScheme.primary
                     )
                     Spacer(modifier = Modifier.height(12.dp))
-                    
+
                     Slider(
                         value = uiState.playbackSpeed,
                         onValueChange = { viewModel.setPlaybackSpeed(it) },
@@ -104,9 +91,9 @@ fun PlaybackSettingsScreen(
                             activeTrackColor = MaterialTheme.colorScheme.primary
                         )
                     )
-                    
+
                     Spacer(modifier = Modifier.height(8.dp))
-                    
+
                     LazyRow(
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
@@ -124,7 +111,7 @@ fun PlaybackSettingsScreen(
                     }
                 }
             }
-            
+
             // Crossfade Section
             item {
                 SettingsSection(
@@ -143,7 +130,7 @@ fun PlaybackSettingsScreen(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Spacer(modifier = Modifier.height(12.dp))
-                    
+
                     LazyRow(
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
@@ -151,8 +138,8 @@ fun PlaybackSettingsScreen(
                             FilterChip(
                                 selected = uiState.crossfadeDuration == duration,
                                 onClick = { viewModel.setCrossfadeDuration(duration) },
-                                label = { 
-                                    Text(if (duration == 0) "Off" else "${duration}s") 
+                                label = {
+                                    Text(if (duration == 0) "Off" else "${duration}s")
                                 },
                                 colors = FilterChipDefaults.filterChipColors(
                                     selectedContainerColor = MaterialTheme.colorScheme.primary,
@@ -163,7 +150,7 @@ fun PlaybackSettingsScreen(
                     }
                 }
             }
-            
+
             // Sleep Timer Fade Section
             item {
                 SettingsSection(
@@ -196,7 +183,7 @@ fun PlaybackSettingsScreen(
                             )
                         )
                     }
-                    
+
                     if (uiState.sleepTimerFadeOut) {
                         Spacer(modifier = Modifier.height(16.dp))
                         Text(

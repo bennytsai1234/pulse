@@ -40,7 +40,7 @@ import androidx.compose.material.icons.rounded.Timer
 import androidx.compose.material.icons.automirrored.rounded.TrendingUp
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CenterAlignedTopAppBar
+import com.gemini.music.core.designsystem.component.GeminiTopBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -48,7 +48,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -75,29 +74,17 @@ fun StatsScreen(
     viewModel: StatsViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    
+
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(
-                title = { 
-                    Text(
-                        "Listening Stats", 
-                        fontWeight = FontWeight.Bold
-                    ) 
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = "Back")
-                    }
-                },
+            GeminiTopBar(
+                title = "Listening Stats",
+                onNavigationClick = onBackClick,
                 actions = {
                     IconButton(onClick = { viewModel.refreshStats() }) {
                         Icon(Icons.Rounded.Refresh, contentDescription = "Refresh")
                     }
-                },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background
-                )
+                }
             )
         }
     ) { padding ->
@@ -162,7 +149,7 @@ fun StatsScreen(
                         )
                     }
                 }
-                
+
                 // Smart Playlists
                 item {
                     Text(
@@ -183,7 +170,7 @@ fun StatsScreen(
                         }
                     }
                 }
-                
+
                 // Top Songs
                 if (uiState.topSongs.isNotEmpty()) {
                     item {
@@ -202,7 +189,7 @@ fun StatsScreen(
                         )
                     }
                 }
-                
+
                 // Top Artists
                 if (uiState.topArtists.isNotEmpty()) {
                     item {
@@ -225,7 +212,7 @@ fun StatsScreen(
                         }
                     }
                 }
-                
+
                 // Empty State
                 if (uiState.topSongs.isEmpty() && uiState.topArtists.isEmpty()) {
                     item {
@@ -317,16 +304,16 @@ fun SmartPlaylistCard(
         SmartPlaylistType.THIS_WEEK -> Icons.Rounded.DateRange
         SmartPlaylistType.THIS_MONTH -> Icons.Rounded.CalendarMonth
     }
-    
+
     Card(
         modifier = Modifier
             .width(140.dp)
             .clickable { onClick() },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = if (isSelected) 
-                MaterialTheme.colorScheme.primaryContainer 
-            else 
+            containerColor = if (isSelected)
+                MaterialTheme.colorScheme.primaryContainer
+            else
                 MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
         )
     ) {
@@ -408,15 +395,15 @@ fun TopSongItem(
                 text = "$rank",
                 style = MaterialTheme.typography.labelMedium,
                 fontWeight = FontWeight.Bold,
-                color = if (rank <= 3) 
-                    MaterialTheme.colorScheme.onPrimary 
-                else 
+                color = if (rank <= 3)
+                    MaterialTheme.colorScheme.onPrimary
+                else
                     MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
-        
+
         Spacer(modifier = Modifier.width(12.dp))
-        
+
         // Song Info
         Column(modifier = Modifier.weight(1f)) {
             Text(
@@ -434,7 +421,7 @@ fun TopSongItem(
                 overflow = TextOverflow.Ellipsis
             )
         }
-        
+
         // Play Stats
         Column(horizontalAlignment = Alignment.End) {
             Text(

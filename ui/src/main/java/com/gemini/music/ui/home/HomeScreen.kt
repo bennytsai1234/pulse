@@ -403,8 +403,7 @@ fun GreetingHeader() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
+
 fun HomeTopBar(
     isSelectionMode: Boolean,
     selectedCount: Int,
@@ -617,7 +616,7 @@ fun FastScroller(
         modifier = modifier
             .width(48.dp)
             .fillMaxHeight()
-            .padding(vertical = 32.dp)
+            .padding(vertical = 32.dp, bottom = 80.dp)
             .pointerInput(Unit) {
                 detectVerticalDragGestures(
                     onDragStart = { offset ->

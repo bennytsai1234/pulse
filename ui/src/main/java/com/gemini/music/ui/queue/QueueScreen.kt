@@ -25,7 +25,7 @@ import androidx.compose.material.icons.rounded.Album
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.DragIndicator
 import androidx.compose.material.icons.rounded.GraphicEq
-import androidx.compose.material3.CenterAlignedTopAppBar
+import com.gemini.music.core.designsystem.component.GeminiTopBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -37,7 +37,6 @@ import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -85,29 +84,17 @@ fun QueueScreen(
 
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(
-                title = {
-                    Text(
-                        text = "Up Next",
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(Icons.Rounded.Close, contentDescription = "Close")
-                    }
-                },
+            GeminiTopBar(
+                title = "Up Next",
+                onNavigationClick = onBackClick,
+                navigationIcon = Icons.Rounded.Close,
                 actions = {
                     if (uiState.queue.size > 1) {
                         TextButton(onClick = { isReorderMode = !isReorderMode }) {
                             Text(if (isReorderMode) "Done" else "Sort")
                         }
                     }
-                },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface
-                )
+                }
             )
         }
     ) { padding ->
@@ -141,7 +128,7 @@ fun QueueScreen(
         } else {
             val scope = rememberCoroutineScope()
             val hapticFeedback = LocalHapticFeedback.current
-            
+
             // Track dragging state
             var draggedItemIndex by remember { mutableStateOf<Int?>(null) }
             var draggedOverIndex by remember { mutableStateOf<Int?>(null) }
@@ -158,16 +145,16 @@ fun QueueScreen(
                     key = { index, song -> "${song.id}_$index" }
                 ) { index, song ->
                     val isCurrent = index == uiState.currentSongIndex
-                    
+
                     if (isReorderMode) {
                         val isDragging = draggedItemIndex == index
                         val isDraggedOver = draggedOverIndex == index && draggedItemIndex != null && draggedItemIndex != index
-                        
+
                         val elevation by animateDpAsState(
                             targetValue = if (isDragging) 8.dp else 0.dp,
                             label = "DragElevation"
                         )
-                        
+
                         val backgroundColor = when {
                             isDragging -> MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.8f)
                             isDraggedOver -> MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
@@ -214,17 +201,17 @@ fun QueueScreen(
                                                     },
                                                     positionalThreshold = { it * 0.5f } // Require 50% swipe
                                                 )
-                        
+
                                                 SwipeToDismissBox(
                                                     state = dismissState,
                                                     backgroundContent = {
                                                         val color by animateColorAsState(
-                                                            targetValue = if (dismissState.targetValue == SwipeToDismissBoxValue.EndToStart) 
-                                                                MaterialTheme.colorScheme.errorContainer 
+                                                            targetValue = if (dismissState.targetValue == SwipeToDismissBoxValue.EndToStart)
+                                                                MaterialTheme.colorScheme.errorContainer
                                                             else MaterialTheme.colorScheme.surfaceContainerHighest,
                                                             label = "DismissColor"
                                                         )
-                                                        
+
                                                         Box(
                                                             modifier = Modifier
                                                                 .fillMaxSize()
@@ -255,7 +242,7 @@ fun QueueScreen(
                                 }
                             }
                         }
-                        
+
                         @Composable
                         fun QueueItem(
                             song: Song,
@@ -268,7 +255,7 @@ fun QueueScreen(
                             } else {
                                 MaterialTheme.colorScheme.surface
                             }
-                        
+
                             ListItem(
                                 headlineContent = {
                                     Text(
@@ -329,7 +316,7 @@ fun QueueScreen(
                                     .clickable(onClick = onClick)
                             )
                         }
-                        
+
 @Composable
 fun DraggableQueueItem(
     song: Song,
@@ -346,7 +333,7 @@ fun DraggableQueueItem(
     index: Int // Added index parameter
 ) {
     var accumulatedDrag by remember { androidx.compose.runtime.mutableFloatStateOf(0f) }
-    
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -378,21 +365,21 @@ fun DraggableQueueItem(
                         onDrag = { change, dragAmount ->
                             change.consume()
                             accumulatedDrag += dragAmount.y
-                            
+
                             val itemHeight = 72.dp.toPx() // Approximate height
                             val positionOffset = (accumulatedDrag / itemHeight).toInt()
                             val targetIndex = (index + positionOffset).coerceIn(0, totalItems - 1)
-                            
+
                             if (targetIndex != index) {
                                 onDragOver(targetIndex)
                             }
-                            
+
                             // Auto-scroll
                             val visibleItems = listState.layoutInfo.visibleItemsInfo
                             if (visibleItems.isNotEmpty()) {
                                 val firstVisible = visibleItems.first().index
                                 val lastVisible = visibleItems.last().index
-                                
+
                                 if (targetIndex <= firstVisible + 1 && firstVisible > 0) {
                                     scope.launch { listState.animateScrollToItem(firstVisible - 1) }
                                 } else if (targetIndex >= lastVisible - 1 && lastVisible < totalItems - 1) {
@@ -403,13 +390,13 @@ fun DraggableQueueItem(
                     )
                 }
         )
-        
+
         // Content
         QueueItem(
             song = song,
             isCurrent = isCurrent,
             isPlaying = isPlaying,
-            onClick = {} 
+            onClick = {}
         )
     }
 }
@@ -419,7 +406,7 @@ private fun formatDuration(durationMs: Long): String {
     val hours = totalSeconds / 3600
     val minutes = (totalSeconds % 3600) / 60
     val seconds = totalSeconds % 60
-    
+
     return if (hours > 0) {
         String.format("%d:%02d:%02d", hours, minutes, seconds)
     } else {
