@@ -69,7 +69,9 @@ fun SwipeablePlayerSheet(
                     modifier = Modifier
                         .fillMaxSize()
                         .graphicsLayer {
-                            alpha = progress
+                            // Fade in late: 0.2 -> 1.0 (Full opacity at 100%)
+                            // Maps progress 0.2..1.0 to 0..1
+                            alpha = ((progress - 0.2f) / 0.8f).coerceIn(0f, 1f)
                         }
                 ) {
                     expandedContent()
@@ -82,7 +84,9 @@ fun SwipeablePlayerSheet(
                     .fillMaxWidth()
                     .height(80.dp) // Fixed height for MiniPlayer area
                     .graphicsLayer {
-                        alpha = 1f - progress
+                        // Fade out early: 0.0 -> 0.4 (Zero opacity at 40%)
+                        // Maps progress 0.0..0.4 to 1..0
+                        alpha = (1f - (progress / 0.4f)).coerceIn(0f, 1f)
                     }
             ) {
                 miniPlayerContent()

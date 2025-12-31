@@ -3,6 +3,7 @@ package com.gemini.music.ui.main
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.exponentialDecay
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.AnchoredDraggableState
 import androidx.compose.foundation.gestures.DraggableAnchors
@@ -48,11 +49,11 @@ fun MainScreen(
     val navController = rememberNavController()
 
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
-    
+
     // Hide mini player on Settings, Search, and Queue
     // Hide mini player on specific screens
-    val isPlayerVisible = currentRoute != Screen.Settings.route && 
-                          currentRoute != Screen.Search.route && 
+    val isPlayerVisible = currentRoute != Screen.Settings.route &&
+                          currentRoute != Screen.Search.route &&
                           currentRoute != Screen.Queue.route &&
                           currentRoute != Screen.PlaybackSettings.route &&
                           currentRoute != Screen.DrivingMode.route &&
@@ -83,11 +84,11 @@ fun MainScreen(
                     anchors = sheetAnchors,
                     positionalThreshold = { distance: Float -> distance * 0.5f },
                     velocityThreshold = { with(density) { 100.dp.toPx() } },
-                    snapAnimationSpec = tween(150, easing = androidx.compose.animation.core.LinearEasing),
+                    snapAnimationSpec = tween(400, easing = androidx.compose.animation.core.FastOutSlowInEasing),
                     decayAnimationSpec = exponentialDecay()
                 )
             }
-            
+
             // Update anchors when availableHeight changes and force state sync
             androidx.compose.runtime.LaunchedEffect(sheetAnchors) {
                 sheetState.updateAnchors(sheetAnchors)
@@ -111,14 +112,14 @@ fun MainScreen(
                         val musicState by viewModel.musicState.collectAsState()
                         val progress by viewModel.progress.collectAsState()
                         val dynamicThemeState by viewModel.dynamicThemeState.collectAsState()
-                        
+
                         MiniPlayer(
                             song = musicState.currentSong,
                             isPlaying = musicState.isPlaying,
                             progress = progress,
                             dynamicTheme = dynamicThemeState,
                             onPlayPauseClick = { viewModel.togglePlayPause() },
-                            onQueueClick = { 
+                            onQueueClick = {
                                 // Navigate to Queue
                                 navController.navigate(Screen.Queue.route)
                             },
@@ -135,7 +136,7 @@ fun MainScreen(
                             onBackClick = {
                                 scope.launch { sheetState.animateTo(PlayerSheetValue.Collapsed) }
                             },
-                            onQueueClick = { 
+                            onQueueClick = {
                                 // Navigate to Queue and collapse or keep open?
                                 // Better to collapse or just navigate on top.
                                 // If we navigate, BackHandler of Navigation takes over.
