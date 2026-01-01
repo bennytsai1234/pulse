@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animated-vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt">
+
+    <aapt:attr name="android:drawable">
+        <vector
+            android:width="108dp"
+            android:height="108dp"
+            android:viewportWidth="108"
+            android:viewportHeight="108">
+            <group
+                android:name="logo_group"
+                android:pivotX="54"
+                android:pivotY="54">
+                <path
+                    android:fillType="evenOdd"
+                    android:pathData="M38,36 L38,72 C38,77.5 33.5,82 28,82 C22.5,82 18,77.5 18,72 C18,66.5 22.5,62 28,62 C30,62 32,62.5 34,63.5 L34,36 L38,36 Z M90,36 L90,72 C90,77.5 85.5,82 80,82 C74.5,82 70,77.5 70,72 C70,66.5 74.5,62 80,62 C82,62 84,62.5 86,63.5 L86,36 L90,36 Z M34,36 L34,26 C34,26 54,34 86,26 L86,36 C86,36 60,42 34,36 Z">
+                    <aapt:attr name="android:fillColor">
+                        <gradient
+                            android:endX="90"
+                            android:endY="82"
+                            android:startX="18"
+                            android:startY="26"
+                            android:type="linear">
+                            <item
+                                android:color="#FF8AB4F8"
+                                android:offset="0.0" />
+                            <item
+                                android:color="#FFC58AF9"
+                                android:offset="1.0" />
+                        </gradient>
+                    </aapt:attr>
+                </path>
+            </group>
+        </vector>
+    </aapt:attr>
+
+    <target android:name="logo_group">
+        <aapt:attr name="android:animation">
+            <set>
+                <objectAnimator
+                    android:duration="800"
+                    android:propertyName="scaleX"
+                    android:valueFrom="0.0"
+                    android:valueTo="1.0"
+                    android:valueType="floatType"
+                    android:interpolator="@android:interpolator/overshoot" />
+                <objectAnimator
+                    android:duration="800"
+                    android:propertyName="scaleY"
+                    android:valueFrom="0.0"
+                    android:valueTo="1.0"
+                    android:valueType="floatType"
+                    android:interpolator="@android:interpolator/overshoot" />
+                <objectAnimator
+                    android:duration="500"
+                    android:propertyName="alpha"
+                    android:valueFrom="0.0"
+                    android:valueTo="1.0"
+                    android:valueType="floatType"
+                    android:interpolator="@android:interpolator/linear" />
+            </set>
+        </aapt:attr>
+    </target>
+</animated-vector>
