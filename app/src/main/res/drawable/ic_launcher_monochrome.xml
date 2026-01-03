@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Pulse wave monochrome icon -->
+    <group
+        android:translateX="27"
+        android:translateY="27">
+
+        <!-- Main pulse wave -->
+        <path
+            android:fillColor="#000000"
+            android:pathData="M0,27 L8,27 L12,15 L18,35 L24,10 L30,40 L36,20 L42,30 L48,25 L54,27 L54,31 L48,29 L42,34 L36,24 L30,44 L24,14 L18,39 L12,19 L8,31 L0,31 Z" />
+
+        <!-- Play button triangle -->
+        <path
+            android:fillColor="#000000"
+            android:pathData="M20,18 L38,27 L20,36 Z" />
+
+    </group>
+</vector>
