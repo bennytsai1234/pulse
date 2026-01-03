@@ -55,7 +55,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.pulse.music.core.designsystem.component.GeminiTopBarWithBack
+import com.pulse.music.core.designsystem.component.PulseTopBarWithBack
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -70,7 +70,7 @@ fun EqualizerScreen(
 
     Scaffold(
             topBar = {
-                GeminiTopBarWithBack(
+                PulseTopBarWithBack(
                         title = "Equalizer",
                         onBackClick = onBackClick,
                         actions = {

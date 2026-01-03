@@ -50,7 +50,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import com.pulse.music.core.designsystem.component.GeminiTopBarWithBack
+import com.pulse.music.core.designsystem.component.PulseTopBarWithBack
 import com.pulse.music.ui.component.SongListItem
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -63,7 +63,7 @@ fun ArtistDetailScreen(
     val uiState by viewModel.uiState.collectAsState()
 
     Scaffold(
-            topBar = { GeminiTopBarWithBack(title = uiState.artistName, onBackClick = onBackClick) }
+            topBar = { PulseTopBarWithBack(title = uiState.artistName, onBackClick = onBackClick) }
     ) { padding ->
         LazyColumn(
                 modifier = Modifier.fillMaxSize().padding(padding),

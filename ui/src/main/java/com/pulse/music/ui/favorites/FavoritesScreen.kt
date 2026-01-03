@@ -11,10 +11,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.pulse.music.core.designsystem.GeminiSpacing
-import com.pulse.music.core.designsystem.component.GeminiEmptyState
-import com.pulse.music.core.designsystem.component.GeminiSongListItem
-import com.pulse.music.core.designsystem.component.GeminiTopBarWithBack
+import com.pulse.music.core.designsystem.PulseSpacing
+import com.pulse.music.core.designsystem.component.PulseEmptyState
+import com.pulse.music.core.designsystem.component.PulseSongListItem
+import com.pulse.music.core.designsystem.component.PulseTopBarWithBack
 
 /**
  * 重新設計的最愛畫面 - 使用統一設計系統
@@ -29,7 +29,7 @@ fun FavoritesScreen(
 
     Scaffold(
         topBar = {
-            GeminiTopBarWithBack(
+            PulseTopBarWithBack(
                 title = "我的最愛",
                 onBackClick = onBackClick
             )
@@ -43,7 +43,7 @@ fun FavoritesScreen(
                     .padding(padding),
                 contentAlignment = androidx.compose.ui.Alignment.Center
             ) {
-                GeminiEmptyState(
+                PulseEmptyState(
                     icon = Icons.Rounded.Favorite,
                     title = "尚無最愛歌曲",
                     subtitle = "點擊歌曲旁的愛心圖標來加入最愛"
@@ -54,13 +54,13 @@ fun FavoritesScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(padding),
-                contentPadding = PaddingValues(bottom = GeminiSpacing.bottomSafeArea)
+                contentPadding = PaddingValues(bottom = PulseSpacing.bottomSafeArea)
             ) {
                 itemsIndexed(
                     items = uiState.songs,
                     key = { _, song -> song.id }
                 ) { index, song ->
-                    GeminiSongListItem(
+                    PulseSongListItem(
                         title = song.title,
                         subtitle = "${song.artist} · ${song.album}",
                         albumArtUri = song.albumArtUri,
@@ -71,7 +71,7 @@ fun FavoritesScreen(
                         showFavorite = true,
                         onClick = { viewModel.onSongClick(index) },
                         onFavoriteClick = { viewModel.toggleFavorite(song.id) },
-                        modifier = Modifier.padding(horizontal = GeminiSpacing.xs)
+                        modifier = Modifier.padding(horizontal = PulseSpacing.xs)
                     )
                 }
             }

@@ -12,7 +12,7 @@ import com.pulse.music.domain.model.ThemePalette
  */
 data class ThemeSettingsUiState(
     val currentMode: ThemeMode = ThemeMode.SYSTEM,
-    val currentPalette: ThemePalette = ThemePalette.GEMINI,
+    val currentPalette: ThemePalette = ThemePalette.PULSE,
     val useDynamicColor: Boolean = false,
     val useAmoledBlack: Boolean = false,
     val contrastLevel: Float = 1.0f,

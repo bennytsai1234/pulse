@@ -35,8 +35,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import com.pulse.music.core.designsystem.component.GeminiEmptyState
-import com.pulse.music.core.designsystem.component.GeminiTopBarWithBack
+import com.pulse.music.core.designsystem.component.PulseEmptyState
+import com.pulse.music.core.designsystem.component.PulseTopBarWithBack
 import com.pulse.music.domain.model.Song
 import com.pulse.music.ui.component.SongListItem
 import kotlinx.coroutines.launch
@@ -66,7 +66,7 @@ fun PlaylistDetailScreen(
 
     Scaffold(
             topBar = {
-                GeminiTopBarWithBack(
+                PulseTopBarWithBack(
                         title = uiState.playlist?.name ?: "Playlist",
                         onBackClick = onBackClick,
                         actions = {
@@ -101,7 +101,7 @@ fun PlaylistDetailScreen(
     ) { padding ->
         if (uiState.songs.isEmpty()) {
             Box(modifier = Modifier.padding(padding).fillMaxSize()) {
-                GeminiEmptyState(
+                PulseEmptyState(
                         icon = Icons.AutoMirrored.Rounded.QueueMusic,
                         title = "Empty Playlist",
                         subtitle = "Add songs from your library!"

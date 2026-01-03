@@ -22,7 +22,7 @@ import javax.inject.Inject
  * 負責管理 ExoPlayer 生命週期、MediaSession 以及背景播放邏輯。
  */
 @AndroidEntryPoint
-class GeminiAudioService : MediaLibraryService() {
+class PulseAudioService : MediaLibraryService() {
 
     // 透過 Hilt 注入已經配置好的 ExoPlayer 實例
     // 我們會在 DI Module 中設定 Gapless 播放與 Audio Focus
@@ -270,7 +270,7 @@ class GeminiAudioService : MediaLibraryService() {
     }
 
     companion object {
-        const val MEDIA_ROOT_ID = "gemini_root"
+        const val MEDIA_ROOT_ID = "PULSE_root"
         const val MEDIA_RECENT_ID = "recent"
         const val MEDIA_ALL_SONGS_ID = "all_songs"
         const val MEDIA_ALBUMS_ID = "albums"
@@ -361,7 +361,7 @@ class GeminiAudioService : MediaLibraryService() {
             }
 
             override fun onPlayerError(error: androidx.media3.common.PlaybackException) {
-                android.util.Log.e("GeminiAudioService", "Player Error: ${error.message}")
+                android.util.Log.e("PulseAudioService", "Player Error: ${error.message}")
                 android.widget.Toast.makeText(applicationContext, "Playback Error: ${error.errorCodeName}", android.widget.Toast.LENGTH_SHORT).show()
 
                 // Attempt to skip to next track if available

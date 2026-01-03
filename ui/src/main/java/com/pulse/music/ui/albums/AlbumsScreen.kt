@@ -14,10 +14,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.pulse.music.core.designsystem.GeminiSpacing
-import com.pulse.music.core.designsystem.component.GeminiAlbumGridCard
-import com.pulse.music.core.designsystem.component.GeminiEmptyState
-import com.pulse.music.core.designsystem.component.GeminiTopBarWithBack
+import com.pulse.music.core.designsystem.PulseSpacing
+import com.pulse.music.core.designsystem.component.PulseAlbumGridCard
+import com.pulse.music.core.designsystem.component.PulseEmptyState
+import com.pulse.music.core.designsystem.component.PulseTopBarWithBack
 import com.pulse.music.ui.R
 
 /**
@@ -34,7 +34,7 @@ fun AlbumsScreen(
 
     Scaffold(
         topBar = {
-            GeminiTopBarWithBack(
+            PulseTopBarWithBack(
                 title = stringResource(R.string.albums),
                 onBackClick = onBackClick
             )
@@ -42,7 +42,7 @@ fun AlbumsScreen(
         containerColor = MaterialTheme.colorScheme.background
     ) { padding ->
         if (uiState.albums.isEmpty() && !uiState.isLoading) {
-            GeminiEmptyState(
+            PulseEmptyState(
                 icon = Icons.Rounded.Album,
                 title = stringResource(R.string.no_albums),
                 subtitle = "尚未發現任何專輯"
@@ -54,19 +54,19 @@ fun AlbumsScreen(
                     .fillMaxSize()
                     .padding(padding),
                 contentPadding = PaddingValues(
-                    start = GeminiSpacing.screenPaddingHorizontal,
-                    end = GeminiSpacing.screenPaddingHorizontal,
-                    top = GeminiSpacing.md,
-                    bottom = GeminiSpacing.bottomSafeArea
+                    start = PulseSpacing.screenPaddingHorizontal,
+                    end = PulseSpacing.screenPaddingHorizontal,
+                    top = PulseSpacing.md,
+                    bottom = PulseSpacing.bottomSafeArea
                 ),
-                horizontalArrangement = Arrangement.spacedBy(GeminiSpacing.cardSpacing),
-                verticalArrangement = Arrangement.spacedBy(GeminiSpacing.cardSpacing)
+                horizontalArrangement = Arrangement.spacedBy(PulseSpacing.cardSpacing),
+                verticalArrangement = Arrangement.spacedBy(PulseSpacing.cardSpacing)
             ) {
                 items(
                     items = uiState.albums,
                     key = { it.id }
                 ) { album ->
-                    GeminiAlbumGridCard(
+                    PulseAlbumGridCard(
                         title = album.title,
                         subtitle = album.artist,
                         artUri = album.artUri,

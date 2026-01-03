@@ -6,7 +6,7 @@ import androidx.test.core.app.ApplicationProvider
 import app.cash.turbine.test
 import com.pulse.music.data.database.FavoriteDao
 import com.pulse.music.data.database.FavoriteEntity
-import com.pulse.music.data.database.GeminiDatabase
+import com.pulse.music.data.database.PulseDatabase
 import com.pulse.music.data.database.PlaylistDao
 import com.pulse.music.data.database.SongDao
 import com.pulse.music.data.database.SongEntity
@@ -39,7 +39,7 @@ import org.robolectric.annotation.Config
 @Config(manifest = Config.NONE, sdk = [28])
 class MusicRepositoryImplTest {
 
-    private lateinit var database: GeminiDatabase
+    private lateinit var database: PulseDatabase
     private lateinit var songDao: SongDao
     private lateinit var playlistDao: PlaylistDao
     private lateinit var favoriteDao: FavoriteDao
@@ -53,7 +53,7 @@ class MusicRepositoryImplTest {
     @Before
     fun setUp() {
         val context = ApplicationProvider.getApplicationContext<Context>()
-        database = Room.inMemoryDatabaseBuilder(context, GeminiDatabase::class.java)
+        database = Room.inMemoryDatabaseBuilder(context, PulseDatabase::class.java)
             .allowMainThreadQueries()
             .build()
         

@@ -64,7 +64,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
-import com.pulse.music.core.designsystem.component.GeminiTopBarWithBack
+import com.pulse.music.core.designsystem.component.PulseTopBarWithBack
 import com.pulse.music.domain.model.MusicFolder
 import com.pulse.music.domain.model.Song
 
@@ -82,7 +82,7 @@ fun FolderBrowserScreen(
 
     Scaffold(
             topBar = {
-                GeminiTopBarWithBack(
+                PulseTopBarWithBack(
                         title =
                                 if (uiState.currentPath != null) {
                                     uiState.currentContent?.folder?.name ?: "Folders"

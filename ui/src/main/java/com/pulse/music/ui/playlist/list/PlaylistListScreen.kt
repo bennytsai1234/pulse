@@ -12,10 +12,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.pulse.music.core.designsystem.GeminiSpacing
-import com.pulse.music.core.designsystem.component.GeminiEmptyState
-import com.pulse.music.core.designsystem.component.GeminiPlaylistGridCard
-import com.pulse.music.core.designsystem.component.GeminiTopBarWithBack
+import com.pulse.music.core.designsystem.PulseSpacing
+import com.pulse.music.core.designsystem.component.PulseEmptyState
+import com.pulse.music.core.designsystem.component.PulsePlaylistGridCard
+import com.pulse.music.core.designsystem.component.PulseTopBarWithBack
 import com.pulse.music.ui.component.CreatePlaylistDialog
 import com.pulse.music.domain.model.Playlist
 
@@ -50,7 +50,7 @@ fun PlaylistListScreen(
 
     Scaffold(
         topBar = {
-            GeminiTopBarWithBack(
+            PulseTopBarWithBack(
                 title = "播放清單",
                 onBackClick = onBackClick
             )
@@ -67,7 +67,7 @@ fun PlaylistListScreen(
     ) { padding ->
         if (uiState.playlists.isEmpty()) {
             Box(modifier = Modifier.padding(padding).fillMaxSize()) {
-                GeminiEmptyState(
+                PulseEmptyState(
                     icon = Icons.AutoMirrored.Rounded.List,
                     title = "沒有播放清單",
                     subtitle = "建立你的第一個播放清單吧！"
@@ -80,13 +80,13 @@ fun PlaylistListScreen(
                     .fillMaxSize()
                     .padding(padding),
                 contentPadding = PaddingValues(
-                    start = GeminiSpacing.screenPaddingHorizontal,
-                    end = GeminiSpacing.screenPaddingHorizontal,
-                    top = GeminiSpacing.md,
-                    bottom = GeminiSpacing.bottomSafeArea
+                    start = PulseSpacing.screenPaddingHorizontal,
+                    end = PulseSpacing.screenPaddingHorizontal,
+                    top = PulseSpacing.md,
+                    bottom = PulseSpacing.bottomSafeArea
                 ),
-                horizontalArrangement = Arrangement.spacedBy(GeminiSpacing.cardSpacing),
-                verticalArrangement = Arrangement.spacedBy(GeminiSpacing.cardSpacing)
+                horizontalArrangement = Arrangement.spacedBy(PulseSpacing.cardSpacing),
+                verticalArrangement = Arrangement.spacedBy(PulseSpacing.cardSpacing)
             ) {
                 items(
                     items = uiState.playlists,
@@ -110,7 +110,7 @@ private fun PlaylistGridItem(
     // 取得封面 URI 列表 (最多 4 個用於 2x2 拼圖)
     val coverArts = listOfNotNull(playlist.coverArtUri)
     
-    GeminiPlaylistGridCard(
+    PulsePlaylistGridCard(
         title = playlist.name,
         songCount = playlist.songCount,
         coverArts = coverArts,

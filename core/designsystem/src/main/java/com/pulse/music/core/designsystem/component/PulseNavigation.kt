@@ -32,9 +32,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import com.pulse.music.core.designsystem.GeminiCorners
-import com.pulse.music.core.designsystem.GeminiSize
-import com.pulse.music.core.designsystem.GeminiSpacing
+import com.pulse.music.core.designsystem.PulseCorners
+import com.pulse.music.core.designsystem.PulseSize
+import com.pulse.music.core.designsystem.PulseSpacing
 import java.util.Calendar
 
 /**
@@ -42,7 +42,7 @@ import java.util.Calendar
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun GeminiTopBar(
+fun PulseTopBar(
     title: String,
     modifier: Modifier = Modifier,
     navigationIcon: @Composable (() -> Unit)? = null,
@@ -73,14 +73,14 @@ fun GeminiTopBar(
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun GeminiTopBarWithBack(
+fun PulseTopBarWithBack(
     title: String,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
     actions: @Composable RowScope.() -> Unit = {},
     scrollBehavior: TopAppBarScrollBehavior? = null
 ) {
-    GeminiTopBar(
+    PulseTopBar(
         title = title,
         navigationIcon = {
             IconButton(onClick = onBackClick) {
@@ -100,7 +100,7 @@ fun GeminiTopBarWithBack(
  * 問候語標頭 (Dashboard 首頁用)
  */
 @Composable
-fun GeminiGreetingHeader(
+fun PULSEGreetingHeader(
     modifier: Modifier = Modifier,
     userName: String? = null
 ) {
@@ -124,8 +124,8 @@ fun GeminiGreetingHeader(
         modifier = modifier
             .fillMaxWidth()
             .padding(
-                horizontal = GeminiSpacing.screenPaddingHorizontal,
-                vertical = GeminiSpacing.lg
+                horizontal = PulseSpacing.screenPaddingHorizontal,
+                vertical = PulseSpacing.lg
             )
     ) {
         Row(
@@ -135,7 +135,7 @@ fun GeminiGreetingHeader(
                 text = icon,
                 style = MaterialTheme.typography.headlineMedium
             )
-            Spacer(modifier = Modifier.width(GeminiSpacing.sm))
+            Spacer(modifier = Modifier.width(PulseSpacing.sm))
             Text(
                 text = greeting,
                 style = MaterialTheme.typography.headlineMedium,
@@ -151,7 +151,7 @@ fun GeminiGreetingHeader(
             )
         }
 
-        Spacer(modifier = Modifier.height(GeminiSpacing.xs))
+        Spacer(modifier = Modifier.height(PulseSpacing.xs))
 
         Text(
             text = "來聽點音樂吧",
@@ -165,17 +165,17 @@ fun GeminiGreetingHeader(
  * Dashboard 快捷入口列
  */
 @Composable
-fun GeminiQuickAccessRow(
+fun PULSEQuickAccessRow(
     items: List<QuickAccessItem>,
     modifier: Modifier = Modifier
 ) {
     LazyRow(
         modifier = modifier.fillMaxWidth(),
-        contentPadding = PaddingValues(horizontal = GeminiSpacing.screenPaddingHorizontal),
-        horizontalArrangement = Arrangement.spacedBy(GeminiSpacing.md)
+        contentPadding = PaddingValues(horizontal = PulseSpacing.screenPaddingHorizontal),
+        horizontalArrangement = Arrangement.spacedBy(PulseSpacing.md)
     ) {
         items(items) { item ->
-            GeminiQuickAction(
+            PULSEQuickAction(
                 icon = item.icon,
                 label = item.label,
                 onClick = item.onClick,
@@ -198,7 +198,7 @@ data class QuickAccessItem(
  * 統計卡片 (Dashboard 用)
  */
 @Composable
-fun GeminiStatsCard(
+fun PULSEStatsCard(
     title: String,
     value: String,
     modifier: Modifier = Modifier,
@@ -206,10 +206,10 @@ fun GeminiStatsCard(
     subtitle: String? = null,
     onClick: (() -> Unit)? = null
 ) {
-    GeminiCard(
+    PulseCard(
         modifier = modifier,
         onClick = onClick,
-        contentPadding = PaddingValues(GeminiSpacing.cardPadding)
+        contentPadding = PaddingValues(PulseSpacing.cardPadding)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically
@@ -218,7 +218,7 @@ fun GeminiStatsCard(
                 Box(
                     modifier = Modifier
                         .size(48.dp)
-                        .clip(RoundedCornerShape(GeminiCorners.md))
+                        .clip(RoundedCornerShape(PulseCorners.md))
                         .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)),
                     contentAlignment = Alignment.Center
                 ) {
@@ -228,7 +228,7 @@ fun GeminiStatsCard(
                         tint = MaterialTheme.colorScheme.primary
                     )
                 }
-                Spacer(modifier = Modifier.width(GeminiSpacing.md))
+                Spacer(modifier = Modifier.width(PulseSpacing.md))
             }
 
             Column(modifier = Modifier.weight(1f)) {
@@ -237,7 +237,7 @@ fun GeminiStatsCard(
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-                Spacer(modifier = Modifier.height(GeminiSpacing.xxs))
+                Spacer(modifier = Modifier.height(PulseSpacing.xxs))
                 Text(
                     text = value,
                     style = MaterialTheme.typography.titleLarge,
@@ -259,7 +259,7 @@ fun GeminiStatsCard(
  * 橫向滑動的專輯/歌曲卡片
  */
 @Composable
-fun GeminiHorizontalCard(
+fun PULSEHorizontalCard(
     title: String,
     subtitle: String,
     imageUri: String?,
@@ -279,19 +279,19 @@ fun GeminiHorizontalCard(
         modifier = modifier
             .width(140.dp)
             .scale(scale)
-            .clip(RoundedCornerShape(GeminiCorners.lg))
+            .clip(RoundedCornerShape(PulseCorners.lg))
             .clickable(
                 interactionSource = interactionSource,
                 indication = LocalIndication.current,
                 onClick = onClick
             )
-            .padding(GeminiSpacing.sm)
+            .padding(PulseSpacing.sm)
     ) {
         // 封面圖
         Box(
             modifier = Modifier
                 .size(124.dp)
-                .clip(RoundedCornerShape(GeminiCorners.albumArtLarge)),
+                .clip(RoundedCornerShape(PulseCorners.albumArtLarge)),
             contentAlignment = Alignment.Center
         ) {
             if (imageUri != null) {
@@ -321,7 +321,7 @@ fun GeminiHorizontalCard(
             }
         }
 
-        Spacer(modifier = Modifier.height(GeminiSpacing.sm))
+        Spacer(modifier = Modifier.height(PulseSpacing.sm))
 
         Text(
             text = title,
@@ -345,7 +345,7 @@ fun GeminiHorizontalCard(
  * 篩選/排序 Chip
  */
 @Composable
-fun GeminiFilterChip(
+fun PULSEFilterChip(
     label: String,
     selected: Boolean,
     onClick: () -> Unit,
@@ -366,15 +366,15 @@ fun GeminiFilterChip(
 
     Surface(
         modifier = modifier
-            .clip(RoundedCornerShape(GeminiCorners.chip))
+            .clip(RoundedCornerShape(PulseCorners.chip))
             .clickable(onClick = onClick),
         color = backgroundColor,
-        shape = RoundedCornerShape(GeminiCorners.chip)
+        shape = RoundedCornerShape(PulseCorners.chip)
     ) {
         Row(
             modifier = Modifier.padding(
-                horizontal = GeminiSpacing.md,
-                vertical = GeminiSpacing.sm
+                horizontal = PulseSpacing.md,
+                vertical = PulseSpacing.sm
             ),
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -383,9 +383,9 @@ fun GeminiFilterChip(
                     imageVector = leadingIcon,
                     contentDescription = null,
                     tint = contentColor,
-                    modifier = Modifier.size(GeminiSize.iconXs)
+                    modifier = Modifier.size(PulseSize.iconXs)
                 )
-                Spacer(modifier = Modifier.width(GeminiSpacing.xs))
+                Spacer(modifier = Modifier.width(PulseSpacing.xs))
             }
 
             Text(
@@ -402,7 +402,7 @@ fun GeminiFilterChip(
  * 操作欄 (播放全部、隨機播放等)
  */
 @Composable
-fun GeminiControlRow(
+fun PULSEControlRow(
     itemCount: Int,
     modifier: Modifier = Modifier,
     onPlayAll: (() -> Unit)? = null,
@@ -413,8 +413,8 @@ fun GeminiControlRow(
         modifier = modifier
             .fillMaxWidth()
             .padding(
-                horizontal = GeminiSpacing.screenPaddingHorizontal,
-                vertical = GeminiSpacing.sm
+                horizontal = PulseSpacing.screenPaddingHorizontal,
+                vertical = PulseSpacing.sm
             ),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
@@ -422,7 +422,7 @@ fun GeminiControlRow(
         // 左側：數量與篩選
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(GeminiSpacing.sm)
+            horizontalArrangement = Arrangement.spacedBy(PulseSpacing.sm)
         ) {
             Text(
                 text = "$itemCount 首",
@@ -434,7 +434,7 @@ fun GeminiControlRow(
 
         // 右側：播放按鈕
         Row(
-            horizontalArrangement = Arrangement.spacedBy(GeminiSpacing.sm)
+            horizontalArrangement = Arrangement.spacedBy(PulseSpacing.sm)
         ) {
             if (onShuffle != null) {
                 FilledTonalIconButton(
@@ -444,7 +444,7 @@ fun GeminiControlRow(
                     Icon(
                         imageVector = Icons.Rounded.Shuffle,
                         contentDescription = "隨機播放",
-                        modifier = Modifier.size(GeminiSize.iconSm)
+                        modifier = Modifier.size(PulseSize.iconSm)
                     )
                 }
             }
@@ -457,7 +457,7 @@ fun GeminiControlRow(
                     Icon(
                         imageVector = Icons.Rounded.PlayArrow,
                         contentDescription = "播放全部",
-                        modifier = Modifier.size(GeminiSize.iconMd)
+                        modifier = Modifier.size(PulseSize.iconMd)
                     )
                 }
             }

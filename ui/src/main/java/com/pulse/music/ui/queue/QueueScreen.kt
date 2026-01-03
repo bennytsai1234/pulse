@@ -59,7 +59,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import com.pulse.music.core.designsystem.component.GeminiTopBar
+import com.pulse.music.core.designsystem.component.PulseTopBar
 import com.pulse.music.domain.model.Song
 import kotlinx.coroutines.launch
 
@@ -79,7 +79,7 @@ fun QueueScreen(onBackClick: () -> Unit, viewModel: QueueViewModel = hiltViewMod
 
     Scaffold(
             topBar = {
-                GeminiTopBar(
+                PulseTopBar(
                         title = "Up Next",
                         navigationIcon = {
                             IconButton(onClick = onBackClick) {

@@ -93,8 +93,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.pulse.music.domain.model.Song
-import com.pulse.music.core.designsystem.component.GeminiEmptyState
-import com.pulse.music.core.designsystem.component.GeminiTopBar
+import com.pulse.music.core.designsystem.component.PulseEmptyState
+import com.pulse.music.core.designsystem.component.PulseTopBar
 import com.pulse.music.ui.component.SongListItem
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.surfaceColorAtElevation
@@ -282,7 +282,7 @@ fun HomeScreen(
                 }
 
                 if (uiState.songs.isEmpty() && !uiState.isLoading) {
-                    GeminiEmptyState(
+                    PulseEmptyState(
                         icon = Icons.Rounded.Album,
                         title = stringResource(com.pulse.music.ui.R.string.no_songs),
                         subtitle = stringResource(com.pulse.music.ui.R.string.no_songs_message),
@@ -418,7 +418,7 @@ fun HomeTopBar(
 ) {
     if (isSelectionMode) {
         // Contextual Action Bar appearance for Selection Mode
-        GeminiTopBar(
+        PulseTopBar(
             title = {
                 Text(
                     text = pluralStringResource(com.pulse.music.ui.R.plurals.selected_count, selectedCount, selectedCount),
@@ -454,7 +454,7 @@ fun HomeTopBar(
         )
     } else {
         // Standard Home AppBar
-        GeminiTopBar(
+        PulseTopBar(
             title = { /* Empty or App Name if desired, keeping empty as per original functionality */ },
             navigationIcon = {
                 IconButton(onClick = onMenuClick) {

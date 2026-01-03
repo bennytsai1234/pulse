@@ -24,13 +24,13 @@ import org.junit.Assert.assertTrue
 @Config(manifest = Config.NONE, sdk = [28])
 class SongDaoTest {
 
-    private lateinit var database: GeminiDatabase
+    private lateinit var database: PulseDatabase
     private lateinit var songDao: SongDao
 
     @Before
     fun setUp() {
         val context = ApplicationProvider.getApplicationContext<Context>()
-        database = Room.inMemoryDatabaseBuilder(context, GeminiDatabase::class.java)
+        database = Room.inMemoryDatabaseBuilder(context, PulseDatabase::class.java)
             .allowMainThreadQueries()
             .build()
         songDao = database.songDao()

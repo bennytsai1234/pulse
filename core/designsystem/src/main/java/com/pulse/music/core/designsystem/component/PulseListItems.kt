@@ -30,9 +30,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import com.pulse.music.core.designsystem.GeminiCorners
-import com.pulse.music.core.designsystem.GeminiSize
-import com.pulse.music.core.designsystem.GeminiSpacing
+import com.pulse.music.core.designsystem.PulseCorners
+import com.pulse.music.core.designsystem.PulseSize
+import com.pulse.music.core.designsystem.PulseSpacing
 
 /**
  * 統一的歌曲列表項目
@@ -53,7 +53,7 @@ import com.pulse.music.core.designsystem.GeminiSpacing
  * @param onMoreClick 更多按鈕回調
  */
 @Composable
-fun GeminiSongListItem(
+fun PulseSongListItem(
     title: String,
     subtitle: String,
     modifier: Modifier = Modifier,
@@ -93,9 +93,9 @@ fun GeminiSongListItem(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .height(GeminiSize.listItemHeight)
+            .height(PulseSize.listItemHeight)
             .scale(scale)
-            .clip(RoundedCornerShape(GeminiCorners.md))
+            .clip(RoundedCornerShape(PulseCorners.md))
             .background(backgroundColor)
             .clickable(
                 interactionSource = interactionSource,
@@ -103,16 +103,16 @@ fun GeminiSongListItem(
                 onClick = onClick
             )
             .padding(
-                horizontal = GeminiSpacing.listItemPaddingHorizontal,
-                vertical = GeminiSpacing.listItemPaddingVertical
+                horizontal = PulseSpacing.listItemPaddingHorizontal,
+                vertical = PulseSpacing.listItemPaddingVertical
             ),
         verticalAlignment = Alignment.CenterVertically
     ) {
         // 專輯封面
         Box(
             modifier = Modifier
-                .size(GeminiSize.albumArtSmall)
-                .clip(RoundedCornerShape(GeminiCorners.albumArt)),
+                .size(PulseSize.albumArtSmall)
+                .clip(RoundedCornerShape(PulseCorners.albumArt)),
             contentAlignment = Alignment.Center
         ) {
             if (albumArtUri != null) {
@@ -136,7 +136,7 @@ fun GeminiSongListItem(
                             imageVector = Icons.Rounded.MusicNote,
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
-                            modifier = Modifier.size(GeminiSize.iconMd)
+                            modifier = Modifier.size(PulseSize.iconMd)
                         )
                     }
                 }
@@ -154,13 +154,13 @@ fun GeminiSongListItem(
                         imageVector = Icons.Rounded.PlayArrow,
                         contentDescription = "Playing",
                         tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(GeminiSize.iconMd)
+                        modifier = Modifier.size(PulseSize.iconMd)
                     )
                 }
             }
         }
         
-        Spacer(modifier = Modifier.width(GeminiSpacing.md))
+        Spacer(modifier = Modifier.width(PulseSpacing.md))
         
         // 文字內容
         Column(
@@ -177,7 +177,7 @@ fun GeminiSongListItem(
                 overflow = TextOverflow.Ellipsis
             )
             
-            Spacer(modifier = Modifier.height(GeminiSpacing.xxs))
+            Spacer(modifier = Modifier.height(PulseSpacing.xxs))
             
             Row(
                 verticalAlignment = Alignment.CenterVertically
@@ -217,7 +217,7 @@ fun GeminiSongListItem(
                         contentDescription = if (isFavorite) "Remove from favorites" else "Add to favorites",
                         tint = if (isFavorite) MaterialTheme.colorScheme.primary 
                                else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
-                        modifier = Modifier.size(GeminiSize.iconSm)
+                        modifier = Modifier.size(PulseSize.iconSm)
                     )
                 }
             }
@@ -232,7 +232,7 @@ fun GeminiSongListItem(
                         imageVector = Icons.Rounded.MoreVert,
                         contentDescription = "More options",
                         tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
-                        modifier = Modifier.size(GeminiSize.iconSm)
+                        modifier = Modifier.size(PulseSize.iconSm)
                     )
                 }
             }
@@ -244,7 +244,7 @@ fun GeminiSongListItem(
  * 緊湊版歌曲列表項
  */
 @Composable
-fun GeminiSongListItemCompact(
+fun PulseSongListItemCompact(
     title: String,
     subtitle: String,
     modifier: Modifier = Modifier,
@@ -252,7 +252,7 @@ fun GeminiSongListItemCompact(
     isPlaying: Boolean = false,
     onClick: () -> Unit = {}
 ) {
-    GeminiSongListItem(
+    PulseSongListItem(
         title = title,
         subtitle = subtitle,
         albumArtUri = albumArtUri,
@@ -269,7 +269,7 @@ fun GeminiSongListItemCompact(
  * 專輯列表項
  */
 @Composable
-fun GeminiAlbumListItem(
+fun PULSEAlbumListItem(
     title: String,
     artist: String,
     songCount: Int,
@@ -289,25 +289,25 @@ fun GeminiAlbumListItem(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .height(GeminiSize.listItemHeightLarge)
+            .height(PulseSize.listItemHeightLarge)
             .scale(scale)
-            .clip(RoundedCornerShape(GeminiCorners.md))
+            .clip(RoundedCornerShape(PulseCorners.md))
             .clickable(
                 interactionSource = interactionSource,
                 indication = LocalIndication.current,
                 onClick = onClick
             )
             .padding(
-                horizontal = GeminiSpacing.listItemPaddingHorizontal,
-                vertical = GeminiSpacing.md
+                horizontal = PulseSpacing.listItemPaddingHorizontal,
+                vertical = PulseSpacing.md
             ),
         verticalAlignment = Alignment.CenterVertically
     ) {
         // 專輯封面
         Box(
             modifier = Modifier
-                .size(GeminiSize.albumArtMedium)
-                .clip(RoundedCornerShape(GeminiCorners.albumArtLarge)),
+                .size(PulseSize.albumArtMedium)
+                .clip(RoundedCornerShape(PulseCorners.albumArtLarge)),
             contentAlignment = Alignment.Center
         ) {
             if (albumArtUri != null) {
@@ -336,7 +336,7 @@ fun GeminiAlbumListItem(
             }
         }
         
-        Spacer(modifier = Modifier.width(GeminiSpacing.lg))
+        Spacer(modifier = Modifier.width(PulseSpacing.lg))
         
         Column(
             modifier = Modifier.weight(1f)
@@ -349,7 +349,7 @@ fun GeminiAlbumListItem(
                 overflow = TextOverflow.Ellipsis
             )
             
-            Spacer(modifier = Modifier.height(GeminiSpacing.xs))
+            Spacer(modifier = Modifier.height(PulseSpacing.xs))
             
             Text(
                 text = artist,
@@ -359,7 +359,7 @@ fun GeminiAlbumListItem(
                 overflow = TextOverflow.Ellipsis
             )
             
-            Spacer(modifier = Modifier.height(GeminiSpacing.xxs))
+            Spacer(modifier = Modifier.height(PulseSpacing.xxs))
             
             Text(
                 text = "$songCount 首歌曲",
@@ -374,7 +374,7 @@ fun GeminiAlbumListItem(
  * 藝人列表項
  */
 @Composable
-fun GeminiArtistListItem(
+fun PULSEArtistListItem(
     name: String,
     songCount: Int,
     modifier: Modifier = Modifier,
@@ -393,24 +393,24 @@ fun GeminiArtistListItem(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .height(GeminiSize.listItemHeight)
+            .height(PulseSize.listItemHeight)
             .scale(scale)
-            .clip(RoundedCornerShape(GeminiCorners.md))
+            .clip(RoundedCornerShape(PulseCorners.md))
             .clickable(
                 interactionSource = interactionSource,
                 indication = LocalIndication.current,
                 onClick = onClick
             )
             .padding(
-                horizontal = GeminiSpacing.listItemPaddingHorizontal,
-                vertical = GeminiSpacing.listItemPaddingVertical
+                horizontal = PulseSpacing.listItemPaddingHorizontal,
+                vertical = PulseSpacing.listItemPaddingVertical
             ),
         verticalAlignment = Alignment.CenterVertically
     ) {
         // 圓形頭像
         Surface(
-            modifier = Modifier.size(GeminiSize.albumArtSmall),
-            shape = RoundedCornerShape(GeminiCorners.full),
+            modifier = Modifier.size(PulseSize.albumArtSmall),
+            shape = RoundedCornerShape(PulseCorners.full),
             color = MaterialTheme.colorScheme.primaryContainer
         ) {
             Box(contentAlignment = Alignment.Center) {
@@ -423,7 +423,7 @@ fun GeminiArtistListItem(
             }
         }
         
-        Spacer(modifier = Modifier.width(GeminiSpacing.md))
+        Spacer(modifier = Modifier.width(PulseSpacing.md))
         
         Column(modifier = Modifier.weight(1f)) {
             Text(

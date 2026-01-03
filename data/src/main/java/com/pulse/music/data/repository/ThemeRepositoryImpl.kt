@@ -53,7 +53,7 @@ class ThemeRepositoryImpl @Inject constructor(
                 useDynamicColor = preferences[PreferencesKeys.USE_DYNAMIC_COLOR] ?: false,
                 selectedPalette = preferences[PreferencesKeys.SELECTED_PALETTE]?.let {
                     ThemePalette.valueOf(it)
-                } ?: ThemePalette.GEMINI,
+                } ?: ThemePalette.PULSE,
                 customThemeId = preferences[PreferencesKeys.CUSTOM_THEME_ID],
                 useAmoledBlack = preferences[PreferencesKeys.USE_AMOLED_BLACK] ?: false,
                 contrastLevel = preferences[PreferencesKeys.CONTRAST_LEVEL] ?: 1.0f

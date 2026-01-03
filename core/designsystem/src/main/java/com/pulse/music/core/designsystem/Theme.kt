@@ -15,29 +15,29 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
-import com.pulse.music.core.designsystem.GeminiTypography
+import com.pulse.music.core.designsystem.PulseTypography
 
 // We primarily focus on Dark Theme for this music player
 private val DarkColorScheme = darkColorScheme(
-    primary = GeminiPrimary,
+    primary = PULSEPrimary,
     onPrimary = Color.White,
-    primaryContainer = GeminiPrimaryDark,
+    primaryContainer = PULSEPrimaryDark,
     onPrimaryContainer = Color.White,
-    secondary = GeminiAccent,
+    secondary = PULSEAccent,
     onSecondary = Color.Black,
-    background = GeminiBlack,
-    onBackground = GeminiTextPrimary,
-    surface = GeminiDarkGray,
-    onSurface = GeminiTextPrimary,
-    surfaceVariant = GeminiSurface,
-    onSurfaceVariant = GeminiTextSecondary,
-    error = GeminiError,
-    outline = GeminiTextDisabled
+    background = PULSEBlack,
+    onBackground = PULSETextPrimary,
+    surface = PULSEDarkGray,
+    onSurface = PULSETextPrimary,
+    surfaceVariant = PULSESurface,
+    onSurfaceVariant = PULSETextSecondary,
+    error = PULSEError,
+    outline = PULSETextDisabled
 )
 
 // Fallback Light Scheme (Ideally user should stick to dark for music apps)
 private val LightColorScheme = lightColorScheme(
-    primary = GeminiPrimary,
+    primary = PULSEPrimary,
     onPrimary = Color.White,
     background = Color(0xFFF5F5F5),
     surface = Color.White,
@@ -46,7 +46,7 @@ private val LightColorScheme = lightColorScheme(
 )
 
 @Composable
-fun GeminiTheme(
+fun PulseTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = false, // We disable dynamic color by default to enforce our brand style
@@ -74,7 +74,7 @@ fun GeminiTheme(
 
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = GeminiTypography, // Uses default for now, can customize later
+        typography = PulseTypography, // Uses default for now, can customize later
         content = content
     )
 }

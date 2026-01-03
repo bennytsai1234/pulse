@@ -30,9 +30,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.pulse.music.core.designsystem.GeminiSpacing
-import com.pulse.music.core.designsystem.component.GeminiEmptyState
-import com.pulse.music.core.designsystem.component.GeminiSongListItem
+import com.pulse.music.core.designsystem.PulseSpacing
+import com.pulse.music.core.designsystem.component.PulseEmptyState
+import com.pulse.music.core.designsystem.component.PulseSongListItem
 import com.pulse.music.domain.model.Song
 import kotlinx.coroutines.launch
 
@@ -263,7 +263,7 @@ fun HomeScreenRedesigned(
                     CircularProgressIndicator()
                 }
             } else if (uiState.songs.isEmpty()) {
-                GeminiEmptyState(
+                PulseEmptyState(
                     icon = Icons.Rounded.MusicNote,
                     title = "沒有歌曲",
                     subtitle = "您的音樂庫中還沒有任何歌曲"
@@ -276,7 +276,7 @@ fun HomeScreenRedesigned(
                 ) {
                     LazyColumn(
                         state = listState,
-                        contentPadding = PaddingValues(bottom = GeminiSpacing.bottomSafeArea),
+                        contentPadding = PaddingValues(bottom = PulseSpacing.bottomSafeArea),
                         modifier = Modifier.weight(1f)
                     ) {
                         items(
@@ -285,7 +285,7 @@ fun HomeScreenRedesigned(
                         ) { song ->
                             val isSelected = uiState.selectedSongIds.contains(song.id)
                             val isCurrentlyPlaying = uiState.currentPlayingSongId == song.id && uiState.isPlaying
-                            GeminiSongListItem(
+                            PulseSongListItem(
                                 title = song.title,
                                 subtitle = "${song.artist} · ${song.album}",
                                 albumArtUri = song.albumArtUri,
@@ -304,7 +304,7 @@ fun HomeScreenRedesigned(
                                     }
                                 },
                                 onFavoriteClick = { viewModel.toggleFavorite(song.id) },
-                                modifier = Modifier.padding(horizontal = GeminiSpacing.xs)
+                                modifier = Modifier.padding(horizontal = PulseSpacing.xs)
                             )
                         }
                     }

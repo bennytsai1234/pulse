@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Splash Screen Theme -->
-    <style name="Theme.Gemini.Splash" parent="Theme.SplashScreen">
+    <style name="Theme.Pulse.Splash" parent="Theme.SplashScreen">
         <item name="windowSplashScreenBackground">@color/splash_background</item>
         <item name="windowSplashScreenAnimatedIcon">@drawable/avd_splash_logo</item>
         <item name="windowSplashScreenAnimationDuration">1000</item>

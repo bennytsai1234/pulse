@@ -34,7 +34,7 @@ class GoogleDriveService @Inject constructor(
     private val transport = NetHttpTransport()
 
     // 備份檔案名稱
-    private val BACKUP_FILE_NAME = "gemini_music_backup.json"
+    private val BACKUP_FILE_NAME = "PULSE_music_backup.json"
     private val MIME_TYPE_JSON = "application/json"
 
     override fun getSignInIntent(): android.content.Intent {

@@ -6,7 +6,7 @@ import androidx.compose.ui.unit.dp
  * 統一的間距規範
  * 遵循 4dp 基準系統
  */
-object GeminiSpacing {
+object PulseSpacing {
     // 基礎間距
     val xxs = 2.dp
     val xs = 4.dp
@@ -43,7 +43,7 @@ object GeminiSpacing {
 /**
  * 統一的尺寸規範
  */
-object GeminiSize {
+object PulseSize {
     // 圖標尺寸
     val iconXs = 16.dp
     val iconSm = 20.dp
@@ -83,7 +83,7 @@ object GeminiSize {
 /**
  * 統一的圓角規範
  */
-object GeminiCorners {
+object PulseCorners {
     val none = 0.dp
     val xs = 4.dp
     val sm = 8.dp
@@ -107,7 +107,7 @@ object GeminiCorners {
 /**
  * 統一的動畫時長
  */
-object GeminiDuration {
+object PulseDuration {
     const val instant = 100
     const val fast = 150
     const val normal = 250
@@ -124,7 +124,7 @@ object GeminiDuration {
 /**
  * 統一的陰影 / 高度
  */
-object GeminiElevation {
+object PulseElevation {
     val none = 0.dp
     val xs = 1.dp
     val sm = 2.dp

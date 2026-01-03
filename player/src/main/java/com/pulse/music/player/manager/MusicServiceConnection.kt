@@ -17,7 +17,7 @@ import com.pulse.music.domain.model.ScrobbleEntry
 import com.pulse.music.domain.model.Song
 import com.pulse.music.domain.repository.MusicController
 import com.pulse.music.domain.repository.ScrobbleRepository
-import com.pulse.music.player.service.GeminiAudioService
+import com.pulse.music.player.service.PulseAudioService
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -51,7 +51,7 @@ class MusicServiceConnection @Inject constructor(
     private var hasScrobbled: Boolean = false
 
     init {
-        val sessionToken = SessionToken(context, ComponentName(context, GeminiAudioService::class.java))
+        val sessionToken = SessionToken(context, ComponentName(context, PulseAudioService::class.java))
         controllerFuture = MediaController.Builder(context, sessionToken).buildAsync()
 
         controllerFuture.addListener({

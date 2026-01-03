@@ -19,7 +19,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.foundation.isSystemInDarkTheme
 import com.pulse.music.domain.repository.UserPreferencesRepository
-import com.pulse.music.core.designsystem.GeminiTheme
+import com.pulse.music.core.designsystem.PulseTheme
 import com.pulse.music.ui.navigation.MusicNavigation
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -78,7 +78,7 @@ class MainActivity : AppCompatActivity() {
                  else -> isSystemDark
             }
 
-            GeminiTheme(darkTheme = darkTheme, dynamicColor = useDynamicColor) {
+            PulseTheme(darkTheme = darkTheme, dynamicColor = useDynamicColor) {
                 Surface(modifier = Modifier.fillMaxSize()) {
                     if (hasPermission) {
                         MainScreen()

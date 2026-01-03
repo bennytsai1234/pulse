@@ -20,7 +20,7 @@ enum class ThemePalette(
     val primaryColor: Long,    // ARGB
     val accentColor: Long
 ) {
-    GEMINI("Gemini", 0xFF9C27B0, 0xFFE040FB),        // 紫色 (預設)
+    PULSE("PULSE", 0xFF9C27B0, 0xFFE040FB),        // 紫色 (預設)
     OCEAN("Ocean", 0xFF0288D1, 0xFF4FC3F7),          // 海洋藍
     FOREST("Forest", 0xFF388E3C, 0xFF81C784),        // 森林綠
     SUNSET("Sunset", 0xFFE64A19, 0xFFFF8A65),        // 日落橙
@@ -53,7 +53,7 @@ data class CustomTheme(
 data class ThemeSettings(
     val themeMode: ThemeMode = ThemeMode.SYSTEM,
     val useDynamicColor: Boolean = false,  // Android 12+ Material You
-    val selectedPalette: ThemePalette = ThemePalette.GEMINI,
+    val selectedPalette: ThemePalette = ThemePalette.PULSE,
     val customThemeId: String? = null,     // 若選用自定義主題
     val useAmoledBlack: Boolean = false,   // AMOLED 純黑背景
     val contrastLevel: Float = 1.0f        // 對比度調整 (0.8 - 1.2)

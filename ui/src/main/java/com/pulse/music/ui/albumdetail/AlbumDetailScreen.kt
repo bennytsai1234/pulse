@@ -49,7 +49,7 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.pulse.music.domain.model.Album
 import com.pulse.music.domain.model.Song
-import com.pulse.music.core.designsystem.component.GeminiEmptyState
+import com.pulse.music.core.designsystem.component.PulseEmptyState
 import com.pulse.music.ui.component.SongListItem
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -85,7 +85,7 @@ fun AlbumDetailScreen(
                 CircularProgressIndicator()
             }
         } else if (album == null) {
-            GeminiEmptyState(
+            PulseEmptyState(
                 icon = Icons.Rounded.Album,
                 title = androidx.compose.ui.res.stringResource(com.pulse.music.ui.R.string.album_not_found),
                 subtitle = androidx.compose.ui.res.stringResource(com.pulse.music.ui.R.string.album_not_found_message)

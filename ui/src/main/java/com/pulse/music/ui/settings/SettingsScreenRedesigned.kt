@@ -19,7 +19,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.pulse.music.core.designsystem.GeminiSpacing
+import com.pulse.music.core.designsystem.PulseSpacing
 import com.pulse.music.core.designsystem.component.*
 import com.pulse.music.ui.R
 
@@ -51,7 +51,7 @@ fun SettingsScreenRedesigned(
 
     Scaffold(
         topBar = {
-            GeminiTopBarWithBack(
+            PulseTopBarWithBack(
                 title = stringResource(R.string.settings),
                 onBackClick = onBackClick
             )
@@ -64,16 +64,16 @@ fun SettingsScreenRedesigned(
                 .verticalScroll(scrollState)
         ) {
             // ===== 外觀設定 =====
-            GeminiSectionHeader(title = "外觀")
+            PulseSectionHeader(title = "外觀")
 
-            GeminiSettingsItem(
+            PulseSettingsItem(
                 title = "主題設定",
                 subtitle = "調色盤、暗色模式、AMOLED 黑",
                 leadingIcon = Icons.Rounded.Palette,
                 onClick = onThemeClick
             )
 
-            GeminiSettingsItem(
+            PulseSettingsItem(
                 title = stringResource(R.string.language),
                 subtitle = "繁體中文",
                 leadingIcon = Icons.Rounded.Language,
@@ -82,12 +82,12 @@ fun SettingsScreenRedesigned(
                 }
             )
 
-            Spacer(modifier = Modifier.height(GeminiSpacing.sectionSpacing))
+            Spacer(modifier = Modifier.height(PulseSpacing.sectionSpacing))
 
             // ===== 播放設定 =====
-            GeminiSectionHeader(title = "播放")
+            PulseSectionHeader(title = "播放")
 
-            GeminiSettingsSwitch(
+            PulseSettingsSwitch(
                 title = "使用內建等化器",
                 subtitle = "使用 5 段等化器取代系統預設",
                 checked = uiState.useInternalEqualizer,
@@ -95,7 +95,7 @@ fun SettingsScreenRedesigned(
                 leadingIcon = Icons.Rounded.Tune
             )
 
-            GeminiSettingsItem(
+            PulseSettingsItem(
                 title = stringResource(R.string.equalizer),
                 subtitle = if (uiState.useInternalEqualizer) "內建 5 段等化器" else "系統等化器",
                 leadingIcon = Icons.Rounded.GraphicEq,
@@ -113,14 +113,14 @@ fun SettingsScreenRedesigned(
                 }
             )
 
-            GeminiSettingsItem(
+            PulseSettingsItem(
                 title = "睡眠定時器",
                 subtitle = "設定時間後自動停止播放",
                 leadingIcon = Icons.Rounded.Timer,
                 onClick = { showSleepTimerDialog = true }
             )
 
-            GeminiSettingsSlider(
+            PulseSettingsSlider(
                 title = stringResource(R.string.min_duration, uiState.minAudioDuration / 1000),
                 subtitle = stringResource(R.string.min_duration_desc),
                 value = uiState.minAudioDuration.toFloat(),
@@ -138,63 +138,63 @@ fun SettingsScreenRedesigned(
             )
 
             // 播放設定入口 (更多播放設定)
-            GeminiSettingsItem(
+            PulseSettingsItem(
                 title = "更多播放設定",
                 subtitle = "交叉淡入淡出、播放速度等",
                 leadingIcon = Icons.Rounded.Speed,
                 onClick = { /* Navigate to PlaybackSettingsScreen */ }
             )
 
-            Spacer(modifier = Modifier.height(GeminiSpacing.sectionSpacing))
+            Spacer(modifier = Modifier.height(PulseSpacing.sectionSpacing))
 
             // ===== 駕駛模式 =====
-            GeminiSectionHeader(title = "駕駛模式")
+            PulseSectionHeader(title = "駕駛模式")
 
-            GeminiSettingsItem(
+            PulseSettingsItem(
                 title = "駕駛模式設定",
                 subtitle = "大按鈕控制、藍牙自動啟動",
                 leadingIcon = Icons.Rounded.DirectionsCar,
                 onClick = onDrivingModeClick
             )
 
-            Spacer(modifier = Modifier.height(GeminiSpacing.sectionSpacing))
+            Spacer(modifier = Modifier.height(PulseSpacing.sectionSpacing))
 
             // ===== 帳戶與同步 =====
-            GeminiSectionHeader(title = "帳戶與同步")
+            PulseSectionHeader(title = "帳戶與同步")
 
             // Last.fm
             LastFmSectionCompact()
 
-            GeminiDivider(startIndent = 72.dp)
+            PulseDivider(startIndent = 72.dp)
 
             // Cloud Backup
             com.pulse.music.ui.settings.backup.BackupSection()
 
-            Spacer(modifier = Modifier.height(GeminiSpacing.sectionSpacing))
+            Spacer(modifier = Modifier.height(PulseSpacing.sectionSpacing))
 
             // ===== 資料庫 =====
-            GeminiSectionHeader(title = "資料庫")
+            PulseSectionHeader(title = "資料庫")
 
-            GeminiSettingsItem(
+            PulseSettingsItem(
                 title = "重新掃描音樂庫",
                 subtitle = "重新掃描裝置上的音樂檔案",
                 leadingIcon = Icons.Rounded.Refresh,
                 onClick = { viewModel.rescanLibrary() }
             )
 
-            GeminiSettingsItem(
+            PulseSettingsItem(
                 title = "管理資料夾",
                 subtitle = "選擇要掃描的資料夾",
                 leadingIcon = Icons.Rounded.Folder,
                 onClick = { folderPickerLauncher.launch(null) }
             )
 
-            Spacer(modifier = Modifier.height(GeminiSpacing.sectionSpacing))
+            Spacer(modifier = Modifier.height(PulseSpacing.sectionSpacing))
 
             // ===== 關於 =====
-            GeminiSectionHeader(title = "關於")
+            PulseSectionHeader(title = "關於")
 
-            GeminiSettingsItem(
+            PulseSettingsItem(
                 title = "版本",
                 subtitle = "v1.2.0",
                 leadingIcon = Icons.Rounded.Info,
@@ -213,7 +213,7 @@ fun SettingsScreenRedesigned(
             )
 
             // 底部安全區域
-            Spacer(modifier = Modifier.height(GeminiSpacing.bottomSafeArea))
+            Spacer(modifier = Modifier.height(PulseSpacing.bottomSafeArea))
         }
     }
 
@@ -294,7 +294,7 @@ private fun LanguageSelectorCompact() {
  */
 @Composable
 private fun LastFmSectionCompact() {
-    GeminiSettingsItem(
+    PulseSettingsItem(
         title = "Last.fm",
         subtitle = "連接帳戶以記錄聆聽歷史",
         leadingIcon = Icons.Rounded.Audiotrack,

@@ -28,15 +28,15 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import com.pulse.music.core.designsystem.GeminiCorners
-import com.pulse.music.core.designsystem.GeminiSize
-import com.pulse.music.core.designsystem.GeminiSpacing
+import com.pulse.music.core.designsystem.PulseCorners
+import com.pulse.music.core.designsystem.PulseSize
+import com.pulse.music.core.designsystem.PulseSpacing
 
 /**
  * 統一的專輯網格卡片
  */
 @Composable
-fun GeminiAlbumGridCard(
+fun PulseAlbumGridCard(
     title: String,
     subtitle: String,
     artUri: String?,
@@ -56,7 +56,7 @@ fun GeminiAlbumGridCard(
 
     Card(
         onClick = onClick,
-        shape = RoundedCornerShape(GeminiCorners.card),
+        shape = RoundedCornerShape(PulseCorners.card),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
         ),
@@ -66,14 +66,14 @@ fun GeminiAlbumGridCard(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(GeminiSpacing.cardPaddingSmall)
+                .padding(PulseSpacing.cardPaddingSmall)
         ) {
             // 封面
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .aspectRatio(1f)
-                    .clip(RoundedCornerShape(GeminiCorners.albumArt)),
+                    .clip(RoundedCornerShape(PulseCorners.albumArt)),
                 contentAlignment = Alignment.Center
             ) {
                 if (artUri != null) {
@@ -120,7 +120,7 @@ fun GeminiAlbumGridCard(
                         FilledIconButton(
                             onClick = onPlayClick,
                             modifier = Modifier
-                                .padding(GeminiSpacing.sm)
+                                .padding(PulseSpacing.sm)
                                 .size(36.dp),
                             colors = IconButtonDefaults.filledIconButtonColors(
                                 containerColor = MaterialTheme.colorScheme.primary
@@ -136,7 +136,7 @@ fun GeminiAlbumGridCard(
                 }
             }
 
-            Spacer(modifier = Modifier.height(GeminiSpacing.sm))
+            Spacer(modifier = Modifier.height(PulseSpacing.sm))
 
             // 標題
             Text(
@@ -172,7 +172,7 @@ fun GeminiAlbumGridCard(
  * 統一的播放清單網格卡片
  */
 @Composable
-fun GeminiPlaylistGridCard(
+fun PulsePlaylistGridCard(
     title: String,
     songCount: Int,
     coverArts: List<String?>,
@@ -191,7 +191,7 @@ fun GeminiPlaylistGridCard(
 
     Card(
         onClick = onClick,
-        shape = RoundedCornerShape(GeminiCorners.card),
+        shape = RoundedCornerShape(PulseCorners.card),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
         ),
@@ -201,14 +201,14 @@ fun GeminiPlaylistGridCard(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(GeminiSpacing.cardPaddingSmall)
+                .padding(PulseSpacing.cardPaddingSmall)
         ) {
             // 4格封面拼圖
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .aspectRatio(1f)
-                    .clip(RoundedCornerShape(GeminiCorners.albumArt)),
+                    .clip(RoundedCornerShape(PulseCorners.albumArt)),
                 contentAlignment = Alignment.Center
             ) {
                 if (coverArts.isNotEmpty()) {
@@ -328,7 +328,7 @@ fun GeminiPlaylistGridCard(
                         FilledIconButton(
                             onClick = onPlayClick,
                             modifier = Modifier
-                                .padding(GeminiSpacing.sm)
+                                .padding(PulseSpacing.sm)
                                 .size(36.dp),
                             colors = IconButtonDefaults.filledIconButtonColors(
                                 containerColor = MaterialTheme.colorScheme.primary
@@ -344,7 +344,7 @@ fun GeminiPlaylistGridCard(
                 }
             }
 
-            Spacer(modifier = Modifier.height(GeminiSpacing.sm))
+            Spacer(modifier = Modifier.height(PulseSpacing.sm))
 
             // 標題
             Text(
@@ -369,7 +369,7 @@ fun GeminiPlaylistGridCard(
  * 統一的功能入口卡片 (大尺寸)
  */
 @Composable
-fun GeminiFeatureCard(
+fun PULSEFeatureCard(
     title: String,
     subtitle: String,
     icon: ImageVector,
@@ -390,7 +390,7 @@ fun GeminiFeatureCard(
 
     Card(
         onClick = onClick,
-        shape = RoundedCornerShape(GeminiCorners.cardLarge),
+        shape = RoundedCornerShape(PulseCorners.cardLarge),
         colors = CardDefaults.cardColors(containerColor = Color.Transparent),
         modifier = modifier.scale(scale),
         interactionSource = interactionSource
@@ -401,7 +401,7 @@ fun GeminiFeatureCard(
                 .background(
                     Brush.horizontalGradient(gradientColors)
                 )
-                .padding(GeminiSpacing.lg)
+                .padding(PulseSpacing.lg)
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically
@@ -410,7 +410,7 @@ fun GeminiFeatureCard(
                 Box(
                     modifier = Modifier
                         .size(56.dp)
-                        .clip(RoundedCornerShape(GeminiCorners.lg))
+                        .clip(RoundedCornerShape(PulseCorners.lg))
                         .background(Color.White.copy(alpha = 0.2f)),
                     contentAlignment = Alignment.Center
                 ) {
@@ -422,7 +422,7 @@ fun GeminiFeatureCard(
                     )
                 }
 
-                Spacer(modifier = Modifier.width(GeminiSpacing.lg))
+                Spacer(modifier = Modifier.width(PulseSpacing.lg))
 
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
@@ -453,7 +453,7 @@ fun GeminiFeatureCard(
  * 統一的小型資訊卡片
  */
 @Composable
-fun GeminiInfoChip(
+fun PULSEInfoChip(
     label: String,
     value: String,
     modifier: Modifier = Modifier,
@@ -463,24 +463,24 @@ fun GeminiInfoChip(
     Surface(
         onClick = onClick ?: {},
         enabled = onClick != null,
-        shape = RoundedCornerShape(GeminiCorners.chip),
+        shape = RoundedCornerShape(PulseCorners.chip),
         color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f),
         modifier = modifier
     ) {
         Row(
             modifier = Modifier.padding(
-                horizontal = GeminiSpacing.md,
-                vertical = GeminiSpacing.sm
+                horizontal = PulseSpacing.md,
+                vertical = PulseSpacing.sm
             ),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(GeminiSpacing.sm)
+            horizontalArrangement = Arrangement.spacedBy(PulseSpacing.sm)
         ) {
             if (icon != null) {
                 Icon(
                     imageVector = icon,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(GeminiSize.iconSm)
+                    modifier = Modifier.size(PulseSize.iconSm)
                 )
             }
             

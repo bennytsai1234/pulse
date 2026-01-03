@@ -57,7 +57,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.pulse.music.core.designsystem.component.GeminiTopBarWithBack
+import com.pulse.music.core.designsystem.component.PulseTopBarWithBack
 import com.pulse.music.domain.model.SmartPlaylist
 import com.pulse.music.domain.model.SmartPlaylistType
 import com.pulse.music.domain.model.SongPlayStats
@@ -73,7 +73,7 @@ fun StatsScreen(
 
     Scaffold(
             topBar = {
-                GeminiTopBarWithBack(
+                PulseTopBarWithBack(
                         title = "Listening Stats",
                         onBackClick = onBackClick,
                         actions = {

@@ -39,7 +39,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.pulse.music.core.designsystem.component.GeminiTopBarWithBack
+import com.pulse.music.core.designsystem.component.PulseTopBarWithBack
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -51,7 +51,7 @@ fun PlaybackSettingsScreen(
 
     Scaffold(
             topBar = {
-                GeminiTopBarWithBack(title = "Playback Settings", onBackClick = onBackClick)
+                PulseTopBarWithBack(title = "Playback Settings", onBackClick = onBackClick)
             }
     ) { padding ->
         LazyColumn(

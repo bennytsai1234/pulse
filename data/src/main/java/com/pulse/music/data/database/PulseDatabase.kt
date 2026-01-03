@@ -19,7 +19,7 @@ import androidx.room.RoomDatabase
     version = 9, 
     exportSchema = false
 )
-abstract class GeminiDatabase : RoomDatabase() {
+abstract class PulseDatabase : RoomDatabase() {
     abstract fun songDao(): SongDao
     abstract fun playlistDao(): PlaylistDao
     abstract fun favoriteDao(): FavoriteDao

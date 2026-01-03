@@ -65,7 +65,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.os.LocaleListCompat
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.pulse.music.core.designsystem.component.GeminiTopBarWithBack
+import com.pulse.music.core.designsystem.component.PulseTopBarWithBack
 import com.pulse.music.domain.model.ScanStatus
 import com.pulse.music.domain.repository.UserPreferencesRepository
 import com.pulse.music.ui.R
@@ -94,7 +94,7 @@ fun SettingsScreen(
 
     Scaffold(
             topBar = {
-                GeminiTopBarWithBack(
+                PulseTopBarWithBack(
                         title = stringResource(R.string.settings),
                         onBackClick = onBackClick
                 )

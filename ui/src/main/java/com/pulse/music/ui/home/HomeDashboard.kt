@@ -31,9 +31,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import com.pulse.music.core.designsystem.GeminiCorners
-import com.pulse.music.core.designsystem.GeminiSize
-import com.pulse.music.core.designsystem.GeminiSpacing
+import com.pulse.music.core.designsystem.PulseCorners
+import com.pulse.music.core.designsystem.PulseSize
+import com.pulse.music.core.designsystem.PulseSpacing
 import com.pulse.music.domain.model.Song
 import java.util.Calendar
 
@@ -57,7 +57,7 @@ fun HomeDashboardHeader(
         // 問候語區域
         DashboardGreeting()
         
-        Spacer(modifier = Modifier.height(GeminiSpacing.lg))
+        Spacer(modifier = Modifier.height(PulseSpacing.lg))
         
         // 快捷入口
         DashboardQuickAccess(
@@ -69,12 +69,12 @@ fun HomeDashboardHeader(
             onFoldersClick = onFoldersClick
         )
         
-        Spacer(modifier = Modifier.height(GeminiSpacing.xl))
+        Spacer(modifier = Modifier.height(PulseSpacing.xl))
         
         // 統計卡片
         DashboardStats(totalSongs = totalSongs)
         
-        Spacer(modifier = Modifier.height(GeminiSpacing.xl))
+        Spacer(modifier = Modifier.height(PulseSpacing.xl))
         
         // 最近新增
         if (recentlyAddedSongs.isNotEmpty()) {
@@ -83,7 +83,7 @@ fun HomeDashboardHeader(
                 onSongClick = onRecentSongClick
             )
             
-            Spacer(modifier = Modifier.height(GeminiSpacing.lg))
+            Spacer(modifier = Modifier.height(PulseSpacing.lg))
         }
     }
 }
@@ -121,14 +121,14 @@ private fun DashboardGreeting() {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = GeminiSpacing.screenPaddingHorizontal)
-            .clip(RoundedCornerShape(GeminiCorners.cardLarge))
+            .padding(horizontal = PulseSpacing.screenPaddingHorizontal)
+            .clip(RoundedCornerShape(PulseCorners.cardLarge))
             .background(
                 Brush.horizontalGradient(
                     colors = gradientColors.map { it.copy(alpha = 0.2f) }
                 )
             )
-            .padding(GeminiSpacing.lg)
+            .padding(PulseSpacing.lg)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically
@@ -138,7 +138,7 @@ private fun DashboardGreeting() {
                 style = MaterialTheme.typography.displaySmall
             )
             
-            Spacer(modifier = Modifier.width(GeminiSpacing.md))
+            Spacer(modifier = Modifier.width(PulseSpacing.md))
             
             Column {
                 Text(
@@ -180,7 +180,7 @@ private fun DashboardQuickAccess(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = GeminiSpacing.screenPaddingHorizontal),
+            .padding(horizontal = PulseSpacing.screenPaddingHorizontal),
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
         items.take(4).forEach { item ->
@@ -194,12 +194,12 @@ private fun DashboardQuickAccess(
         }
     }
     
-    Spacer(modifier = Modifier.height(GeminiSpacing.sm))
+    Spacer(modifier = Modifier.height(PulseSpacing.sm))
     
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = GeminiSpacing.screenPaddingHorizontal),
+            .padding(horizontal = PulseSpacing.screenPaddingHorizontal),
         horizontalArrangement = Arrangement.Center
     ) {
         items.drop(4).forEach { item ->
@@ -240,19 +240,19 @@ private fun QuickAccessButton(
     Column(
         modifier = modifier
             .scale(scale)
-            .clip(RoundedCornerShape(GeminiCorners.lg))
+            .clip(RoundedCornerShape(PulseCorners.lg))
             .clickable(
                 interactionSource = interactionSource,
                 indication = LocalIndication.current,
                 onClick = onClick
             )
-            .padding(GeminiSpacing.sm),
+            .padding(PulseSpacing.sm),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Box(
             modifier = Modifier
                 .size(48.dp)
-                .clip(RoundedCornerShape(GeminiCorners.md))
+                .clip(RoundedCornerShape(PulseCorners.md))
                 .background(tint.copy(alpha = 0.15f)),
             contentAlignment = Alignment.Center
         ) {
@@ -260,11 +260,11 @@ private fun QuickAccessButton(
                 imageVector = icon,
                 contentDescription = label,
                 tint = tint,
-                modifier = Modifier.size(GeminiSize.iconMd)
+                modifier = Modifier.size(PulseSize.iconMd)
             )
         }
         
-        Spacer(modifier = Modifier.height(GeminiSpacing.xs))
+        Spacer(modifier = Modifier.height(PulseSpacing.xs))
         
         Text(
             text = label,
@@ -283,8 +283,8 @@ private fun DashboardStats(totalSongs: Int) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = GeminiSpacing.screenPaddingHorizontal),
-        horizontalArrangement = Arrangement.spacedBy(GeminiSpacing.md)
+            .padding(horizontal = PulseSpacing.screenPaddingHorizontal),
+        horizontalArrangement = Arrangement.spacedBy(PulseSpacing.md)
     ) {
         StatCard(
             title = "歌曲總數",
@@ -312,16 +312,16 @@ private fun StatCard(
     Surface(
         modifier = modifier,
         color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
-        shape = RoundedCornerShape(GeminiCorners.card)
+        shape = RoundedCornerShape(PulseCorners.card)
     ) {
         Row(
-            modifier = Modifier.padding(GeminiSpacing.cardPadding),
+            modifier = Modifier.padding(PulseSpacing.cardPadding),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
                 modifier = Modifier
                     .size(44.dp)
-                    .clip(RoundedCornerShape(GeminiCorners.sm))
+                    .clip(RoundedCornerShape(PulseCorners.sm))
                     .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)),
                 contentAlignment = Alignment.Center
             ) {
@@ -332,7 +332,7 @@ private fun StatCard(
                 )
             }
             
-            Spacer(modifier = Modifier.width(GeminiSpacing.md))
+            Spacer(modifier = Modifier.width(PulseSpacing.md))
             
             Column {
                 Text(
@@ -362,7 +362,7 @@ private fun DashboardRecentlyAdded(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = GeminiSpacing.screenPaddingHorizontal),
+                .padding(horizontal = PulseSpacing.screenPaddingHorizontal),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -377,11 +377,11 @@ private fun DashboardRecentlyAdded(
             }
         }
         
-        Spacer(modifier = Modifier.height(GeminiSpacing.sm))
+        Spacer(modifier = Modifier.height(PulseSpacing.sm))
         
         LazyRow(
-            contentPadding = PaddingValues(horizontal = GeminiSpacing.screenPaddingHorizontal),
-            horizontalArrangement = Arrangement.spacedBy(GeminiSpacing.md)
+            contentPadding = PaddingValues(horizontal = PulseSpacing.screenPaddingHorizontal),
+            horizontalArrangement = Arrangement.spacedBy(PulseSpacing.md)
         ) {
             items(songs.take(10)) { song ->
                 RecentlyAddedCard(
@@ -411,19 +411,19 @@ private fun RecentlyAddedCard(
         modifier = Modifier
             .width(130.dp)
             .scale(scale)
-            .clip(RoundedCornerShape(GeminiCorners.lg))
+            .clip(RoundedCornerShape(PulseCorners.lg))
             .clickable(
                 interactionSource = interactionSource,
                 indication = LocalIndication.current,
                 onClick = onClick
             )
-            .padding(GeminiSpacing.xs)
+            .padding(PulseSpacing.xs)
     ) {
         // 封面
         Box(
             modifier = Modifier
                 .size(120.dp)
-                .clip(RoundedCornerShape(GeminiCorners.albumArtLarge)),
+                .clip(RoundedCornerShape(PulseCorners.albumArtLarge)),
             contentAlignment = Alignment.Center
         ) {
             AsyncImage(
@@ -459,7 +459,7 @@ private fun RecentlyAddedCard(
             }
         }
         
-        Spacer(modifier = Modifier.height(GeminiSpacing.sm))
+        Spacer(modifier = Modifier.height(PulseSpacing.sm))
         
         Text(
             text = song.title,

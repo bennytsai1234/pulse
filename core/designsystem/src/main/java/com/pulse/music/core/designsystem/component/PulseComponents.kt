@@ -24,9 +24,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.pulse.music.core.designsystem.GeminiCorners
-import com.pulse.music.core.designsystem.GeminiSize
-import com.pulse.music.core.designsystem.GeminiSpacing
+import com.pulse.music.core.designsystem.PulseCorners
+import com.pulse.music.core.designsystem.PulseSize
+import com.pulse.music.core.designsystem.PulseSpacing
 import androidx.compose.material3.TopAppBarColors
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
@@ -36,7 +36,7 @@ import androidx.compose.material3.surfaceColorAtElevation
  * 統一的設定項目組件
  */
 @Composable
-fun GeminiSettingsItem(
+fun PulseSettingsItem(
     title: String,
     modifier: Modifier = Modifier,
     subtitle: String? = null,
@@ -58,7 +58,7 @@ fun GeminiSettingsItem(
         modifier = modifier
             .fillMaxWidth()
             .scale(scale)
-            .clip(RoundedCornerShape(GeminiCorners.md))
+            .clip(RoundedCornerShape(PulseCorners.md))
             .then(
                 if (onClick != null && enabled) {
                     Modifier.clickable(
@@ -69,8 +69,8 @@ fun GeminiSettingsItem(
                 } else Modifier
             )
             .padding(
-                horizontal = GeminiSpacing.lg,
-                vertical = GeminiSpacing.md
+                horizontal = PulseSpacing.lg,
+                vertical = PulseSpacing.md
             ),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -79,7 +79,7 @@ fun GeminiSettingsItem(
             Box(
                 modifier = Modifier
                     .size(40.dp)
-                    .clip(RoundedCornerShape(GeminiCorners.sm))
+                    .clip(RoundedCornerShape(PulseCorners.sm))
                     .background(leadingIconTint.copy(alpha = 0.1f)),
                 contentAlignment = Alignment.Center
             ) {
@@ -87,10 +87,10 @@ fun GeminiSettingsItem(
                     imageVector = leadingIcon,
                     contentDescription = null,
                     tint = if (enabled) leadingIconTint else leadingIconTint.copy(alpha = 0.5f),
-                    modifier = Modifier.size(GeminiSize.iconMd)
+                    modifier = Modifier.size(PulseSize.iconMd)
                 )
             }
-            Spacer(modifier = Modifier.width(GeminiSpacing.lg))
+            Spacer(modifier = Modifier.width(PulseSpacing.lg))
         }
 
         // Text Content
@@ -107,7 +107,7 @@ fun GeminiSettingsItem(
                 overflow = TextOverflow.Ellipsis
             )
             if (subtitle != null) {
-                Spacer(modifier = Modifier.height(GeminiSpacing.xxs))
+                Spacer(modifier = Modifier.height(PulseSpacing.xxs))
                 Text(
                     text = subtitle,
                     style = MaterialTheme.typography.bodySmall,
@@ -121,7 +121,7 @@ fun GeminiSettingsItem(
 
         // Trailing Content
         if (trailingContent != null) {
-            Spacer(modifier = Modifier.width(GeminiSpacing.md))
+            Spacer(modifier = Modifier.width(PulseSpacing.md))
             trailingContent()
         }
     }
@@ -131,7 +131,7 @@ fun GeminiSettingsItem(
  * 設定項目帶開關
  */
 @Composable
-fun GeminiSettingsSwitch(
+fun PulseSettingsSwitch(
     title: String,
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
@@ -140,7 +140,7 @@ fun GeminiSettingsSwitch(
     leadingIcon: ImageVector? = null,
     enabled: Boolean = true
 ) {
-    GeminiSettingsItem(
+    PulseSettingsItem(
         title = title,
         subtitle = subtitle,
         leadingIcon = leadingIcon,
@@ -161,7 +161,7 @@ fun GeminiSettingsSwitch(
  * 設定項目帶滑桿
  */
 @Composable
-fun GeminiSettingsSlider(
+fun PulseSettingsSlider(
     title: String,
     value: Float,
     onValueChange: (Float) -> Unit,
@@ -176,7 +176,7 @@ fun GeminiSettingsSlider(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = GeminiSpacing.lg, vertical = GeminiSpacing.md)
+            .padding(horizontal = PulseSpacing.lg, vertical = PulseSpacing.md)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically
@@ -185,7 +185,7 @@ fun GeminiSettingsSlider(
                 Box(
                     modifier = Modifier
                         .size(40.dp)
-                        .clip(RoundedCornerShape(GeminiCorners.sm))
+                        .clip(RoundedCornerShape(PulseCorners.sm))
                         .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)),
                     contentAlignment = Alignment.Center
                 ) {
@@ -193,10 +193,10 @@ fun GeminiSettingsSlider(
                         imageVector = leadingIcon,
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(GeminiSize.iconMd)
+                        modifier = Modifier.size(PulseSize.iconMd)
                     )
                 }
-                Spacer(modifier = Modifier.width(GeminiSpacing.lg))
+                Spacer(modifier = Modifier.width(PulseSpacing.lg))
             }
 
             Column(modifier = Modifier.weight(1f)) {
@@ -219,7 +219,7 @@ fun GeminiSettingsSlider(
             }
         }
 
-        Spacer(modifier = Modifier.height(GeminiSpacing.sm))
+        Spacer(modifier = Modifier.height(PulseSpacing.sm))
 
         Slider(
             value = value,
@@ -236,7 +236,7 @@ fun GeminiSettingsSlider(
  * 設定區塊標題
  */
 @Composable
-fun GeminiSectionHeader(
+fun PulseSectionHeader(
     title: String,
     modifier: Modifier = Modifier,
     action: @Composable (() -> Unit)? = null
@@ -245,8 +245,8 @@ fun GeminiSectionHeader(
         modifier = modifier
             .fillMaxWidth()
             .padding(
-                horizontal = GeminiSpacing.lg,
-                vertical = GeminiSpacing.md
+                horizontal = PulseSpacing.lg,
+                vertical = PulseSpacing.md
             ),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
@@ -267,11 +267,11 @@ fun GeminiSectionHeader(
  * 統一的卡片容器
  */
 @Composable
-fun GeminiCard(
+fun PulseCard(
     modifier: Modifier = Modifier,
     onClick: (() -> Unit)? = null,
     backgroundColor: Color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
-    contentPadding: PaddingValues = PaddingValues(GeminiSpacing.cardPadding),
+    contentPadding: PaddingValues = PaddingValues(PulseSpacing.cardPadding),
     content: @Composable ColumnScope.() -> Unit
 ) {
     val interactionSource = remember { MutableInteractionSource() }
@@ -285,7 +285,7 @@ fun GeminiCard(
     Surface(
         modifier = modifier
             .scale(scale)
-            .clip(RoundedCornerShape(GeminiCorners.card))
+            .clip(RoundedCornerShape(PulseCorners.card))
             .then(
                 if (onClick != null) {
                     Modifier.clickable(
@@ -296,7 +296,7 @@ fun GeminiCard(
                 } else Modifier
             ),
         color = backgroundColor,
-        shape = RoundedCornerShape(GeminiCorners.card)
+        shape = RoundedCornerShape(PulseCorners.card)
     ) {
         Column(
             modifier = Modifier.padding(contentPadding),
@@ -309,13 +309,13 @@ fun GeminiCard(
  * 玻璃態卡片
  */
 @Composable
-fun GeminiGlassCard(
+fun PULSEGlassCard(
     modifier: Modifier = Modifier,
     onClick: (() -> Unit)? = null,
-    contentPadding: PaddingValues = PaddingValues(GeminiSpacing.cardPadding),
+    contentPadding: PaddingValues = PaddingValues(PulseSpacing.cardPadding),
     content: @Composable ColumnScope.() -> Unit
 ) {
-    GeminiCard(
+    PulseCard(
         modifier = modifier,
         onClick = onClick,
         backgroundColor = Color.White.copy(alpha = 0.08f),
@@ -328,7 +328,7 @@ fun GeminiGlassCard(
  * 快捷入口按鈕 (Dashboard 風格)
  */
 @Composable
-fun GeminiQuickAction(
+fun PULSEQuickAction(
     icon: ImageVector,
     label: String,
     onClick: () -> Unit,
@@ -347,20 +347,20 @@ fun GeminiQuickAction(
     Column(
         modifier = modifier
             .scale(scale)
-            .clip(RoundedCornerShape(GeminiCorners.lg))
+            .clip(RoundedCornerShape(PulseCorners.lg))
             .clickable(
                 interactionSource = interactionSource,
                 indication = LocalIndication.current,
                 onClick = onClick
             )
-            .padding(GeminiSpacing.md),
+            .padding(PulseSpacing.md),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Box {
             Box(
                 modifier = Modifier
                     .size(56.dp)
-                    .clip(RoundedCornerShape(GeminiCorners.md))
+                    .clip(RoundedCornerShape(PulseCorners.md))
                     .background(iconTint.copy(alpha = 0.12f)),
                 contentAlignment = Alignment.Center
             ) {
@@ -368,7 +368,7 @@ fun GeminiQuickAction(
                     imageVector = icon,
                     contentDescription = label,
                     tint = iconTint,
-                    modifier = Modifier.size(GeminiSize.iconLg)
+                    modifier = Modifier.size(PulseSize.iconLg)
                 )
             }
 
@@ -379,7 +379,7 @@ fun GeminiQuickAction(
                         .align(Alignment.TopEnd)
                         .offset(x = 4.dp, y = (-4).dp),
                     color = MaterialTheme.colorScheme.error,
-                    shape = RoundedCornerShape(GeminiCorners.full)
+                    shape = RoundedCornerShape(PulseCorners.full)
                 ) {
                     Text(
                         text = badge,
@@ -391,7 +391,7 @@ fun GeminiQuickAction(
             }
         }
 
-        Spacer(modifier = Modifier.height(GeminiSpacing.sm))
+        Spacer(modifier = Modifier.height(PulseSpacing.sm))
 
         Text(
             text = label,
@@ -407,7 +407,7 @@ fun GeminiQuickAction(
  * 漸變文字標題
  */
 @Composable
-fun GeminiGradientTitle(
+fun PULSEGradientTitle(
     text: String,
     modifier: Modifier = Modifier,
     colors: List<Color> = listOf(
@@ -429,7 +429,7 @@ fun GeminiGradientTitle(
  * 分隔線
  */
 @Composable
-fun GeminiDivider(
+fun PulseDivider(
     modifier: Modifier = Modifier,
     startIndent: Dp = 0.dp,
     thickness: Dp = 1.dp,
@@ -446,7 +446,7 @@ fun GeminiDivider(
  * 空狀態統一組件
  */
 @Composable
-fun GeminiEmptyState(
+fun PulseEmptyState(
     icon: ImageVector,
     title: String,
     modifier: Modifier = Modifier,
@@ -456,14 +456,14 @@ fun GeminiEmptyState(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(GeminiSpacing.xl),
+            .padding(PulseSpacing.xl),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
         Box(
             modifier = Modifier
                 .size(80.dp)
-                .clip(RoundedCornerShape(GeminiCorners.xl))
+                .clip(RoundedCornerShape(PulseCorners.xl))
                 .background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)),
             contentAlignment = Alignment.Center
         ) {
@@ -475,7 +475,7 @@ fun GeminiEmptyState(
             )
         }
 
-        Spacer(modifier = Modifier.height(GeminiSpacing.lg))
+        Spacer(modifier = Modifier.height(PulseSpacing.lg))
 
         Text(
             text = title,
@@ -485,7 +485,7 @@ fun GeminiEmptyState(
         )
 
         if (subtitle != null) {
-            Spacer(modifier = Modifier.height(GeminiSpacing.sm))
+            Spacer(modifier = Modifier.height(PulseSpacing.sm))
             Text(
                 text = subtitle,
                 style = MaterialTheme.typography.bodyMedium,
@@ -494,7 +494,7 @@ fun GeminiEmptyState(
         }
 
         if (action != null) {
-            Spacer(modifier = Modifier.height(GeminiSpacing.lg))
+            Spacer(modifier = Modifier.height(PulseSpacing.lg))
             action()
         }
     }
@@ -506,7 +506,7 @@ fun GeminiEmptyState(
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun GeminiTopBar(
+fun PulseTopBar(
     title: @Composable () -> Unit,
     modifier: Modifier = Modifier,
     navigationIcon: @Composable () -> Unit = {},
