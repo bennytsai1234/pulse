@@ -35,6 +35,9 @@ class PulseAudioService : MediaLibraryService() {
     @Inject
     lateinit var musicRepository: com.pulse.music.domain.repository.MusicRepository
 
+    @Inject
+    lateinit var crossfadeController: com.pulse.music.player.crossfade.CrossfadeController
+
     private var mediaLibrarySession: MediaLibrarySession? = null
 
     private val serviceScope = kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.SupervisorJob() + kotlinx.coroutines.Dispatchers.Main)
@@ -347,11 +350,23 @@ class PulseAudioService : MediaLibraryService() {
                 if (!isPlaying) {
                      savePlaybackState()
                 }
+
+                // 開始/停止交叉淡入淡出監控
+                if (isPlaying) {
+                    startCrossfadeMonitor()
+                } else {
+                    crossfadeController.stopPositionMonitor()
+                }
             }
 
             override fun onMediaItemTransition(mediaItem: androidx.media3.common.MediaItem?, reason: Int) {
                 updateWidget()
                 savePlaybackState()
+
+                // 歌曲切換後重新啟動交叉淡入淡出監控
+                if (player.isPlaying) {
+                    startCrossfadeMonitor()
+                }
             }
 
             override fun onPositionDiscontinuity(oldPosition: Player.PositionInfo, newPosition: Player.PositionInfo, reason: Int) {
@@ -372,6 +387,54 @@ class PulseAudioService : MediaLibraryService() {
                 }
             }
         })
+
+        // 設定主播放器給交叉淡入淡出控制器
+        crossfadeController.setMainPlayer(player)
+    }
+
+    /**
+     * 開始交叉淡入淡出監控
+     */
+    private fun startCrossfadeMonitor() {
+        crossfadeController.startPositionMonitor(player) {
+            // 當觸發交叉淡入淡出時
+            performCrossfade()
+        }
+    }
+
+    /**
+     * 執行交叉淡入淡出
+     */
+    private fun performCrossfade() {
+        if (!player.hasNextMediaItem()) {
+            android.util.Log.d("PulseAudioService", "No next track for crossfade")
+            return
+        }
+
+        val nextIndex = player.currentMediaItemIndex + 1
+        if (nextIndex >= player.mediaItemCount) return
+
+        val nextMediaItem = player.getMediaItemAt(nextIndex)
+        val currentAlbum = player.currentMediaItem?.mediaMetadata?.albumTitle?.toString()
+        val nextAlbum = nextMediaItem.mediaMetadata.albumTitle?.toString()
+
+        serviceScope.launch {
+            // 檢查是否應該跳過交叉淡入淡出 (專輯連續模式)
+            if (crossfadeController.shouldSkipCrossfade(currentAlbum, nextAlbum)) {
+                android.util.Log.d("PulseAudioService", "Skipping crossfade for album continuous mode")
+                return@launch
+            }
+
+            crossfadeController.performCrossfade(
+                currentPlayer = player,
+                nextMediaItem = nextMediaItem
+            ) {
+                // 交叉淡入淡出完成後，跳到下一首
+                kotlinx.coroutines.MainScope().launch {
+                    player.seekToNextMediaItem()
+                }
+            }
+        }
     }
 
     private fun updateWidget() {
@@ -449,6 +512,7 @@ class PulseAudioService : MediaLibraryService() {
 
     override fun onDestroy() {
         savePlaybackState()
+        crossfadeController.release()
         mediaLibrarySession?.run {
             player.release()
             release()

@@ -40,11 +40,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.pulse.music.core.designsystem.component.PulseTopBarWithBack
+import androidx.compose.material.icons.rounded.ChevronRight
+import androidx.compose.foundation.clickable
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlaybackSettingsScreen(
         onBackClick: () -> Unit,
+        onCrossfadeClick: () -> Unit = {},
         viewModel: PlaybackSettingsViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -105,37 +108,36 @@ fun PlaybackSettingsScreen(
 
             // Crossfade Section
             item {
-                SettingsSection(title = "Crossfade", icon = Icons.Rounded.Tune) {
-                    Text(
-                            text =
-                                    if (uiState.crossfadeDuration == 0) "Off"
-                                    else "${uiState.crossfadeDuration}s",
-                            style = MaterialTheme.typography.headlineMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.primary
-                    )
-                    Text(
-                            text = "Smooth transition between tracks",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        items(PlaybackSettingsViewModel.CROSSFADE_OPTIONS) { duration ->
-                            FilterChip(
-                                    selected = uiState.crossfadeDuration == duration,
-                                    onClick = { viewModel.setCrossfadeDuration(duration) },
-                                    label = { Text(if (duration == 0) "Off" else "${duration}s") },
-                                    colors =
-                                            FilterChipDefaults.filterChipColors(
-                                                    selectedContainerColor =
-                                                            MaterialTheme.colorScheme.primary,
-                                                    selectedLabelColor =
-                                                            MaterialTheme.colorScheme.onPrimary
-                                            )
+                SettingsSection(
+                    title = "Crossfade",
+                    icon = Icons.Rounded.Tune,
+                    onClick = onCrossfadeClick
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column {
+                            Text(
+                                    text =
+                                            if (uiState.crossfadeDuration == 0) "Off"
+                                            else "${uiState.crossfadeDuration}s",
+                                    style = MaterialTheme.typography.headlineMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.primary
+                            )
+                            Text(
+                                    text = "Smooth transition between tracks",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
+                        Icon(
+                            imageVector = Icons.Rounded.ChevronRight,
+                            contentDescription = "Open crossfade settings",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                     }
                 }
             }
@@ -201,9 +203,16 @@ fun PlaybackSettingsScreen(
 }
 
 @Composable
-private fun SettingsSection(title: String, icon: ImageVector, content: @Composable () -> Unit) {
+private fun SettingsSection(
+    title: String,
+    icon: ImageVector,
+    onClick: (() -> Unit)? = null,
+    content: @Composable () -> Unit
+) {
     Card(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .then(if (onClick != null) Modifier.clickable { onClick() } else Modifier),
             shape = RoundedCornerShape(16.dp),
             colors =
                     CardDefaults.cardColors(

@@ -29,6 +29,7 @@ import com.pulse.music.ui.folder.FolderBrowserScreen
 import com.pulse.music.ui.discover.DiscoverScreen
 import com.pulse.music.ui.lyrics.LyricsEditorScreen
 import com.pulse.music.ui.driving.DrivingModeScreen
+import com.pulse.music.ui.settings.crossfade.CrossfadeSettingsScreen
 
 /**
  * Safe popBackStack that checks if we can actually navigate back
@@ -93,6 +94,7 @@ sealed class Screen(val route: String) {
         fun createRoute(songId: Long) = "lyrics_editor/$songId"
     }
     data object DrivingMode : Screen("driving_mode")
+    data object CrossfadeSettings : Screen("crossfade_settings")
 }
 
 /**
@@ -294,6 +296,16 @@ fun MusicNavigation(navController: NavHostController) {
                 composable(route = Screen.PlaybackSettings.route) {
                     CompositionLocalProvider(LocalAnimatedContentScope provides this) {
                         PlaybackSettingsScreen(
+                            onBackClick = { navController.safePopBackStack() },
+                            onCrossfadeClick = { navController.navigate(Screen.CrossfadeSettings.route) }
+                        )
+                    }
+                }
+
+                // Crossfade Settings Screen
+                composable(route = Screen.CrossfadeSettings.route) {
+                    CompositionLocalProvider(LocalAnimatedContentScope provides this) {
+                        CrossfadeSettingsScreen(
                             onBackClick = { navController.safePopBackStack() }
                         )
                     }
