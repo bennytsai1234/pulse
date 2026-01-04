@@ -1,457 +1,520 @@
-# OpenSpec Instructions
+# AGENTS.md - AI Coding Assistant Guidelines
 
-Instructions for AI coding assistants using OpenSpec for spec-driven development.
+> **版本**: 2.0 | **更新日期**: 2026-01-04
+> **標準**: 基於 AGENTS.md Open Standard 與 OpenSpec Framework
 
-## TL;DR Quick Checklist
+---
 
-- Search existing work: `openspec spec list --long`, `openspec list` (use `rg` only for full-text search)
-- Decide scope: new capability vs modify existing capability
-- Pick a unique `change-id`: kebab-case, verb-led (`add-`, `update-`, `remove-`, `refactor-`)
-- Scaffold: `proposal.md`, `tasks.md`, `design.md` (only if needed), and delta specs per affected capability
-- Write deltas: use `## ADDED|MODIFIED|REMOVED|RENAMED Requirements`; include at least one `#### Scenario:` per requirement
-- Validate: `openspec validate [change-id] --strict` and fix issues
-- Request approval: Do not start implementation until proposal is approved
-
-## Three-Stage Workflow
-
-### Stage 1: Creating Changes
-Create proposal when you need to:
-- Add features or functionality
-- Make breaking changes (API, schema)
-- Change architecture or patterns
-- Optimize performance (changes behavior)
-- Update security patterns
-
-Triggers (examples):
-- "Help me create a change proposal"
-- "Help me plan a change"
-- "Help me create a proposal"
-- "I want to create a spec proposal"
-- "I want to create a spec"
-
-Loose matching guidance:
-- Contains one of: `proposal`, `change`, `spec`
-- With one of: `create`, `plan`, `make`, `start`, `help`
-
-Skip proposal for:
-- Bug fixes (restore intended behavior)
-- Typos, formatting, comments
-- Dependency updates (non-breaking)
-- Configuration changes
-- Tests for existing behavior
-
-**Workflow**
-1. Review `openspec/project.md`, `openspec list`, and `openspec list --specs` to understand current context.
-2. Choose a unique verb-led `change-id` and scaffold `proposal.md`, `tasks.md`, optional `design.md`, and spec deltas under `openspec/changes/<id>/`.
-3. Draft spec deltas using `## ADDED|MODIFIED|REMOVED Requirements` with at least one `#### Scenario:` per requirement.
-4. Run `openspec validate <id> --strict` and resolve any issues before sharing the proposal.
-
-### Stage 2: Implementing Changes
-Track these steps as TODOs and complete them one by one.
-1. **Read proposal.md** - Understand what's being built
-2. **Read design.md** (if exists) - Review technical decisions
-3. **Read tasks.md** - Get implementation checklist
-4. **Implement tasks sequentially** - Complete in order
-5. **Confirm completion** - Ensure every item in `tasks.md` is finished before updating statuses
-6. **Update checklist** - After all work is done, set every task to `- [x]` so the list reflects reality
-7. **Approval gate** - Do not start implementation until the proposal is reviewed and approved
-
-### Stage 3: Archiving Changes
-After deployment, create separate PR to:
-- Move `changes/[name]/` → `changes/archive/YYYY-MM-DD-[name]/`
-- Update `specs/` if capabilities changed
-- Use `openspec archive <change-id> --skip-specs --yes` for tooling-only changes (always pass the change ID explicitly)
-- Run `openspec validate --strict` to confirm the archived change passes checks
-- **Git Push**: Run `git push` to ensure the archived change and spec updates are synced to the remote repository.
-
-## Before Any Task
-
-**Context Checklist:**
-- [ ] Read relevant specs in `specs/[capability]/spec.md`
-- [ ] Check pending changes in `changes/` for conflicts
-- [ ] Read `openspec/project.md` for conventions
-- [ ] Run `openspec list` to see active changes
-- [ ] Run `openspec list --specs` to see existing capabilities
-
-**Before Creating Specs:**
-- Always check if capability already exists
-- Prefer modifying existing specs over creating duplicates
-- Use `openspec show [spec]` to review current state
-- If request is ambiguous, ask 1–2 clarifying questions before scaffolding
-
-### Search Guidance
-- Enumerate specs: `openspec spec list --long` (or `--json` for scripts)
-- Enumerate changes: `openspec list` (or `openspec change list --json` - deprecated but available)
-- Show details:
-  - Spec: `openspec show <spec-id> --type spec` (use `--json` for filters)
-  - Change: `openspec show <change-id> --json --deltas-only`
-- Full-text search (use ripgrep): `rg -n "Requirement:|Scenario:" openspec/specs`
-
-## Quick Start
-
-### CLI Commands
+## 📋 快速開始 (TL;DR)
 
 ```bash
-# Essential commands
-openspec list                  # List active changes
-openspec list --specs          # List specifications
-openspec show [item]           # Display change or spec
-openspec validate [item]       # Validate changes or specs
-openspec archive <change-id> [--yes|-y]   # Archive after deployment (add --yes for non-interactive runs)
-
-# Project management
-openspec init [path]           # Initialize OpenSpec
-openspec update [path]         # Update instruction files
-
-# Interactive mode
-openspec show                  # Prompts for selection
-openspec validate              # Bulk validation mode
-
-# Debugging
-openspec show [change] --json --deltas-only
-openspec validate [change] --strict
-```
-
-### Command Flags
-
-- `--json` - Machine-readable output
-- `--type change|spec` - Disambiguate items
-- `--strict` - Comprehensive validation
-- `--no-interactive` - Disable prompts
-- `--skip-specs` - Archive without spec updates
-- `--yes`/`-y` - Skip confirmation prompts (non-interactive archive)
-
-## Directory Structure
-
-```
-openspec/
-├── project.md              # Project conventions
-├── specs/                  # Current truth - what IS built
-│   └── [capability]/       # Single focused capability
-│       ├── spec.md         # Requirements and scenarios
-│       └── design.md       # Technical patterns
-├── changes/                # Proposals - what SHOULD change
-│   ├── [change-name]/
-│   │   ├── proposal.md     # Why, what, impact
-│   │   ├── tasks.md        # Implementation checklist
-│   │   ├── design.md       # Technical decisions (optional; see criteria)
-│   │   └── specs/          # Delta changes
-│   │       └── [capability]/
-│   │           └── spec.md # ADDED/MODIFIED/REMOVED
-│   └── archive/            # Completed changes
-```
-
-## Creating Change Proposals
-
-### Decision Tree
-
-```
-New request?
-├─ Bug fix restoring spec behavior? → Fix directly
-├─ Typo/format/comment? → Fix directly
-├─ New feature/capability? → Create proposal
-├─ Breaking change? → Create proposal
-├─ Architecture change? → Create proposal
-└─ Unclear? → Create proposal (safer)
-```
-
-### Proposal Structure
-
-1. **Create directory:** `changes/[change-id]/` (kebab-case, verb-led, unique)
-
-2. **Write proposal.md:**
-```markdown
-# Change: [Brief description of change]
-
-## Why
-[1-2 sentences on problem/opportunity]
-
-## What Changes
-- [Bullet list of changes]
-- [Mark breaking changes with **BREAKING**]
-
-## Impact
-- Affected specs: [list capabilities]
-- Affected code: [key files/systems]
-```
-
-3. **Create spec deltas:** `specs/[capability]/spec.md`
-```markdown
-## ADDED Requirements
-### Requirement: New Feature
-The system SHALL provide...
-
-#### Scenario: Success case
-- **WHEN** user performs action
-- **THEN** expected result
-
-## MODIFIED Requirements
-### Requirement: Existing Feature
-[Complete modified requirement]
-
-## REMOVED Requirements
-### Requirement: Old Feature
-**Reason**: [Why removing]
-**Migration**: [How to handle]
-```
-If multiple capabilities are affected, create multiple delta files under `changes/[change-id]/specs/<capability>/spec.md`—one per capability.
-
-4. **Create tasks.md:**
-```markdown
-## 1. Implementation
-- [ ] 1.1 Create database schema
-- [ ] 1.2 Implement API endpoint
-- [ ] 1.3 Add frontend component
-- [ ] 1.4 Write tests
-```
-
-5. **Create design.md when needed:**
-Create `design.md` if any of the following apply; otherwise omit it:
-- Cross-cutting change (multiple services/modules) or a new architectural pattern
-- New external dependency or significant data model changes
-- Security, performance, or migration complexity
-- Ambiguity that benefits from technical decisions before coding
-
-Minimal `design.md` skeleton:
-```markdown
-## Context
-[Background, constraints, stakeholders]
-
-## Goals / Non-Goals
-- Goals: [...]
-- Non-Goals: [...]
-
-## Decisions
-- Decision: [What and why]
-- Alternatives considered: [Options + rationale]
-
-## Risks / Trade-offs
-- [Risk] → Mitigation
-
-## Migration Plan
-[Steps, rollback]
-
-## Open Questions
-- [...]
-```
-
-## Spec File Format
-
-### Critical: Scenario Formatting
-
-**CORRECT** (use #### headers):
-```markdown
-#### Scenario: User login success
-- **WHEN** valid credentials provided
-- **THEN** return JWT token
-```
-
-**WRONG** (don't use bullets or bold):
-```markdown
-- **Scenario: User login**  ❌
-**Scenario**: User login     ❌
-### Scenario: User login      ❌
-```
-
-Every requirement MUST have at least one scenario.
-
-### Requirement Wording
-- Use SHALL/MUST for normative requirements (avoid should/may unless intentionally non-normative)
-
-### Delta Operations
-
-- `## ADDED Requirements` - New capabilities
-- `## MODIFIED Requirements` - Changed behavior
-- `## REMOVED Requirements` - Deprecated features
-- `## RENAMED Requirements` - Name changes
-
-Headers matched with `trim(header)` - whitespace ignored.
-
-#### When to use ADDED vs MODIFIED
-- ADDED: Introduces a new capability or sub-capability that can stand alone as a requirement. Prefer ADDED when the change is orthogonal (e.g., adding "Slash Command Configuration") rather than altering the semantics of an existing requirement.
-- MODIFIED: Changes the behavior, scope, or acceptance criteria of an existing requirement. Always paste the full, updated requirement content (header + all scenarios). The archiver will replace the entire requirement with what you provide here; partial deltas will drop previous details.
-- RENAMED: Use when only the name changes. If you also change behavior, use RENAMED (name) plus MODIFIED (content) referencing the new name.
-
-Common pitfall: Using MODIFIED to add a new concern without including the previous text. This causes loss of detail at archive time. If you aren’t explicitly changing the existing requirement, add a new requirement under ADDED instead.
-
-Authoring a MODIFIED requirement correctly:
-1) Locate the existing requirement in `openspec/specs/<capability>/spec.md`.
-2) Copy the entire requirement block (from `### Requirement: ...` through its scenarios).
-3) Paste it under `## MODIFIED Requirements` and edit to reflect the new behavior.
-4) Ensure the header text matches exactly (whitespace-insensitive) and keep at least one `#### Scenario:`.
-
-Example for RENAMED:
-```markdown
-## RENAMED Requirements
-- FROM: `### Requirement: Login`
-- TO: `### Requirement: User Authentication`
-```
-
-## Troubleshooting
-
-### Common Errors
-
-**"Change must have at least one delta"**
-- Check `changes/[name]/specs/` exists with .md files
-- Verify files have operation prefixes (## ADDED Requirements)
-
-**"Requirement must have at least one scenario"**
-- Check scenarios use `#### Scenario:` format (4 hashtags)
-- Don't use bullet points or bold for scenario headers
-
-**Silent scenario parsing failures**
-- Exact format required: `#### Scenario: Name`
-- Debug with: `openspec show [change] --json --deltas-only`
-
-### Validation Tips
-
-```bash
-# Always use strict mode for comprehensive checks
-openspec validate [change] --strict
-
-# Debug delta parsing
-openspec show [change] --json | jq '.deltas'
-
-# Check specific requirement
-openspec show [spec] --json -r 1
-```
-
-## Happy Path Script
-
-```bash
-# 1) Explore current state
+# 1. 了解專案現狀
 openspec spec list --long
 openspec list
-# Optional full-text search:
-# rg -n "Requirement:|Scenario:" openspec/specs
-# rg -n "^#|Requirement:" openspec/changes
 
-# 2) Choose change id and scaffold
-CHANGE=add-two-factor-auth
-mkdir -p openspec/changes/$CHANGE/{specs/auth}
-printf "## Why\n...\n\n## What Changes\n- ...\n\n## Impact\n- ...\n" > openspec/changes/$CHANGE/proposal.md
-printf "## 1. Implementation\n- [ ] 1.1 ...\n" > openspec/changes/$CHANGE/tasks.md
+# 2. 閱讀專案規範
+cat openspec/project.md
 
-# 3) Add deltas (example)
-cat > openspec/changes/$CHANGE/specs/auth/spec.md << 'EOF'
-## ADDED Requirements
-### Requirement: Two-Factor Authentication
-Users MUST provide a second factor during login.
+# 3. 選擇任務類型
+# - 需要提案？創建 OpenSpec change
+# - 直接修復？遵循現有規範執行
 
-#### Scenario: OTP required
-- **WHEN** valid credentials are provided
-- **THEN** an OTP challenge is required
+# 4. 執行後驗證
+./gradlew assembleDebug
+git push
+```
+
+---
+
+## 第一章：Agent 身份與職責
+
+### 1.1 你是誰
+
+你是 **Pulse Music Player** 專案的 AI 編碼助手，負責：
+- 🔧 實作新功能與修復錯誤
+- 📝 維護文件與規範
+- 🏗️ 優化架構與程式碼品質
+- 🧪 撰寫與維護測試
+
+### 1.2 核心原則
+
+| 原則 | 說明 |
+|------|------|
+| **尊重現狀** | 修改前必須理解既有邏輯 |
+| **漸進式改進** | 避免大規模重構，優先增量交付 |
+| **可驗證性** | 每個變更都應可獨立驗證 |
+| **文件同步** | 程式碼變更後同步更新相關文件 |
+
+---
+
+## 第二章：專案上下文
+
+### 2.1 技術棧速覽
+
+```
+┌─────────────────────────────────────────────────────────┐
+│  Pulse Music Player - Android 本地音樂播放器            │
+├─────────────────────────────────────────────────────────┤
+│  Language:    Kotlin 2.0.21+                            │
+│  UI:          Jetpack Compose + Material 3              │
+│  Architecture: MVVM + Clean Architecture (Multi-module) │
+│  DI:          Hilt                                       │
+│  Media:       Media3 (ExoPlayer + MediaSession)         │
+│  Database:    Room                                       │
+│  Async:       Coroutines + Flow                         │
+│  Build:       Gradle Kotlin DSL + Version Catalog       │
+└─────────────────────────────────────────────────────────┘
+```
+
+### 2.2 模組結構
+
+```
+pulse/
+├── app/                 → DI 設定、Application、MainActivity
+├── core/
+│   ├── common/          → 共用工具、擴展函數
+│   └── designsystem/    → 設計系統元件
+├── data/                → Repository 實作、資料來源
+├── domain/              → 業務邏輯 (Pure Kotlin)
+├── player/              → 媒體播放 (Media3)
+├── ui/                  → Jetpack Compose UI
+└── openspec/            → 規範與變更管理
+```
+
+### 2.3 依賴規則
+
+```
+UI → Domain ← Data
+     ↑
+   Player
+
+Core: 被所有層依賴，不依賴業務層
+```
+
+---
+
+## 第三章：互動協議
+
+### 3.1 語言規範
+
+> ⚠️ **強制規則**
+
+| 情境 | 語言 |
+|------|------|
+| 回覆使用者 | **繁體中文 (Traditional Chinese)** |
+| 程式碼註解 | 英文或繁體中文 |
+| Commit 訊息 | 英文 (Conventional Commits) |
+| 文件撰寫 | 繁體中文 |
+
+### 3.2 回覆格式
+
+```markdown
+# 使用 GitHub-style Markdown
+- **粗體** 標示重要關鍵字
+- `反引號` 標示檔案、函數、類別名稱
+- 使用表格整理結構化資訊
+- 程式碼區塊標明語言類型
+```
+
+### 3.3 主動性原則
+
+| 情境 | 行為 |
+|------|------|
+| 使用者明確要求 | 直接執行，完成後報告結果 |
+| 使用者詢問方法 | 說明方法，等待確認再執行 |
+| 發現相關問題 | 完成主要任務後提及，不自動修復 |
+| 需要決策 | 提供選項，等待使用者決定 |
+
+---
+
+## 第四章：OpenSpec 工作流程
+
+### 4.1 三階段流程
+
+```
+Stage 1: 創建提案  →  Stage 2: 實作變更  →  Stage 3: 歸檔完成
+(proposal.md)        (按 tasks.md)         (移至 archive/)
+```
+
+### 4.2 何時需要提案？
+
+**需要提案** ✅：
+- 新增功能或能力
+- 破壞性變更 (API, Schema)
+- 架構或模式變更
+- 效能優化 (影響行為)
+- 安全模式更新
+
+**直接修復** ❌ (不需提案)：
+- Bug 修復 (恢復預期行為)
+- 錯字、格式、註解
+- 依賴更新 (非破壞性)
+- 配置變更
+- 現有行為的測試
+
+### 4.3 創建提案
+
+```bash
+# 1. 選擇唯一的 change-id (kebab-case, 動詞開頭)
+CHANGE=add-equalizer-feature
+
+# 2. 建立目錄結構
+mkdir -p openspec/changes/$CHANGE/{specs/player}
+
+# 3. 撰寫 proposal.md
+cat > openspec/changes/$CHANGE/proposal.md << 'EOF'
+# Change: 新增等化器功能
+
+## Why
+使用者需要調整音頻輸出以獲得更好的聆聽體驗。
+
+## What Changes
+- 新增等化器設定 UI
+- 整合 ExoPlayer Equalizer 效果
+- 儲存使用者偏好設定
+
+## Impact
+- Affected specs: player, ui-settings
+- Affected code: player/, ui/settings/
 EOF
 
-# 4) Validate
+# 4. 撰寫 tasks.md
+cat > openspec/changes/$CHANGE/tasks.md << 'EOF'
+## 1. Implementation
+- [ ] 1.1 建立 EqualizerUseCase
+- [ ] 1.2 實作 EqualizerSettings UI
+- [ ] 1.3 整合 ExoPlayer Equalizer
+- [ ] 1.4 撰寫單元測試
+EOF
+
+# 5. 撰寫 spec delta
+cat > openspec/changes/$CHANGE/specs/player/spec.md << 'EOF'
+## ADDED Requirements
+### Requirement: Equalizer Control
+The player MUST support real-time audio equalization.
+
+#### Scenario: Apply Preset
+- **WHEN** user selects "Bass Boost" preset
+- **THEN** the system applies corresponding EQ settings
+- **AND** changes take effect immediately
+EOF
+
+# 6. 驗證
 openspec validate $CHANGE --strict
 ```
 
-## Multi-Capability Example
+### 4.4 實作變更
 
-```
-openspec/changes/add-2fa-notify/
-├── proposal.md
-├── tasks.md
-└── specs/
-    ├── auth/
-    │   └── spec.md   # ADDED: Two-Factor Authentication
-    └── notifications/
-        └── spec.md   # ADDED: OTP email notification
-```
-
-auth/spec.md
 ```markdown
-## ADDED Requirements
-### Requirement: Two-Factor Authentication
-...
+## 實作檢查清單
+
+1. [ ] 閱讀 proposal.md - 理解要做什麼
+2. [ ] 閱讀 design.md - 了解技術決策 (如存在)
+3. [ ] 閱讀 tasks.md - 取得實作清單
+4. [ ] 依序完成任務
+5. [ ] 確認所有項目完成
+6. [ ] 更新 tasks.md 勾選狀態
+7. [ ] 驗證建構成功: `./gradlew assembleDebug`
+8. [ ] 推送變更: `git push`
 ```
 
-notifications/spec.md
-```markdown
-## ADDED Requirements
-### Requirement: OTP Email Notification
-...
-```
+### 4.5 歸檔變更
 
-## Best Practices
-
-### Simplicity First
-- Default to <100 lines of new code
-- Single-file implementations until proven insufficient
-- Avoid frameworks without clear justification
-- Choose boring, proven patterns
-
-### Complexity Triggers
-Only add complexity with:
-- Performance data showing current solution too slow
-- Concrete scale requirements (>1000 users, >100MB data)
-- Multiple proven use cases requiring abstraction
-
-### Clear References
-- Use `file.ts:42` format for code locations
-- Reference specs as `specs/auth/spec.md`
-- Link related changes and PRs
-
-### Capability Naming
-- Use verb-noun: `user-auth`, `payment-capture`
-- Single purpose per capability
-- 10-minute understandability rule
-- Split if description needs "AND"
-
-### Change ID Naming
-- Use kebab-case, short and descriptive: `add-two-factor-auth`
-- Prefer verb-led prefixes: `add-`, `update-`, `remove-`, `refactor-`
-- Ensure uniqueness; if taken, append `-2`, `-3`, etc.
-
-## Tool Selection Guide
-
-| Task | Tool | Why |
-|------|------|-----|
-| Find files by pattern | Glob | Fast pattern matching |
-| Search code content | Grep | Optimized regex search |
-| Read specific files | Read | Direct file access |
-| Explore unknown scope | Task | Multi-step investigation |
-
-## Error Recovery
-
-### Change Conflicts
-1. Run `openspec list` to see active changes
-2. Check for overlapping specs
-3. Coordinate with change owners
-4. Consider combining proposals
-
-### Validation Failures
-1. Run with `--strict` flag
-2. Check JSON output for details
-3. Verify spec file format
-4. Ensure scenarios properly formatted
-
-### Missing Context
-1. Read project.md first
-2. Check related specs
-3. Review recent archives
-4. Ask for clarification
-
-## Quick Reference
-
-### Stage Indicators
-- `changes/` - Proposed, not yet built
-- `specs/` - Built and deployed
-- `archive/` - Completed changes
-
-### File Purposes
-- `proposal.md` - Why and what
-- `tasks.md` - Implementation steps
-- `design.md` - Technical decisions
-- `spec.md` - Requirements and behavior
-
-### CLI Essentials
 ```bash
-openspec list              # What's in progress?
-openspec show [item]       # View details
-openspec validate --strict # Is it correct?
-openspec archive <change-id> [--yes|-y]  # Mark complete (add --yes for automation)
+# 部署後歸檔
+openspec archive <change-id> --yes
+
+# 工具性變更 (不更新 specs)
+openspec archive <change-id> --skip-specs --yes
+
+# 驗證歸檔
+openspec validate --strict
+
+# 推送到遠端
+git push
 ```
 
-Remember: Specs are truth. Changes are proposals. Keep them in sync.
+---
+
+## 第五章：程式碼操作規範
+
+### 5.1 修改前檢查清單
+
+```markdown
+## Context Checklist
+- [ ] 閱讀相關 specs: `specs/[capability]/spec.md`
+- [ ] 檢查待處理變更: `openspec list`
+- [ ] 閱讀專案規範: `openspec/project.md`
+- [ ] 確認無衝突
+```
+
+### 5.2 程式碼風格
+
+```kotlin
+// ✅ 遵循專案架構
+// Domain 層: 純 Kotlin，無 Android 依賴
+class GetSongsUseCase @Inject constructor(
+    private val repository: MusicRepository
+) {
+    operator fun invoke(): Flow<List<Song>> = repository.getSongs()
+}
+
+// ✅ ViewModel: StateFlow + UDF
+@HiltViewModel
+class SongsViewModel @Inject constructor(
+    private val getSongsUseCase: GetSongsUseCase
+) : ViewModel() {
+    private val _uiState = MutableStateFlow(SongsUiState())
+    val uiState: StateFlow<SongsUiState> = _uiState.asStateFlow()
+}
+
+// ✅ Composable: 無狀態優先
+@Composable
+fun SongItem(
+    song: Song,
+    onPlayClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    // 純呈現，不持有狀態
+}
+```
+
+### 5.3 Git 提交規範
+
+```bash
+# 格式: <類型>(<範圍>): <描述>
+git commit -m "feat(player): add equalizer support"
+git commit -m "fix(ui): resolve scroll position reset issue"
+git commit -m "refactor(domain): simplify use case dependencies"
+
+# 類型清單
+# feat:     新功能
+# fix:      錯誤修復
+# docs:     文件變更
+# style:    格式調整
+# refactor: 重構
+# perf:     效能優化
+# test:     測試相關
+# chore:    建構/工具變更
+```
+
+---
+
+## 第六章：指令操作規範
+
+### 6.1 Shell 操作
+
+> ⚠️ **重要規則**
+
+當 `run_command` 無預期輸出時，**必須**改用持續的 Shell Session：
+
+```bash
+# 方法 1: 啟動 cmd shell
+run_command: cmd
+send_command_input: <actual command>\n
+
+# 方法 2: 啟動 pwsh shell
+run_command: pwsh
+send_command_input: <actual command>\n
+```
+
+### 6.2 常用指令
+
+```bash
+# 建構
+./gradlew assembleDebug
+./gradlew assembleRelease
+
+# 測試
+./gradlew test
+./gradlew connectedAndroidTest
+
+# Lint
+./gradlew :app:lintDebug
+
+# OpenSpec
+openspec list
+openspec validate --strict
+openspec archive <change-id> --yes
+```
+
+### 6.3 Git 操作
+
+```bash
+# 狀態檢查
+git status
+git log -n 5 --oneline
+
+# 提交與推送
+git add .
+git commit -m "<type>(<scope>): <description>"
+git push
+
+# 分支操作
+git checkout -b feature/<name>
+git checkout main
+```
+
+---
+
+## 第七章：疑難排解
+
+### 7.1 常見錯誤
+
+| 錯誤 | 原因 | 解決方案 |
+|------|------|----------|
+| `Change must have at least one delta` | 缺少 spec 變更 | 確保 `changes/[name]/specs/` 存在 |
+| `Requirement must have scenario` | 缺少情境 | 新增 `#### Scenario:` 區塊 |
+| `Build failed` | 編譯錯誤 | 檢查錯誤訊息，修復後重試 |
+| `No output from command` | Shell 問題 | 使用 Shell Session 方式 |
+
+### 7.2 建構失敗處理
+
+```bash
+# 1. 清理建構快取
+./gradlew clean
+
+# 2. 重新同步
+./gradlew --refresh-dependencies
+
+# 3. 檢查特定模組
+./gradlew :ui:assembleDebug
+
+# 4. 查看詳細錯誤
+./gradlew assembleDebug --stacktrace
+```
+
+### 7.3 恢復策略
+
+```bash
+# 捨棄未提交變更
+git checkout -- .
+
+# 回退到上一個提交
+git reset --hard HEAD~1
+
+# 暫存變更
+git stash
+git stash pop
+```
+
+---
+
+## 第八章：搜尋與探索
+
+### 8.1 專案搜尋
+
+```bash
+# 列出 specs
+openspec spec list --long
+
+# 列出變更
+openspec list
+
+# 顯示詳細
+openspec show <spec-id> --type spec
+openspec show <change-id> --json --deltas-only
+
+# 全文搜尋 (ripgrep)
+rg -n "Requirement:|Scenario:" openspec/specs
+rg -n "class.*ViewModel" --type kt
+```
+
+### 8.2 程式碼探索
+
+```bash
+# 搜尋類別定義
+rg "class.*UseCase" --type kt
+
+# 搜尋 Composable
+rg "@Composable" --type kt
+
+# 搜尋 TODO
+rg "TODO|FIXME" --type kt
+```
+
+---
+
+## 第九章：最佳實踐
+
+### 9.1 簡潔優先
+
+- 預設目標：< 100 行新程式碼
+- 單檔案實作，直到證明不足
+- 避免無明確理由的框架
+- 選擇無聊但經過驗證的模式
+
+### 9.2 複雜度觸發器
+
+只在以下情況新增複雜度：
+- ⚡ 效能數據顯示現有方案太慢
+- 📈 明確的規模需求 (> 1000 用戶, > 100MB 資料)
+- 🔄 多個已證實的用例需要抽象
+
+### 9.3 清晰的參考
+
+```markdown
+# 程式碼位置
+file.kt:42
+
+# Spec 參考
+specs/player/spec.md
+
+# Change 參考
+changes/add-equalizer/proposal.md
+```
+
+---
+
+## 附錄 A：OpenSpec CLI 速查
+
+```bash
+# 核心指令
+openspec list                    # 列出活動中的變更
+openspec list --specs            # 列出規範
+openspec show [item]             # 顯示詳細
+openspec validate [item]         # 驗證
+openspec archive <id> [--yes]    # 歸檔
+
+# 旗標
+--json                           # 機器可讀輸出
+--type change|spec               # 指定類型
+--strict                         # 完整驗證
+--skip-specs                     # 跳過 spec 更新
+--yes, -y                        # 跳過確認提示
+```
+
+---
+
+## 附錄 B：目錄結構
+
+```
+openspec/
+├── project.md              # 專案規範 (必讀)
+├── AGENTS.md               # 本文件
+├── specs/                  # 現有規範 (已建構的功能)
+│   └── [capability]/
+│       ├── spec.md         # 需求與情境
+│       └── design.md       # 技術模式
+└── changes/                # 變更提案 (待建構)
+    ├── [change-name]/
+    │   ├── proposal.md     # Why, What, Impact
+    │   ├── tasks.md        # 實作清單
+    │   ├── design.md       # 技術決策 (可選)
+    │   └── specs/          # Delta 變更
+    └── archive/            # 已完成變更
+```
+
+---
+
+## 附錄 C：階段指示器
+
+| 位置 | 狀態 |
+|------|------|
+| `changes/` | 已提案，尚未建構 |
+| `specs/` | 已建構並部署 |
+| `changes/archive/` | 已完成的變更 |
+
+---
+
+**記住**：Specs 是真相。Changes 是提案。保持同步。
