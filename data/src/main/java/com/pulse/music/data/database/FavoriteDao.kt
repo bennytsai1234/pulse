@@ -1,6 +1,7 @@
 package com.pulse.music.data.database
 
 import androidx.room.Dao
+import androidx.room.RoomWarnings
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -18,5 +19,6 @@ interface FavoriteDao {
     fun isFavorite(songId: Long): Flow<Boolean>
 
     @Query("SELECT * FROM songs INNER JOIN favorites ON songs.id = favorites.songId ORDER BY favorites.dateAdded DESC")
+    @SuppressWarnings(RoomWarnings.CURSOR_MISMATCH)
     fun getFavoriteSongs(): Flow<List<SongEntity>>
 }

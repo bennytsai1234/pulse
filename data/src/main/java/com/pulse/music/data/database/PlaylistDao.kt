@@ -1,6 +1,7 @@
 package com.pulse.music.data.database
 
 import androidx.room.Dao
+import androidx.room.RoomWarnings
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -22,8 +23,8 @@ interface PlaylistDao {
     suspend fun updatePlaylistName(id: Long, name: String)
 
     @Query("""
-        SELECT 
-            p.*, 
+        SELECT
+            p.*,
             (SELECT s.albumId FROM playlist_songs ps JOIN songs s ON ps.songId = s.id WHERE ps.playlistId = p.playlistId ORDER BY ps.dateAdded ASC LIMIT 1) as coverAlbumId,
             (SELECT COUNT(*) FROM playlist_songs ps WHERE ps.playlistId = p.playlistId) as songCount
         FROM playlists p
@@ -32,8 +33,8 @@ interface PlaylistDao {
     fun getAllPlaylists(): Flow<List<PlaylistWithMeta>>
 
     @Query("""
-        SELECT 
-            p.*, 
+        SELECT
+            p.*,
             (SELECT s.albumId FROM playlist_songs ps JOIN songs s ON ps.songId = s.id WHERE ps.playlistId = p.playlistId ORDER BY ps.dateAdded ASC LIMIT 1) as coverAlbumId,
             (SELECT COUNT(*) FROM playlist_songs ps WHERE ps.playlistId = p.playlistId) as songCount
         FROM playlists p
@@ -57,11 +58,12 @@ interface PlaylistDao {
     // However, Room needs to know how to join.
     @Transaction
     @Query("""
-        SELECT * FROM songs 
-        INNER JOIN playlist_songs ON songs.id = playlist_songs.songId 
+        SELECT * FROM songs
+        INNER JOIN playlist_songs ON songs.id = playlist_songs.songId
         WHERE playlist_songs.playlistId = :playlistId
         ORDER BY playlist_songs.sortOrder ASC
     """)
+    @SuppressWarnings(RoomWarnings.CURSOR_MISMATCH)
     fun getSongsForPlaylist(playlistId: Long): Flow<List<SongEntity>>
 
     @Query("UPDATE playlist_songs SET sortOrder = :newOrder WHERE playlistId = :playlistId AND songId = :songId")

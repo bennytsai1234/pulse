@@ -31,7 +31,7 @@ import androidx.compose.material.icons.rounded.GraphicEq
 import androidx.compose.material.icons.rounded.SkipNext
 import androidx.compose.material.icons.rounded.Timer
 import androidx.compose.material.icons.rounded.Tune
-import androidx.compose.material.icons.rounded.VolumeOff
+import androidx.compose.material.icons.automirrored.rounded.VolumeOff
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -421,7 +421,7 @@ private fun AdvancedSettingsSection(
                     Spacer(modifier = Modifier.height(12.dp))
 
                     ToggleOption(
-                        icon = Icons.Rounded.VolumeOff,
+                        icon = Icons.AutoMirrored.Rounded.VolumeOff,
                         title = "智慧靜音偵測",
                         subtitle = "自動偵測歌曲結尾靜音段落",
                         checked = silenceDetection,

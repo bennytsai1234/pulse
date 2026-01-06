@@ -32,7 +32,7 @@ import org.robolectric.annotation.Config
 
 /**
  * MusicRepositoryImpl 整合測試
- * 
+ *
  * 使用真實的 Room 資料庫（記憶體模式）和 Mock 的外部依賴測試 Repository 邏輯
  */
 @RunWith(RobolectricTestRunner::class)
@@ -43,11 +43,11 @@ class MusicRepositoryImplTest {
     private lateinit var songDao: SongDao
     private lateinit var playlistDao: PlaylistDao
     private lateinit var favoriteDao: FavoriteDao
-    
+
     // Mocked dependencies
     private lateinit var localAudioSource: LocalAudioSource
     private lateinit var userPreferencesRepository: UserPreferencesRepository
-    
+
     private lateinit var repository: MusicRepositoryImpl
 
     @Before
@@ -56,21 +56,23 @@ class MusicRepositoryImplTest {
         database = Room.inMemoryDatabaseBuilder(context, PulseDatabase::class.java)
             .allowMainThreadQueries()
             .build()
-        
+
         songDao = database.songDao()
         playlistDao = database.playlistDao()
         favoriteDao = database.favoriteDao()
-        
+
         // Mock external dependencies
         localAudioSource = mockk()
         userPreferencesRepository = mockk()
-        
+        val tagEditorSource = mockk<com.pulse.music.data.source.TagEditorSource>()
+
         // Default mock behavior
         every { userPreferencesRepository.minAudioDuration } returns MutableStateFlow(30_000L)
         every { userPreferencesRepository.includedFolders } returns MutableStateFlow(emptySet())
-        
+
         repository = MusicRepositoryImpl(
             localAudioSource = localAudioSource,
+            tagEditorSource = tagEditorSource,
             songDao = songDao,
             playlistDao = playlistDao,
             favoriteDao = favoriteDao,
@@ -175,13 +177,13 @@ class MusicRepositoryImplTest {
         repository.getAlbums().test {
             val result = awaitItem()
             assertEquals(2, result.size)
-            
+
             val albumA = result.find { it.title == "Album A" }
             assertEquals(2, albumA?.songCount)
-            
+
             val albumB = result.find { it.title == "Album B" }
             assertEquals(1, albumB?.songCount)
-            
+
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -202,13 +204,13 @@ class MusicRepositoryImplTest {
         repository.getArtists().test {
             val result = awaitItem()
             assertEquals(2, result.size)
-            
+
             val artistA = result.find { it.name == "Artist A" }
             assertEquals(3, artistA?.songCount)
-            
+
             val artistB = result.find { it.name == "Artist B" }
             assertEquals(1, artistB?.songCount)
-            
+
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -258,7 +260,7 @@ class MusicRepositoryImplTest {
         // When & Then
         repository.scanLocalMusic().test {
             awaitItem() // Initial scanning status
-            
+
             val failed = awaitItem()
             assertTrue(failed is ScanStatus.Failed)
             assertEquals("Permission denied", (failed as ScanStatus.Failed).error)
@@ -273,7 +275,7 @@ class MusicRepositoryImplTest {
     fun `toggleFavorite should add song to favorites when not favorited`() = runTest {
         // Given
         songDao.insertAll(listOf(createTestSongEntity(1, "Test Song")))
-        
+
         // Initially not favorited
         assertFalse(repository.isSongFavorite(1).first())
 
@@ -289,7 +291,7 @@ class MusicRepositoryImplTest {
         // Given
         songDao.insertAll(listOf(createTestSongEntity(1, "Test Song")))
         favoriteDao.addFavorite(FavoriteEntity(1))
-        
+
         // Initially favorited
         assertTrue(repository.isSongFavorite(1).first())
 
@@ -331,7 +333,7 @@ class MusicRepositoryImplTest {
 
         // Then
         assertTrue(playlistId > 0)
-        
+
         repository.getPlaylist(playlistId).test {
             val result = awaitItem()
             assertEquals("My Playlist", result?.name)

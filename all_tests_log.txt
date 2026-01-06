@@ -1,0 +1,376 @@
+> Task :domain:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :domain:compileKotlin UP-TO-DATE
+> Task :domain:compileJava NO-SOURCE
+> Task :domain:processResources NO-SOURCE
+> Task :domain:classes UP-TO-DATE
+> Task :domain:jar UP-TO-DATE
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preDebugBuild UP-TO-DATE
+> Task :app:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :app:generateDebugBuildConfig UP-TO-DATE
+> Task :data:preBuild UP-TO-DATE
+> Task :data:preDebugBuild UP-TO-DATE
+> Task :data:writeDebugAarMetadata UP-TO-DATE
+> Task :player:preBuild UP-TO-DATE
+> Task :player:preDebugBuild UP-TO-DATE
+> Task :player:writeDebugAarMetadata UP-TO-DATE
+> Task :ui:preBuild UP-TO-DATE
+> Task :ui:preDebugBuild UP-TO-DATE
+> Task :ui:writeDebugAarMetadata UP-TO-DATE
+> Task :core:common:preBuild UP-TO-DATE
+> Task :core:common:preDebugBuild UP-TO-DATE
+> Task :core:common:writeDebugAarMetadata UP-TO-DATE
+> Task :core:designsystem:preBuild UP-TO-DATE
+> Task :core:designsystem:preDebugBuild UP-TO-DATE
+> Task :core:designsystem:writeDebugAarMetadata UP-TO-DATE
+> Task :app:checkDebugAarMetadata UP-TO-DATE
+> Task :data:processDebugNavigationResources UP-TO-DATE
+> Task :player:processDebugNavigationResources UP-TO-DATE
+> Task :ui:processDebugNavigationResources UP-TO-DATE
+> Task :core:common:processDebugNavigationResources UP-TO-DATE
+> Task :core:designsystem:processDebugNavigationResources UP-TO-DATE
+> Task :app:processDebugNavigationResources UP-TO-DATE
+> Task :app:compileDebugNavigationResources UP-TO-DATE
+> Task :app:generateDebugResValues UP-TO-DATE
+> Task :data:generateDebugResValues UP-TO-DATE
+> Task :data:generateDebugResources UP-TO-DATE
+> Task :data:packageDebugResources UP-TO-DATE
+> Task :player:generateDebugResValues UP-TO-DATE
+> Task :player:generateDebugResources UP-TO-DATE
+> Task :player:packageDebugResources UP-TO-DATE
+> Task :ui:generateDebugResValues UP-TO-DATE
+> Task :ui:generateDebugResources UP-TO-DATE
+> Task :ui:packageDebugResources UP-TO-DATE
+> Task :core:common:generateDebugResValues UP-TO-DATE
+> Task :core:common:generateDebugResources UP-TO-DATE
+> Task :core:common:packageDebugResources UP-TO-DATE
+> Task :core:designsystem:generateDebugResValues UP-TO-DATE
+> Task :core:designsystem:generateDebugResources UP-TO-DATE
+> Task :core:designsystem:packageDebugResources UP-TO-DATE
+> Task :app:mapDebugSourceSetPaths UP-TO-DATE
+> Task :app:generateDebugResources UP-TO-DATE
+> Task :app:mergeDebugResources UP-TO-DATE
+> Task :app:packageDebugResources UP-TO-DATE
+> Task :app:parseDebugLocalResources UP-TO-DATE
+> Task :app:createDebugCompatibleScreenManifests UP-TO-DATE
+> Task :app:extractDeepLinksDebug UP-TO-DATE
+> Task :data:extractDeepLinksDebug UP-TO-DATE
+> Task :data:processDebugManifest UP-TO-DATE
+> Task :player:extractDeepLinksDebug UP-TO-DATE
+> Task :player:processDebugManifest UP-TO-DATE
+> Task :ui:extractDeepLinksDebug UP-TO-DATE
+> Task :ui:processDebugManifest UP-TO-DATE
+> Task :core:common:extractDeepLinksDebug UP-TO-DATE
+> Task :core:common:processDebugManifest UP-TO-DATE
+> Task :core:designsystem:extractDeepLinksDebug UP-TO-DATE
+> Task :core:designsystem:processDebugManifest UP-TO-DATE
+> Task :app:processDebugMainManifest UP-TO-DATE
+> Task :app:processDebugManifest UP-TO-DATE
+> Task :app:processDebugManifestForPackage UP-TO-DATE
+> Task :data:compileDebugLibraryResources UP-TO-DATE
+> Task :data:parseDebugLocalResources UP-TO-DATE
+> Task :data:generateDebugRFile UP-TO-DATE
+> Task :player:compileDebugLibraryResources UP-TO-DATE
+> Task :player:parseDebugLocalResources UP-TO-DATE
+> Task :player:generateDebugRFile UP-TO-DATE
+> Task :ui:compileDebugLibraryResources UP-TO-DATE
+> Task :ui:parseDebugLocalResources UP-TO-DATE
+> Task :ui:generateDebugRFile UP-TO-DATE
+> Task :core:common:compileDebugLibraryResources UP-TO-DATE
+> Task :core:common:parseDebugLocalResources UP-TO-DATE
+> Task :core:common:generateDebugRFile UP-TO-DATE
+> Task :core:designsystem:compileDebugLibraryResources UP-TO-DATE
+> Task :core:designsystem:parseDebugLocalResources UP-TO-DATE
+> Task :core:designsystem:generateDebugRFile UP-TO-DATE
+> Task :app:processDebugResources UP-TO-DATE
+> Task :data:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :core:common:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :core:common:compileDebugKotlin UP-TO-DATE
+> Task :core:common:javaPreCompileDebug UP-TO-DATE
+> Task :core:common:compileDebugJavaWithJavac NO-SOURCE
+> Task :core:common:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :data:kspDebugKotlin UP-TO-DATE
+> Task :data:compileDebugKotlin UP-TO-DATE
+> Task :data:javaPreCompileDebug UP-TO-DATE
+> Task :data:compileDebugJavaWithJavac UP-TO-DATE
+> Task :core:common:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :data:transformDebugClassesWithAsm UP-TO-DATE
+> Task :data:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :player:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :player:kspDebugKotlin UP-TO-DATE
+> Task :player:compileDebugKotlin UP-TO-DATE
+> Task :player:javaPreCompileDebug UP-TO-DATE
+> Task :player:compileDebugJavaWithJavac UP-TO-DATE
+> Task :player:transformDebugClassesWithAsm UP-TO-DATE
+> Task :player:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :ui:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :core:designsystem:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :core:designsystem:compileDebugKotlin UP-TO-DATE
+> Task :core:designsystem:javaPreCompileDebug UP-TO-DATE
+> Task :core:designsystem:compileDebugJavaWithJavac NO-SOURCE
+> Task :core:designsystem:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :ui:javaPreCompileDebug UP-TO-DATE
+> Task :core:designsystem:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :app:javaPreCompileDebug UP-TO-DATE
+> Task :player:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :data:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :app:preDebugUnitTestBuild UP-TO-DATE
+> Task :app:javaPreCompileDebugUnitTest UP-TO-DATE
+> Task :data:processDebugJavaRes UP-TO-DATE
+> Task :player:processDebugJavaRes UP-TO-DATE
+> Task :core:common:processDebugJavaRes UP-TO-DATE
+> Task :core:designsystem:processDebugJavaRes UP-TO-DATE
+> Task :app:preReleaseBuild UP-TO-DATE
+> Task :app:buildKotlinToolingMetadata UP-TO-DATE
+> Task :app:generateReleaseBuildConfig UP-TO-DATE
+> Task :data:preReleaseBuild UP-TO-DATE
+> Task :data:writeReleaseAarMetadata UP-TO-DATE
+> Task :player:preReleaseBuild UP-TO-DATE
+> Task :player:writeReleaseAarMetadata UP-TO-DATE
+> Task :ui:preReleaseBuild UP-TO-DATE
+> Task :ui:writeReleaseAarMetadata UP-TO-DATE
+> Task :core:common:preReleaseBuild UP-TO-DATE
+> Task :core:common:writeReleaseAarMetadata UP-TO-DATE
+> Task :core:designsystem:preReleaseBuild UP-TO-DATE
+> Task :core:designsystem:writeReleaseAarMetadata UP-TO-DATE
+> Task :app:checkReleaseAarMetadata UP-TO-DATE
+> Task :data:processReleaseNavigationResources UP-TO-DATE
+> Task :player:processReleaseNavigationResources UP-TO-DATE
+> Task :ui:processReleaseNavigationResources UP-TO-DATE
+> Task :core:common:processReleaseNavigationResources UP-TO-DATE
+> Task :core:designsystem:processReleaseNavigationResources UP-TO-DATE
+> Task :app:processReleaseNavigationResources UP-TO-DATE
+> Task :app:compileReleaseNavigationResources UP-TO-DATE
+> Task :app:generateReleaseResValues UP-TO-DATE
+> Task :data:generateReleaseResValues UP-TO-DATE
+> Task :data:generateReleaseResources UP-TO-DATE
+> Task :data:packageReleaseResources UP-TO-DATE
+> Task :player:generateReleaseResValues UP-TO-DATE
+> Task :player:generateReleaseResources UP-TO-DATE
+> Task :player:packageReleaseResources UP-TO-DATE
+> Task :ui:generateReleaseResValues UP-TO-DATE
+> Task :ui:generateReleaseResources UP-TO-DATE
+> Task :ui:packageReleaseResources UP-TO-DATE
+> Task :core:common:generateReleaseResValues UP-TO-DATE
+> Task :core:common:generateReleaseResources UP-TO-DATE
+> Task :core:common:packageReleaseResources UP-TO-DATE
+> Task :core:designsystem:generateReleaseResValues UP-TO-DATE
+> Task :core:designsystem:generateReleaseResources UP-TO-DATE
+> Task :core:designsystem:packageReleaseResources UP-TO-DATE
+> Task :app:mapReleaseSourceSetPaths UP-TO-DATE
+> Task :app:generateReleaseResources UP-TO-DATE
+> Task :app:mergeReleaseResources UP-TO-DATE
+> Task :app:packageReleaseResources UP-TO-DATE
+> Task :app:parseReleaseLocalResources UP-TO-DATE
+> Task :app:createReleaseCompatibleScreenManifests UP-TO-DATE
+> Task :app:extractDeepLinksRelease UP-TO-DATE
+> Task :data:extractDeepLinksRelease UP-TO-DATE
+> Task :data:processReleaseManifest UP-TO-DATE
+> Task :player:extractDeepLinksRelease UP-TO-DATE
+> Task :player:processReleaseManifest UP-TO-DATE
+> Task :ui:extractDeepLinksRelease UP-TO-DATE
+> Task :ui:processReleaseManifest UP-TO-DATE
+> Task :core:common:extractDeepLinksRelease UP-TO-DATE
+> Task :core:common:processReleaseManifest UP-TO-DATE
+> Task :core:designsystem:extractDeepLinksRelease UP-TO-DATE
+> Task :core:designsystem:processReleaseManifest UP-TO-DATE
+> Task :app:processReleaseMainManifest UP-TO-DATE
+> Task :app:processReleaseManifest UP-TO-DATE
+> Task :app:processReleaseManifestForPackage UP-TO-DATE
+> Task :data:compileReleaseLibraryResources UP-TO-DATE
+> Task :data:parseReleaseLocalResources UP-TO-DATE
+> Task :data:generateReleaseRFile UP-TO-DATE
+> Task :player:compileReleaseLibraryResources UP-TO-DATE
+> Task :player:parseReleaseLocalResources UP-TO-DATE
+> Task :player:generateReleaseRFile UP-TO-DATE
+> Task :ui:compileReleaseLibraryResources UP-TO-DATE
+> Task :ui:parseReleaseLocalResources UP-TO-DATE
+> Task :ui:generateReleaseRFile UP-TO-DATE
+> Task :core:common:compileReleaseLibraryResources UP-TO-DATE
+> Task :core:common:parseReleaseLocalResources UP-TO-DATE
+> Task :core:common:generateReleaseRFile UP-TO-DATE
+> Task :core:designsystem:compileReleaseLibraryResources UP-TO-DATE
+> Task :core:designsystem:parseReleaseLocalResources UP-TO-DATE
+> Task :core:designsystem:generateReleaseRFile UP-TO-DATE
+> Task :app:processReleaseResources UP-TO-DATE
+> Task :core:common:compileReleaseKotlin UP-TO-DATE
+> Task :core:common:javaPreCompileRelease UP-TO-DATE
+> Task :core:common:compileReleaseJavaWithJavac NO-SOURCE
+> Task :core:common:bundleLibCompileToJarRelease UP-TO-DATE
+> Task :data:javaPreCompileRelease UP-TO-DATE
+> Task :core:common:bundleLibRuntimeToJarRelease UP-TO-DATE
+> Task :player:kspReleaseKotlin UP-TO-DATE
+> Task :player:compileReleaseKotlin UP-TO-DATE
+> Task :player:javaPreCompileRelease UP-TO-DATE
+> Task :player:compileReleaseJavaWithJavac UP-TO-DATE
+> Task :player:transformReleaseClassesWithAsm UP-TO-DATE
+> Task :player:bundleLibCompileToJarRelease UP-TO-DATE
+> Task :core:designsystem:compileReleaseKotlin UP-TO-DATE
+> Task :core:designsystem:javaPreCompileRelease UP-TO-DATE
+> Task :core:designsystem:compileReleaseJavaWithJavac NO-SOURCE
+> Task :core:designsystem:bundleLibCompileToJarRelease UP-TO-DATE
+> Task :ui:javaPreCompileRelease UP-TO-DATE
+> Task :core:designsystem:bundleLibRuntimeToJarRelease UP-TO-DATE
+> Task :app:javaPreCompileRelease UP-TO-DATE
+> Task :player:bundleLibRuntimeToJarRelease UP-TO-DATE
+> Task :app:preReleaseUnitTestBuild UP-TO-DATE
+> Task :player:processReleaseJavaRes UP-TO-DATE
+> Task :app:javaPreCompileReleaseUnitTest
+> Task :core:common:processReleaseJavaRes UP-TO-DATE
+> Task :core:designsystem:processReleaseJavaRes UP-TO-DATE
+> Task :data:preDebugUnitTestBuild UP-TO-DATE
+> Task :data:preReleaseUnitTestBuild UP-TO-DATE
+> Task :data:javaPreCompileDebugUnitTest
+> Task :data:javaPreCompileReleaseUnitTest
+> Task :domain:processTestResources NO-SOURCE
+> Task :player:preDebugUnitTestBuild UP-TO-DATE
+> Task :player:preReleaseUnitTestBuild UP-TO-DATE
+> Task :player:javaPreCompileDebugUnitTest
+> Task :ui:preDebugUnitTestBuild UP-TO-DATE
+> Task :player:javaPreCompileReleaseUnitTest
+> Task :player:generateReleaseUnitTestStubRFile
+> Task :player:generateDebugUnitTestStubRFile
+> Task :data:generateDebugUnitTestStubRFile
+> Task :data:generateReleaseUnitTestStubRFile
+> Task :ui:generateDebugUnitTestStubRFile
+> Task :ui:preReleaseUnitTestBuild UP-TO-DATE
+> Task :ui:javaPreCompileDebugUnitTest
+> Task :core:common:preDebugUnitTestBuild UP-TO-DATE
+> Task :ui:javaPreCompileReleaseUnitTest
+> Task :core:common:preReleaseUnitTestBuild UP-TO-DATE
+> Task :core:common:javaPreCompileDebugUnitTest
+> Task :core:common:generateDebugUnitTestStubRFile
+> Task :core:common:compileDebugUnitTestKotlin NO-SOURCE
+> Task :core:common:javaPreCompileReleaseUnitTest
+> Task :core:common:compileDebugUnitTestJavaWithJavac NO-SOURCE
+> Task :core:common:generateReleaseUnitTestStubRFile
+> Task :core:common:processDebugUnitTestJavaRes NO-SOURCE
+> Task :core:common:testDebugUnitTest NO-SOURCE
+> Task :core:common:compileReleaseUnitTestKotlin NO-SOURCE
+> Task :core:common:compileReleaseUnitTestJavaWithJavac NO-SOURCE
+> Task :core:common:processReleaseUnitTestJavaRes NO-SOURCE
+> Task :ui:generateReleaseUnitTestStubRFile
+> Task :core:common:testReleaseUnitTest NO-SOURCE
+> Task :core:common:test UP-TO-DATE
+> Task :core:designsystem:preDebugUnitTestBuild UP-TO-DATE
+> Task :core:designsystem:preReleaseUnitTestBuild UP-TO-DATE
+> Task :core:designsystem:javaPreCompileDebugUnitTest
+> Task :core:designsystem:generateDebugUnitTestStubRFile
+> Task :core:designsystem:javaPreCompileReleaseUnitTest
+> Task :core:designsystem:compileDebugUnitTestKotlin NO-SOURCE
+> Task :core:designsystem:compileDebugUnitTestJavaWithJavac NO-SOURCE
+> Task :core:designsystem:processDebugUnitTestJavaRes NO-SOURCE
+> Task :core:designsystem:testDebugUnitTest NO-SOURCE
+> Task :core:designsystem:generateReleaseUnitTestStubRFile
+> Task :core:designsystem:compileReleaseUnitTestKotlin NO-SOURCE
+> Task :core:designsystem:compileReleaseUnitTestJavaWithJavac NO-SOURCE
+> Task :core:designsystem:processReleaseUnitTestJavaRes NO-SOURCE
+> Task :core:designsystem:testReleaseUnitTest NO-SOURCE
+> Task :core:designsystem:test UP-TO-DATE
+> Task :player:kspReleaseUnitTestKotlin
+> Task :player:kspDebugUnitTestKotlin
+> Task :data:kspDebugUnitTestKotlin
+
+> Task :data:compileDebugUnitTestKotlin FAILED
+e: file:///C:/Users/benny/Desktop/Floder/gemini/music%20player/data/src/test/java/com/pulse/music/data/repository/MusicRepositoryImplTest.kt:77:13 No value passed for parameter 'tagEditorSource'.
+
+> Task :player:compileReleaseUnitTestKotlin
+> Task :player:compileReleaseUnitTestJavaWithJavac NO-SOURCE
+> Task :player:compileDebugUnitTestKotlin
+> Task :player:compileDebugUnitTestJavaWithJavac NO-SOURCE
+> Task :player:hiltAggregateDepsDebugUnitTest
+> Task :player:hiltAggregateDepsReleaseUnitTest
+> Task :player:hiltJavaCompileDebugUnitTest NO-SOURCE
+> Task :player:processDebugUnitTestJavaRes
+> Task :player:hiltJavaCompileReleaseUnitTest NO-SOURCE
+> Task :player:processReleaseUnitTestJavaRes
+> Task :player:transformDebugUnitTestClassesWithAsm
+> Task :player:transformReleaseUnitTestClassesWithAsm
+> Task :domain:compileTestKotlin
+> Task :data:kspReleaseKotlin
+> Task :player:testDebugUnitTest
+> Task :domain:compileTestJava NO-SOURCE
+> Task :domain:testClasses UP-TO-DATE
+> Task :data:compileReleaseKotlin
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+
+> Task :ui:kspReleaseKotlin FAILED
+e: file:///C:/Users/benny/Desktop/Floder/gemini/music%20player/ui/src/main/java/com/pulse/music/ui/equalizer/EqualizerViewModel.kt:3:30 imports are only allowed in the beginning of file
+
+> Task :ui:kspDebugKotlin
+e: file:///C:/Users/benny/Desktop/Floder/gemini/music%20player/ui/src/main/java/com/pulse/music/ui/equalizer/EqualizerViewModel.kt:3:30 imports are only allowed in the beginning of file
+
+> Task :ui:kspDebugKotlin FAILED
+> Task :domain:test
+> Task :data:compileReleaseJavaWithJavac
+> Task :data:processReleaseJavaRes UP-TO-DATE
+> Task :data:transformReleaseClassesWithAsm
+> Task :player:testReleaseUnitTest
+> Task :player:test
+> Task :data:bundleLibCompileToJarRelease
+> Task :data:bundleLibRuntimeToJarRelease
+> Task :data:kspReleaseUnitTestKotlin
+
+> Task :data:compileReleaseUnitTestKotlin FAILED
+e: file:///C:/Users/benny/Desktop/Floder/gemini/music%20player/data/src/test/java/com/pulse/music/data/repository/MusicRepositoryImplTest.kt:77:13 No value passed for parameter 'tagEditorSource'.
+
+FAILURE: Build completed with 4 failures.
+
+1: Task failed with an exception.
+-----------
+* What went wrong:
+Execution failed for task ':data:compileDebugUnitTestKotlin'.
+> A failure occurred while executing org.jetbrains.kotlin.compilerRunner.GradleCompilerRunnerWithWorkers$GradleKotlinCompilerWorkAction
+   > Compilation error. See log for more details
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+==============================================================================
+
+2: Task failed with an exception.
+-----------
+* What went wrong:
+Execution failed for task ':ui:kspReleaseKotlin'.
+> A failure occurred while executing org.jetbrains.kotlin.compilerRunner.GradleCompilerRunnerWithWorkers$GradleKotlinCompilerWorkAction
+   > Compilation error. See log for more details
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+==============================================================================
+
+3: Task failed with an exception.
+-----------
+* What went wrong:
+Execution failed for task ':ui:kspDebugKotlin'.
+> A failure occurred while executing org.jetbrains.kotlin.compilerRunner.GradleCompilerRunnerWithWorkers$GradleKotlinCompilerWorkAction
+   > Compilation error. See log for more details
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+==============================================================================
+
+4: Task failed with an exception.
+-----------
+* What went wrong:
+Execution failed for task ':data:compileReleaseUnitTestKotlin'.
+> A failure occurred while executing org.jetbrains.kotlin.compilerRunner.GradleCompilerRunnerWithWorkers$GradleKotlinCompilerWorkAction
+   > Compilation error. See log for more details
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+==============================================================================
+
+BUILD FAILED in 22s
+233 actionable tasks: 47 executed, 186 up-to-date

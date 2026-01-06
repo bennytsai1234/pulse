@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.pulse.music.ui.equalizer
 
 import android.media.audiofx.BassBoost

@@ -68,6 +68,8 @@ android {
         disable += "UseTomlInstead"
         disable += "NewerVersionAvailable"
         disable += "GradleDependency"
+
+        lintConfig = file("lint.xml")
     }
 
     packaging {
