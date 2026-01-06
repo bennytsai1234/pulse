@@ -36,7 +36,7 @@
             android:enabled="true"
             android:exported="true"
             android:foregroundServiceType="mediaPlayback"
-            android:permission="android.permission.MEDIA_CONTENT_CONTROL">
+            tools:ignore="ExportedService">
             <intent-filter>
                 <action android:name="androidx.media3.session.MediaSessionService" />
             </intent-filter>
