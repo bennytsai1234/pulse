@@ -13,8 +13,8 @@ android {
         applicationId = "com.pulse.music"
         minSdk = 26
         targetSdk = 36
-        versionCode = 14
-        versionName = "2.0.0"
+        versionCode = 15
+        versionName = "2.0.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
