@@ -80,13 +80,15 @@ fun PlayerControls(
     onRepeatToggle: () -> Unit,
     isFavorite: Boolean,
     onFavoriteToggle: () -> Unit,
-    onQueueClick: () -> Unit
+    onQueueClick: () -> Unit,
+    onLyricsClick: () -> Unit = {},
+    showLyrics: Boolean = false
 ) {
     val onSurface = MaterialTheme.colorScheme.onSurface
     val onSurfaceVariant = MaterialTheme.colorScheme.onSurfaceVariant
     val primary = MaterialTheme.colorScheme.primary
     val onPrimary = MaterialTheme.colorScheme.onPrimary
-    
+
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceAround,
@@ -154,9 +156,9 @@ fun PlayerControls(
             )
         }
     }
-    
+
     Spacer(modifier = Modifier.height(16.dp))
-    
+
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceAround,
@@ -172,11 +174,11 @@ fun PlayerControls(
             )
         }
         // Lyrics Button
-        IconButton(onClick = { /* Handled by HeroImage click or separate button if needed */ }) {
+        IconButton(onClick = onLyricsClick) {
             Icon(
                 imageVector = Icons.Rounded.Description,
                 contentDescription = "Lyrics",
-                tint = onSurfaceVariant,
+                tint = if (showLyrics) primary else onSurfaceVariant,
                 modifier = Modifier.size(24.dp)
             )
         }

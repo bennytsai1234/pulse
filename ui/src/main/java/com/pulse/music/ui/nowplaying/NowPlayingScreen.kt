@@ -204,6 +204,7 @@ fun NowPlayingScreen(
                             isLoading = uiState.lyricsLoading,
                             hasError = uiState.lyricsError,
                             onRetry = { viewModel.onEvent(NowPlayingEvent.RetryLoadLyrics) },
+                            onClick = { showLyrics = false },
                             modifier = Modifier.fillMaxSize()
                         )
                     } else {
@@ -238,7 +239,9 @@ fun NowPlayingScreen(
                     onShuffleToggle = { viewModel.onEvent(NowPlayingEvent.ToggleShuffle) },
                     onRepeatToggle = { viewModel.onEvent(NowPlayingEvent.ToggleRepeat) },
                     onFavoriteToggle = { viewModel.onEvent(NowPlayingEvent.ToggleFavorite) },
-                    onQueueClick = onQueueClick
+                    onQueueClick = onQueueClick,
+                    onLyricsClick = { showLyrics = !showLyrics },
+                    showLyrics = showLyrics
                 )
             }
         }
@@ -303,7 +306,9 @@ private fun NowPlayingBottomSection(
     onShuffleToggle: () -> Unit,
     onRepeatToggle: () -> Unit,
     onFavoriteToggle: () -> Unit,
-    onQueueClick: () -> Unit
+    onQueueClick: () -> Unit,
+    onLyricsClick: () -> Unit = {},
+    showLyrics: Boolean = false
 ) {
     Column(
         modifier = Modifier
@@ -388,7 +393,9 @@ private fun NowPlayingBottomSection(
             onRepeatToggle = onRepeatToggle,
             isFavorite = uiState.isFavorite,
             onFavoriteToggle = onFavoriteToggle,
-            onQueueClick = onQueueClick
+            onQueueClick = onQueueClick,
+            onLyricsClick = onLyricsClick,
+            showLyrics = showLyrics
         )
     }
 }

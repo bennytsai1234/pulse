@@ -14,6 +14,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.PlaylistPlay
@@ -109,7 +110,23 @@ fun HomeScreenRedesigned(
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
+        bottomBar = {
+            if (uiState.isSelectionMode) {
+                SelectionBottomBar(
+                    selectedCount = uiState.selectedSongIds.size,
+                    onAddToPlaylist = { viewModel.addToPlaylistClicked() },
+                    onDelete = { viewModel.deleteSelected() }
+                )
+            }
+        },
         topBar = {
+            if (uiState.isSelectionMode) {
+                SelectionTopBar(
+                    selectedCount = uiState.selectedSongIds.size,
+                    onClose = { viewModel.exitSelectionMode() },
+                    onSelectAll = { viewModel.selectAll() }
+                )
+            } else {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -233,6 +250,7 @@ fun HomeScreenRedesigned(
                     )
                 }
             }
+            }
         }
     ) { padding ->
         Column(
@@ -295,16 +313,16 @@ fun HomeScreenRedesigned(
                                 showDuration = true,
                                 showFavorite = false,
                                 isSelected = isSelected,
+                                onLongClick = { viewModel.toggleSongSelection(song.id) },
                                 onClick = {
                                     if (uiState.isSelectionMode) {
                                         viewModel.toggleSongSelection(song.id)
                                     } else {
                                         viewModel.playSong(song)
+                                        // Update UI state immediately or rely on player state
                                         onSongClick(song)
                                     }
-                                },
-                                onFavoriteClick = { viewModel.toggleFavorite(song.id) },
-                                modifier = Modifier.padding(horizontal = PulseSpacing.xs)
+                                }
                             )
                         }
                     }
@@ -318,8 +336,164 @@ fun HomeScreenRedesigned(
                 }
             }
         }
+
+        if (uiState.showAddToPlaylistDialog) {
+            AddToPlaylistDialog(
+                playlists = uiState.playlists,
+                onDismiss = { viewModel.dismissAddToPlaylistDialog() },
+                onCreatePlaylist = { viewModel.createPlaylist(it) },
+                onPlaylistSelected = { viewModel.addSelectedToPlaylist(it) }
+            )
+        }
     }
 }
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun SelectionTopBar(
+    selectedCount: Int,
+    onClose: () -> Unit,
+    onSelectAll: () -> Unit
+) {
+    TopAppBar(
+        title = {
+            Text(
+                text = "已選擇 $selectedCount 項",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
+            )
+        },
+        navigationIcon = {
+            IconButton(onClick = onClose) {
+                Icon(Icons.Rounded.Close, contentDescription = "Close Selection Mode")
+            }
+        },
+        actions = {
+            IconButton(onClick = onSelectAll) {
+                Icon(Icons.Rounded.SelectAll, contentDescription = "Select All")
+            }
+        },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+            titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            navigationIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            actionIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+        )
+    )
+}
+
+@Composable
+private fun SelectionBottomBar(
+    selectedCount: Int,
+    onAddToPlaylist: () -> Unit,
+    onDelete: () -> Unit
+) {
+    BottomAppBar(
+        containerColor = MaterialTheme.colorScheme.surfaceContainer,
+        contentPadding = PaddingValues(horizontal = 16.dp),
+        actions = {
+            // Add to Playlist
+            AssistChip(
+                onClick = onAddToPlaylist,
+                label = { Text("加入播放清單") },
+                leadingIcon = { Icon(Icons.Rounded.PlaylistAdd, null, modifier = Modifier.size(18.dp)) },
+                colors = AssistChipDefaults.assistChipColors(
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    labelColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                    leadingIconContentColor = MaterialTheme.colorScheme.onSecondaryContainer
+                )
+            )
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            // Delete with Fill container for emphasis
+            Button(
+                onClick = onDelete,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.error,
+                    contentColor = MaterialTheme.colorScheme.onError
+                ),
+                contentPadding = PaddingValues(horizontal = 16.dp)
+            ) {
+                Icon(Icons.Rounded.Delete, null, modifier = Modifier.size(18.dp))
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("刪除")
+            }
+        }
+    )
+}
+
+@Composable
+private fun AddToPlaylistDialog(
+    playlists: List<com.pulse.music.domain.model.Playlist>,
+    onDismiss: () -> Unit,
+    onCreatePlaylist: (String) -> Unit,
+    onPlaylistSelected: (com.pulse.music.domain.model.Playlist) -> Unit
+) {
+    var showCreateUI by remember { mutableStateOf(false) }
+    var newPlaylistName by remember { mutableStateOf("") }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(if (showCreateUI) "新建播放清單" else "加入播放清單") },
+        text = {
+            if (showCreateUI) {
+                OutlinedTextField(
+                    value = newPlaylistName,
+                    onValueChange = { newPlaylistName = it },
+                    label = { Text("清單名稱") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            } else {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(max = 300.dp)
+                ) {
+                    item {
+                        ListItem(
+                            headlineContent = { Text("新建播放清單") },
+                            leadingContent = { Icon(Icons.Rounded.Add, null) },
+                            modifier = Modifier.clickable { showCreateUI = true }
+                        )
+                    }
+                    items(playlists) { playlist ->
+                        ListItem(
+                            headlineContent = { Text(playlist.name) },
+                            leadingContent = { Icon(Icons.AutoMirrored.Rounded.PlaylistPlay, null) },
+                            modifier = Modifier.clickable { onPlaylistSelected(playlist) }
+                        )
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            if (showCreateUI) {
+                TextButton(
+                    onClick = {
+                        if (newPlaylistName.isNotBlank()) {
+                            onCreatePlaylist(newPlaylistName)
+                        }
+                    }
+                ) {
+                    Text("建立")
+                }
+            }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = {
+                    if (showCreateUI) showCreateUI = false else onDismiss()
+                }
+            ) {
+                Text(if (showCreateUI) "返回" else "取消")
+            }
+        }
+    )
+}
+
+
 
 /**
  * 歌曲控制列

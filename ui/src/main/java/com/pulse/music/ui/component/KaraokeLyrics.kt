@@ -4,6 +4,7 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.collectIsDraggedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -55,6 +56,7 @@ fun KaraokeLyrics(
     isLoading: Boolean = false,
     hasError: Boolean = false,
     onRetry: () -> Unit = {},
+    onClick: () -> Unit = {},
     highlightColor: Color = MaterialTheme.colorScheme.primary,
     normalColor: Color = Color.White.copy(alpha = 0.5f)
 ) {
@@ -93,7 +95,9 @@ fun KaraokeLyrics(
 
     LazyColumn(
         state = listState,
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier
+            .fillMaxSize()
+            .clickable { onClick() },
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
@@ -129,19 +133,26 @@ private fun LyricLineView(
     normalColor: Color
 ) {
     val scale by animateFloatAsState(
-        targetValue = if (isCurrentLine) 1.1f else 1f,
-        animationSpec = tween(150, easing = androidx.compose.animation.core.LinearEasing),
+        targetValue = if (isCurrentLine) 1.15f else 1f,
+        animationSpec = tween(200, easing = androidx.compose.animation.core.FastOutSlowInEasing),
         label = "LyricScale"
     )
 
     val alpha by animateFloatAsState(
         targetValue = when {
             isCurrentLine -> 1f
-            isPastLine -> 0.4f
-            else -> 0.6f
+            isPastLine -> 0.35f
+            else -> 0.5f
         },
-        animationSpec = tween(150, easing = androidx.compose.animation.core.LinearEasing),
+        animationSpec = tween(200, easing = androidx.compose.animation.core.LinearEasing),
         label = "LyricAlpha"
+    )
+
+    // 浮動效果：當前行向上浮動
+    val translationY by animateFloatAsState(
+        targetValue = if (isCurrentLine) -12f else 0f,
+        animationSpec = tween(250, easing = androidx.compose.animation.core.FastOutSlowInEasing),
+        label = "LyricFloat"
     )
 
     Box(
@@ -152,6 +163,11 @@ private fun LyricLineView(
                 scaleX = scale
                 scaleY = scale
                 this.alpha = alpha
+                this.translationY = translationY
+                // 使用 shadowElevation 創建浮起效果
+                if (isCurrentLine) {
+                    shadowElevation = 8f
+                }
             },
         contentAlignment = Alignment.Center
     ) {

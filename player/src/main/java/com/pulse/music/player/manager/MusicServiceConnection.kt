@@ -295,7 +295,7 @@ fun MediaItem.toSong(): Song {
         artist = meta.artist?.toString() ?: "Unknown",
         album = meta.albumTitle?.toString() ?: "Unknown",
         albumId = meta.extras?.getLong("ALBUM_ID") ?: 0L,
-        duration = 0,
+        duration = meta.extras?.getLong("DURATION") ?: 0L,
         contentUri = requestMetadata.mediaUri.toString(),
         dataPath = meta.extras?.getString("DATA_PATH") ?: ""
     )
@@ -305,6 +305,7 @@ fun Song.toMediaItem(): MediaItem {
     val extras = Bundle().apply {
         putString("DATA_PATH", dataPath)
         putLong("ALBUM_ID", albumId)
+        putLong("DURATION", duration)
     }
 
     val metadata = MediaMetadata.Builder()

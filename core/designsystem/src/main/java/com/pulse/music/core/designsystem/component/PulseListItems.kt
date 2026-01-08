@@ -3,8 +3,10 @@ package com.pulse.music.core.designsystem.component
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.LocalIndication
@@ -36,7 +38,7 @@ import com.pulse.music.core.designsystem.PulseSpacing
 
 /**
  * 統一的歌曲列表項目
- * 
+ *
  * @param title 歌曲標題
  * @param subtitle 副標題 (藝人 - 專輯)
  * @param albumArtUri 專輯封面 URI
@@ -52,6 +54,7 @@ import com.pulse.music.core.designsystem.PulseSpacing
  * @param onFavoriteClick 最愛按鈕回調
  * @param onMoreClick 更多按鈕回調
  */
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun PulseSongListItem(
     title: String,
@@ -74,13 +77,13 @@ fun PulseSongListItem(
     val context = LocalContext.current
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
-    
+
     val scale by animateFloatAsState(
         targetValue = if (isPressed) 0.98f else 1f,
         animationSpec = tween(100),
         label = "scale"
     )
-    
+
     val backgroundColor by animateColorAsState(
         targetValue = when {
             isSelected -> MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
@@ -89,7 +92,7 @@ fun PulseSongListItem(
         },
         label = "bg"
     )
-    
+
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -97,10 +100,11 @@ fun PulseSongListItem(
             .scale(scale)
             .clip(RoundedCornerShape(PulseCorners.md))
             .background(backgroundColor)
-            .clickable(
+            .combinedClickable(
                 interactionSource = interactionSource,
                 indication = LocalIndication.current,
-                onClick = onClick
+                onClick = onClick,
+                onLongClick = onLongClick
             )
             .padding(
                 horizontal = PulseSpacing.listItemPaddingHorizontal,
@@ -141,7 +145,7 @@ fun PulseSongListItem(
                     }
                 }
             }
-            
+
             // 正在播放指示器
             if (isPlaying && showPlayingIndicator) {
                 Box(
@@ -159,9 +163,9 @@ fun PulseSongListItem(
                 }
             }
         }
-        
+
         Spacer(modifier = Modifier.width(PulseSpacing.md))
-        
+
         // 文字內容
         Column(
             modifier = Modifier.weight(1f),
@@ -171,14 +175,14 @@ fun PulseSongListItem(
                 text = title,
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = if (isPlaying) FontWeight.SemiBold else FontWeight.Normal,
-                color = if (isPlaying) MaterialTheme.colorScheme.primary 
+                color = if (isPlaying) MaterialTheme.colorScheme.primary
                         else MaterialTheme.colorScheme.onSurface,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
-            
+
             Spacer(modifier = Modifier.height(PulseSpacing.xxs))
-            
+
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -190,7 +194,7 @@ fun PulseSongListItem(
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.weight(1f, fill = false)
                 )
-                
+
                 if (showDuration && duration != null) {
                     Text(
                         text = " · $duration",
@@ -200,7 +204,7 @@ fun PulseSongListItem(
                 }
             }
         }
-        
+
         // 操作按鈕
         Row(
             horizontalArrangement = Arrangement.End,
@@ -215,13 +219,13 @@ fun PulseSongListItem(
                     Icon(
                         imageVector = if (isFavorite) Icons.Rounded.Favorite else Icons.Rounded.FavoriteBorder,
                         contentDescription = if (isFavorite) "Remove from favorites" else "Add to favorites",
-                        tint = if (isFavorite) MaterialTheme.colorScheme.primary 
+                        tint = if (isFavorite) MaterialTheme.colorScheme.primary
                                else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
                         modifier = Modifier.size(PulseSize.iconSm)
                     )
                 }
             }
-            
+
             // 更多按鈕
             if (showMoreButton) {
                 IconButton(
@@ -285,7 +289,7 @@ fun PULSEAlbumListItem(
         animationSpec = tween(100),
         label = "scale"
     )
-    
+
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -335,9 +339,9 @@ fun PULSEAlbumListItem(
                 }
             }
         }
-        
+
         Spacer(modifier = Modifier.width(PulseSpacing.lg))
-        
+
         Column(
             modifier = Modifier.weight(1f)
         ) {
@@ -348,9 +352,9 @@ fun PULSEAlbumListItem(
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
-            
+
             Spacer(modifier = Modifier.height(PulseSpacing.xs))
-            
+
             Text(
                 text = artist,
                 style = MaterialTheme.typography.bodyMedium,
@@ -358,9 +362,9 @@ fun PULSEAlbumListItem(
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
-            
+
             Spacer(modifier = Modifier.height(PulseSpacing.xxs))
-            
+
             Text(
                 text = "$songCount 首歌曲",
                 style = MaterialTheme.typography.bodySmall,
@@ -389,7 +393,7 @@ fun PULSEArtistListItem(
         animationSpec = tween(100),
         label = "scale"
     )
-    
+
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -422,9 +426,9 @@ fun PULSEArtistListItem(
                 )
             }
         }
-        
+
         Spacer(modifier = Modifier.width(PulseSpacing.md))
-        
+
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = name,
@@ -433,7 +437,7 @@ fun PULSEArtistListItem(
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
-            
+
             Text(
                 text = "$songCount 首歌曲",
                 style = MaterialTheme.typography.bodySmall,

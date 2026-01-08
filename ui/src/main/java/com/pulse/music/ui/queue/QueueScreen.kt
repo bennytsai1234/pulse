@@ -19,6 +19,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Album
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.DragIndicator
@@ -79,21 +80,32 @@ fun QueueScreen(onBackClick: () -> Unit, viewModel: QueueViewModel = hiltViewMod
 
     Scaffold(
             topBar = {
-                PulseTopBar(
-                        title = "Up Next",
-                        navigationIcon = {
-                            IconButton(onClick = onBackClick) {
-                                Icon(Icons.Rounded.Close, contentDescription = "Close")
-                            }
-                        },
-                        actions = {
-                            if (uiState.queue.size > 1) {
-                                TextButton(onClick = { isReorderMode = !isReorderMode }) {
-                                    Text(if (isReorderMode) "Done" else "Sort")
-                                }
-                            }
+                // 使用與首頁一致的緊湊型 Row 佈局
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(MaterialTheme.colorScheme.background)
+                        .padding(horizontal = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    IconButton(onClick = onBackClick) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+                            contentDescription = "返回"
+                        )
+                    }
+                    Text(
+                        text = "Up Next",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.weight(1f)
+                    )
+                    if (uiState.queue.size > 1) {
+                        TextButton(onClick = { isReorderMode = !isReorderMode }) {
+                            Text(if (isReorderMode) "完成" else "排序")
                         }
-                )
+                    }
+                }
             }
     ) { padding ->
         if (uiState.queue.isEmpty()) {
