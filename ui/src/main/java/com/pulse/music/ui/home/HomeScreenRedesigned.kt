@@ -472,7 +472,7 @@ private fun FastScrollerRedesigned(
         modifier = Modifier
             .width(32.dp)
             .fillMaxHeight()
-            .padding(vertical = 16.dp)
+            .padding(top = 16.dp, bottom = 96.dp) // 增加底部間距確保 Z 和 # 不被 Mini Player 遮擋
             .pointerInput(Unit) {
                 detectVerticalDragGestures(
                     onDragStart = { offset ->

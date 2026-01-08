@@ -1,3 +1,21 @@
+# 🎵 Pulse v2.1.1
+
+## 🐛 Bug 修復 (Bug Fixes)
+
+### 🔧 FastScroller 字母索引修復
+- **解決 Z 和 # 被 Mini Player 遮擋**：優化字母索引的 padding 配置，將字體從 10sp 縮減至 9sp，並增加底部間距至 96dp，確保全部 27 個字母 (A-Z + #) 完整可見且可點擊。
+
+### 🧭 導航一致性改進
+- **統一 TopBar 高度**：將 `PulseTopBarWithBack` 和 `DiscoverScreen` 的 TopBar 改為緊湊型 Row 佈局，與首頁 (`HomeScreenRedesigned`) 的選單按鈕高度完全對齊。
+- **探索頁面返回按鈕**：為「探索」頁面添加返回導航按鈕，符合 Android 導航慣例。
+
+## 📦 發布資訊
+- **版本**：v2.1.1 (Build 17)
+- **構建類型**：Signed Release
+- **發布日期**：2026-01-08
+
+---
+
 # 🎵 Pulse v2.1.0
 
 ## ✨ 新功能 (New Features)

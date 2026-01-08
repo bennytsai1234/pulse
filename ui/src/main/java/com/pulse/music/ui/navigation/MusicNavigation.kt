@@ -323,7 +323,9 @@ fun MusicNavigation(navController: NavHostController) {
                 // Discover Screen (Recommendations)
                 composable(route = Screen.Discover.route) {
                     CompositionLocalProvider(LocalAnimatedContentScope provides this) {
-                        DiscoverScreen()
+                        DiscoverScreen(
+                            onBackClick = { navController.safePopBackStack() }
+                        )
                     }
                 }
 

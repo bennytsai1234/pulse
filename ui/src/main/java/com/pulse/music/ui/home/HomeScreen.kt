@@ -364,7 +364,7 @@ fun HomeScreen(
                             listState = listState,
                             songs = uiState.songs,
                             headerOffset = headerCount,
-                            modifier = Modifier.padding(bottom = 80.dp)
+                            modifier = Modifier.padding(bottom = 96.dp) // 增加間距確保 Z 和 # 不被 Mini Player 遮擋
                         )
                     }
                 }
@@ -617,7 +617,7 @@ fun FastScroller(
         modifier = modifier
             .width(48.dp)
             .fillMaxHeight()
-            .padding(top = 32.dp, bottom = 8.dp) // 底部間距由外部 modifier 處理
+            .padding(top = 16.dp, bottom = 16.dp) // 減少 padding 使字母有更多空間顯示
             .pointerInput(Unit) {
                 detectVerticalDragGestures(
                     onDragStart = { offset ->
@@ -675,7 +675,7 @@ fun FastScroller(
                     Text(
                         text = char.toString(),
                         style = MaterialTheme.typography.labelSmall,
-                        fontSize = 10.sp,
+                        fontSize = 9.sp, // 使用更緊湊的字體以容納 27 個字母
                         color = if (activeChar == char) MaterialTheme.colorScheme.primary
                                 else if (isPresent) MaterialTheme.colorScheme.onSurfaceVariant
                                 else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f),

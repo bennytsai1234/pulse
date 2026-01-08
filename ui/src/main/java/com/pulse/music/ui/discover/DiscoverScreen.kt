@@ -51,6 +51,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import com.pulse.music.domain.model.Recommendation
 import com.pulse.music.domain.model.RecommendationPlaylist
 import com.pulse.music.domain.model.RecommendationReason
@@ -59,40 +60,48 @@ import com.pulse.music.domain.model.RecommendationReason
 @Composable
 fun DiscoverScreen(
     viewModel: DiscoverViewModel = hiltViewModel(),
-    onSongClick: (Long) -> Unit = {}
+    onSongClick: (Long) -> Unit = {},
+    onBackClick: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
-    
+
     Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            LargeTopAppBar(
-                title = {
-                    Column {
-                        Text(
-                            text = "探索",
-                            style = MaterialTheme.typography.headlineMedium,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Text(
-                            text = "為你推薦的音樂",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                },
-                actions = {
-                    IconButton(onClick = { viewModel.refresh() }) {
-                        Icon(Icons.Default.Refresh, contentDescription = "刷新")
-                    }
-                },
-                scrollBehavior = scrollBehavior,
-                colors = TopAppBarDefaults.largeTopAppBarColors(
-                    containerColor = Color.Transparent,
-                    scrolledContainerColor = MaterialTheme.colorScheme.surface
-                )
-            )
+            // 使用與 HomeScreenRedesigned 相同的緊湊型 Row 佈局，確保返回按鈕位置一致
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(MaterialTheme.colorScheme.background)
+                    .padding(horizontal = 4.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Back Button
+                IconButton(onClick = onBackClick) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+                        contentDescription = "返回"
+                    )
+                }
+
+                // Title
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = "探索",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = "為你推薦的音樂",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+
+                // Refresh Button
+                IconButton(onClick = { viewModel.refresh() }) {
+                    Icon(Icons.Default.Refresh, contentDescription = "刷新")
+                }
+            }
         }
     ) { paddingValues ->
         if (uiState.isLoading && uiState.dailyMix == null) {
@@ -122,7 +131,7 @@ fun DiscoverScreen(
                         )
                     }
                 }
-                
+
                 // Section: 為你推薦
                 if (uiState.recommendations.isNotEmpty()) {
                     item {
@@ -131,7 +140,7 @@ fun DiscoverScreen(
                             subtitle = "根據你的聆聽習慣"
                         )
                     }
-                    
+
                     item {
                         LazyRow(
                             contentPadding = PaddingValues(horizontal = 16.dp),
@@ -146,10 +155,10 @@ fun DiscoverScreen(
                         }
                     }
                 }
-                
+
                 // Section: 按推薦原因分組
                 val groupedRecommendations = uiState.recommendations.groupBy { it.reason }
-                
+
                 groupedRecommendations.forEach { (reason, songs) ->
                     if (songs.isNotEmpty()) {
                         item {
@@ -159,7 +168,7 @@ fun DiscoverScreen(
                                 subtitle = reason.toDescription()
                             )
                         }
-                        
+
                         items(songs.take(5)) { recommendation ->
                             RecommendationListItem(
                                 recommendation = recommendation,
@@ -204,7 +213,7 @@ private fun DailyMixCard(
                         )
                     )
             )
-            
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -226,9 +235,9 @@ private fun DailyMixCard(
                         contentScale = ContentScale.Crop
                     )
                 }
-                
+
                 Spacer(modifier = Modifier.width(16.dp))
-                
+
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = playlist.title,
@@ -246,9 +255,9 @@ private fun DailyMixCard(
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.5f)
                     )
-                    
+
                     Spacer(modifier = Modifier.height(16.dp))
-                    
+
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         IconButton(
                             onClick = onPlayClick,
@@ -265,7 +274,7 @@ private fun DailyMixCard(
                                 tint = MaterialTheme.colorScheme.onPrimary
                             )
                         }
-                        
+
                         IconButton(
                             onClick = onShuffleClick,
                             modifier = Modifier
@@ -331,7 +340,7 @@ private fun RecommendationCard(
                     .aspectRatio(1f),
                 contentScale = ContentScale.Crop
             )
-            
+
             Column(modifier = Modifier.padding(12.dp)) {
                 Text(
                     text = recommendation.song.title,
@@ -383,9 +392,9 @@ private fun RecommendationListItem(
                 .clip(RoundedCornerShape(8.dp)),
             contentScale = ContentScale.Crop
         )
-        
+
         Spacer(modifier = Modifier.width(12.dp))
-        
+
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = recommendation.song.title,
@@ -401,7 +410,7 @@ private fun RecommendationListItem(
                 overflow = TextOverflow.Ellipsis
             )
         }
-        
+
         recommendation.context?.let { context ->
             Text(
                 text = context,

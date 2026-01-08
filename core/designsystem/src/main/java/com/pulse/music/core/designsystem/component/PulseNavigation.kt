@@ -69,7 +69,7 @@ fun PulseTopBar(
 }
 
 /**
- * 帶返回按鈕的頂部欄
+ * 帶返回按鈕的頂部欄 - 緊湊型設計，與首頁 TopBar 高度一致
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -80,20 +80,34 @@ fun PulseTopBarWithBack(
     actions: @Composable RowScope.() -> Unit = {},
     scrollBehavior: TopAppBarScrollBehavior? = null
 ) {
-    PulseTopBar(
-        title = title,
-        navigationIcon = {
-            IconButton(onClick = onBackClick) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
-                    contentDescription = "返回"
-                )
-            }
-        },
-        actions = actions,
-        scrollBehavior = scrollBehavior,
+    // 使用與 HomeScreenRedesigned 相同的緊湊型 Row 佈局
+    Row(
         modifier = modifier
-    )
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.background)
+            .padding(horizontal = 4.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        // Back Button
+        IconButton(onClick = onBackClick) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+                contentDescription = "返回"
+            )
+        }
+
+        // Title
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onBackground,
+            modifier = Modifier.weight(1f)
+        )
+
+        // Actions
+        actions()
+    }
 }
 
 /**
