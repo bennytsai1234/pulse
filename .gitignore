@@ -13,3 +13,27 @@ build/
 .externalNativeBuild
 .cxx
 local.properties
+
+# Build outputs
+*.apk
+*.aab
+*.ap_
+*.dex
+
+# Log files
+*.log
+*_log.txt
+
+# Compiled output
+bin/
+out/
+
+# Kotlin
+.kotlin/
+
+# Signing
+*.jks
+*.keystore
+
+# Misc
+*.hprof
