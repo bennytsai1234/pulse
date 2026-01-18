@@ -38,15 +38,16 @@ class SettingsViewModel @Inject constructor(
         userPreferencesRepository.includedFolders,
         userPreferencesRepository.themeMode,
         userPreferencesRepository.useInternalEqualizer,
-        _scanStatus
-    ) { duration, folders, theme, useInternal, scanStatus ->
+        _scanStatus,
+        musicController.musicState
+    ) { duration, folders, theme, useInternal, scanStatus, musicState ->
         SettingsUiState(
             minAudioDuration = duration,
             includedFolders = folders,
             themeMode = theme,
             useInternalEqualizer = useInternal,
             scanStatus = scanStatus,
-            audioSessionId = 0 // Will be fetched separately if needed
+            audioSessionId = musicState.audioSessionId
         )
     }.stateIn(
         scope = viewModelScope,
