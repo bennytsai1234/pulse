@@ -14,9 +14,11 @@ import androidx.room.RoomDatabase
         CustomEqPresetEntity::class,
         PlaybackHistoryEntity::class,
         ScrobbleEntity::class,
-        CustomLyricsEntity::class
+        CustomLyricsEntity::class,
+        AlbumEntity::class,
+        ArtistEntity::class
     ], 
-    version = 9, 
+    version = 10, 
     exportSchema = false
 )
 abstract class PulseDatabase : RoomDatabase() {
@@ -29,6 +31,8 @@ abstract class PulseDatabase : RoomDatabase() {
     abstract fun playbackHistoryDao(): PlaybackHistoryDao
     abstract fun scrobbleDao(): ScrobbleDao
     abstract fun customLyricsDao(): CustomLyricsDao
+    abstract fun albumDao(): AlbumDao
+    abstract fun artistDao(): ArtistDao
 }
 
 

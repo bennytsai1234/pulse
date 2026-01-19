@@ -121,6 +121,30 @@ class UserPreferencesRepositoryImpl @Inject constructor(
         preferences[USE_DYNAMIC_COLOR] ?: false
     }
 
+    override val connectTimeout: Flow<Long> = dataStore.data.map { preferences ->
+        preferences[CONNECT_TIMEOUT] ?: 10000L
+    }
+
+    override val readTimeout: Flow<Long> = dataStore.data.map { preferences ->
+        preferences[READ_TIMEOUT] ?: 10000L
+    }
+
+    override val userAgent: Flow<String> = dataStore.data.map { preferences ->
+        preferences[USER_AGENT] ?: "Pulse Music Player"
+    }
+
+    override val keepScreenOn: Flow<Boolean> = dataStore.data.map { preferences ->
+        preferences[KEEP_SCREEN_ON] ?: false
+    }
+
+    override val isRotationLocked: Flow<Boolean> = dataStore.data.map { preferences ->
+        preferences[IS_ROTATION_LOCKED] ?: false
+    }
+
+    override val excludedFolders: Flow<Set<String>> = dataStore.data.map { preferences ->
+        preferences[EXCLUDED_FOLDERS] ?: emptySet()
+    }
+
     override suspend fun setMinAudioDuration(durationMs: Long) {
         dataStore.edit { preferences ->
             preferences[MIN_AUDIO_DURATION] = durationMs
@@ -259,6 +283,42 @@ class UserPreferencesRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun setConnectTimeout(timeout: Long) {
+        dataStore.edit { preferences ->
+            preferences[CONNECT_TIMEOUT] = timeout
+        }
+    }
+
+    override suspend fun setReadTimeout(timeout: Long) {
+        dataStore.edit { preferences ->
+            preferences[READ_TIMEOUT] = timeout
+        }
+    }
+
+    override suspend fun setUserAgent(userAgent: String) {
+        dataStore.edit { preferences ->
+            preferences[USER_AGENT] = userAgent
+        }
+    }
+
+    override suspend fun setKeepScreenOn(enabled: Boolean) {
+        dataStore.edit { preferences ->
+            preferences[KEEP_SCREEN_ON] = enabled
+        }
+    }
+
+    override suspend fun setRotationLocked(locked: Boolean) {
+        dataStore.edit { preferences ->
+            preferences[IS_ROTATION_LOCKED] = locked
+        }
+    }
+
+    override suspend fun setExcludedFolders(folders: Set<String>) {
+        dataStore.edit { preferences ->
+            preferences[EXCLUDED_FOLDERS] = folders
+        }
+    }
+
     companion object {
         private val MIN_AUDIO_DURATION = longPreferencesKey("min_audio_duration")
         private val INCLUDED_FOLDERS = stringSetPreferencesKey("included_folders")
@@ -289,6 +349,18 @@ class UserPreferencesRepositoryImpl @Inject constructor(
         private val LAST_QUEUE_INDEX = intPreferencesKey("last_queue_index")
 
         private val USE_DYNAMIC_COLOR = booleanPreferencesKey("use_dynamic_color")
+
+        // Network
+        private val CONNECT_TIMEOUT = longPreferencesKey("connect_timeout")
+        private val READ_TIMEOUT = longPreferencesKey("read_timeout")
+        private val USER_AGENT = stringPreferencesKey("user_agent")
+
+        // Display
+        private val KEEP_SCREEN_ON = booleanPreferencesKey("keep_screen_on")
+        private val IS_ROTATION_LOCKED = booleanPreferencesKey("is_rotation_locked")
+        
+        // Library
+        private val EXCLUDED_FOLDERS = stringSetPreferencesKey("excluded_folders")
     }
 }
 

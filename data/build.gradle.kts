@@ -54,6 +54,10 @@ dependencies {
     // Coroutines
     implementation(libs.kotlinx.coroutines.android)
 
+    // Paging 3
+    implementation(libs.androidx.paging.runtime)
+    implementation(libs.androidx.paging.common)
+
     // Android Core
     implementation(libs.androidx.core.ktx)
 
@@ -80,6 +84,11 @@ dependencies {
         exclude(group = "org.apache.httpcomponents")
     }
     implementation("com.google.http-client:google-http-client-android:1.43.3")
+
+    // Media3 Database & Datasource (For Downloads)
+    implementation(libs.androidx.media3.database)
+    implementation(libs.androidx.media3.datasource)
+    implementation(libs.androidx.media3.exoplayer)
 
     // ===== Testing Dependencies =====
     // JUnit

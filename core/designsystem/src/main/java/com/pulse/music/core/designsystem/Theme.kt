@@ -50,9 +50,29 @@ fun PulseTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = false, // We disable dynamic color by default to enforce our brand style
+    seedColor: Color? = null, // Custom seed color for dynamic theming
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
+        seedColor != null -> {
+             if (darkTheme) {
+                 // Generate dark scheme from seed
+                 // Simple mapping for now, ideally use material-color-utilities
+                 DarkColorScheme.copy(
+                     primary = seedColor,
+                     secondary = seedColor.copy(alpha = 0.8f),
+                     tertiary = seedColor.copy(alpha = 0.6f),
+                     primaryContainer = seedColor.copy(alpha = 0.3f),
+                     onPrimaryContainer = Color.White
+                 )
+             } else {
+                 LightColorScheme.copy(
+                     primary = seedColor,
+                     secondary = seedColor.copy(alpha = 0.8f),
+                     tertiary = seedColor.copy(alpha = 0.6f)
+                 )
+             }
+        }
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)

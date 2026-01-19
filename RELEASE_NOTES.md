@@ -1,3 +1,30 @@
+# 🎵 Pulse v2.3.0
+
+## ✨ 新功能 (New Features)
+
+### 🔁 AB 循環播放 (AB Loop)
+- **精確片段循環**：新增 A-B 點循環功能，適合語言學習或細節聆聽。
+- **狀態管理**：在 `domain` 層實作了完整的 AB Loop 狀態控制。
+
+### 🏷️ 音樂流派支援 (Genres)
+- **流派分類**：新增 `Genre` 模型與 `GetGenresUseCase`，為未來的流派瀏覽功能奠定基礎。
+
+## 🚀 效能與架構優化 (Optimization)
+
+### 🏗️ 依賴管理現代化
+- **Version Catalog 遷移**：完成 `player` 模組的依賴遷移，全專案統一使用 `libs.versions.toml` 管理版本，大幅降低維護成本。
+- **Lint 警告修復**：解決了 `PulseAudioService` 與 `PulseDownloadService` 中的 Media3 Unstable API 標註問題，提升代碼穩健性。
+
+### 🛡️ 測試與穩定性
+- **單元測試修復**：更新 JUnit 5 與 Coroutines Test 依賴，確保 `player` 模組測試全數通過。
+- **編譯優化**：消除 Gradle 構建過程中的版本衝突警告。
+
+## 📦 發布資訊
+- **版本**：v2.3.0 (Build 19)
+- **構建類型**：Signed Release
+- **發布日期**：2026-01-19
+
+---
 # 🎵 Pulse v2.2.0
 
 ## ✨ Experience Enhancements (體驗增強)

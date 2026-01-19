@@ -1,7 +1,9 @@
 package com.pulse.music.domain.repository
 
+import androidx.paging.PagingData
 import com.pulse.music.domain.model.Album
 import com.pulse.music.domain.model.Artist
+import com.pulse.music.domain.model.Genre
 import com.pulse.music.domain.model.Playlist
 import com.pulse.music.domain.model.ScanStatus
 import com.pulse.music.domain.model.Song
@@ -15,6 +17,10 @@ import kotlinx.coroutines.flow.Flow
 interface MusicRepository {
     // 觀察所有歌曲 (單一來源真相：Database)
     fun getSongs(): Flow<List<Song>>
+
+    // 觀察所有歌曲 (分頁)
+    // sortOrder: "TITLE", "DATE_ADDED", "ARTIST", "ALBUM"
+    fun getPagedSongs(sortOrder: String = "TITLE"): Flow<PagingData<Song>>
 
     // 觀察特定歌曲
     fun getSong(id: Long): Flow<Song?>
@@ -31,7 +37,8 @@ interface MusicRepository {
     // 取得所有藝人 (聚合)
     fun getArtists(): Flow<List<Artist>>
 
-    // 取得特定專輯的歌曲
+    fun getGenres(): Flow<List<Genre>>
+
     fun getSongsByAlbumId(albumId: Long): Flow<List<Song>>
 
     // 觸發掃描系統媒體庫並更新資料庫

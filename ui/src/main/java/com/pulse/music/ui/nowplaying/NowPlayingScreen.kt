@@ -1,6 +1,7 @@
 package com.pulse.music.ui.nowplaying
 
 import android.graphics.Bitmap
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -40,6 +41,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -154,14 +157,12 @@ fun NowPlayingScreen(
 
     // MAIN UI STRUCTURE - Material You 風格 with Material3 background
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    colors = uiState.gradientColors
-                )
-            )
+        modifier = Modifier.fillMaxSize()
     ) {
+        GlassmorphicBackground(
+            colors = uiState.gradientColors
+        )
+
         // Create a dynamic color scheme for the content to ensure contrast
         // We override onSurface and onSurfaceVariant to match the extracted 'on' color
         // Keep primary vibrant for buttons and ensure onPrimary has proper contrast
@@ -475,4 +476,52 @@ private fun OptionsBottomSheet(
     }
 }
 
+@Composable
+private fun GlassmorphicBackground(
+    colors: List<Color>,
+    modifier: Modifier = Modifier
+) {
+    val primaryColor = colors.getOrElse(0) { MaterialTheme.colorScheme.primary }
+    val secondaryColor = colors.getOrElse(1) { MaterialTheme.colorScheme.secondary }
+    val tertiaryColor = colors.getOrElse(2) { MaterialTheme.colorScheme.tertiary }
 
+    Box(modifier = modifier.fillMaxSize().background(Color.Black)) {
+        Canvas(modifier = Modifier.fillMaxSize().blur(80.dp)) {
+            drawCircle(
+                brush = Brush.radialGradient(
+                    colors = listOf(primaryColor.copy(alpha = 0.6f), Color.Transparent),
+                    center = Offset(size.width * 0.2f, size.height * 0.3f),
+                    radius = size.width * 0.9f
+                ),
+                center = Offset(size.width * 0.2f, size.height * 0.3f),
+                radius = size.width * 0.9f
+            )
+            
+            drawCircle(
+                brush = Brush.radialGradient(
+                    colors = listOf(secondaryColor.copy(alpha = 0.5f), Color.Transparent),
+                    center = Offset(size.width * 0.8f, size.height * 0.7f),
+                    radius = size.width * 0.8f
+                ),
+                center = Offset(size.width * 0.8f, size.height * 0.7f),
+                radius = size.width * 0.8f
+            )
+
+            drawCircle(
+                brush = Brush.radialGradient(
+                    colors = listOf(tertiaryColor.copy(alpha = 0.4f), Color.Transparent),
+                    center = Offset(size.width * 0.5f, size.height * 0.5f),
+                    radius = size.width * 0.7f
+                ),
+                center = Offset(size.width * 0.5f, size.height * 0.5f),
+                radius = size.width * 0.7f
+            )
+        }
+
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.4f))
+        )
+    }
+}

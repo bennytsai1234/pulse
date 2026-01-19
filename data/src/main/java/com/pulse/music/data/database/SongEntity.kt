@@ -20,7 +20,8 @@ data class SongEntity(
     val dataPath: String,
     val trackNumber: Int,
     val year: Int,
-    val dateAdded: Long
+    val dateAdded: Long,
+    val genre: String? = null
 )
 
 // Extension function: Entity -> Domain Model
@@ -36,7 +37,8 @@ fun SongEntity.asDomainModel(): Song {
         dataPath = dataPath,
         trackNumber = trackNumber,
         year = year,
-        dateAdded = dateAdded
+        dateAdded = dateAdded,
+        genre = genre
     )
 }
 
@@ -53,6 +55,7 @@ fun Song.asEntity(): SongEntity {
         dataPath = dataPath,
         trackNumber = trackNumber,
         year = year,
-        dateAdded = dateAdded
+        dateAdded = dateAdded,
+        genre = genre
     )
 }

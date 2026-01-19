@@ -85,7 +85,18 @@ class LocalAudioSource @Inject constructor(
             MediaStore.Audio.Media.YEAR,
             MediaStore.Audio.Media.DATE_ADDED,
             MediaStore.Audio.Media.DATA,
-            MediaStore.Audio.Media.MIME_TYPE
+            MediaStore.Audio.Media.MIME_TYPE,
+            // Genre is not directly in Audio.Media in older APIs, but often queryable.
+            // However, standard way is querying MediaStore.Audio.Genres table separately or using projection if supported.
+            // On newer Android versions, Genre might be tricky.
+            // Let's stick to standard columns first. If we want Genre, we usually need a separate query or join.
+            // For MVP, we might skip direct genre query here unless we implement the complex join.
+            // Wait, Android Q+ deprecates direct file paths but we use DATA for compatibility or relative path.
+            // Actually, querying Genres is separate.
+            // To be efficient, we might need to query all Genres members.
+            // Let's defer complex genre query implementation to avoid slowing down scanning massively.
+            // We'll set genre to null for now in this batch query, and maybe update it later or use a specific loader.
+            // Or, if we are lucky, some devices support "genre_name" column but it's not standard.
         )
 
         // 移除 IS_MUSIC 限制，改用時長過濾 + MIME 類型驗證
@@ -154,7 +165,8 @@ class LocalAudioSource @Inject constructor(
                             dataPath = dataPath,
                             trackNumber = track,
                             year = year,
-                            dateAdded = dateAdded
+                            dateAdded = dateAdded,
+                            genre = null // Genre fetching requires separate query
                         )
                     )
                 }

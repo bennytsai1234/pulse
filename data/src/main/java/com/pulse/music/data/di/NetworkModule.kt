@@ -13,6 +13,9 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 import javax.inject.Qualifier
 import javax.inject.Singleton
+import com.pulse.music.domain.repository.UserPreferencesRepository
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
@@ -28,14 +31,36 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideOkHttpClient(): OkHttpClient {
+    fun provideOkHttpClient(
+        userPreferencesRepository: UserPreferencesRepository
+    ): OkHttpClient {
+        // Warning: This creates a client with fixed settings at startup.
+        // Dynamic updates require creating new clients or custom interceptors.
+        // For simplicity in MVP, we read initial values.
+        val connectTimeout = runBlocking { 
+            try { userPreferencesRepository.connectTimeout.first() } catch (e: Exception) { 10000L }
+        }
+        val readTimeout = runBlocking { 
+            try { userPreferencesRepository.readTimeout.first() } catch (e: Exception) { 10000L }
+        }
+        val userAgent = runBlocking { 
+            try { userPreferencesRepository.userAgent.first() } catch (e: Exception) { "Pulse Music Player" }
+        }
+
         val logging = HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BODY
         }
+        
         return OkHttpClient.Builder()
             .addInterceptor(logging)
-            .connectTimeout(10, TimeUnit.SECONDS)
-            .readTimeout(10, TimeUnit.SECONDS)
+            .addInterceptor { chain ->
+                val request = chain.request().newBuilder()
+                    .header("User-Agent", userAgent)
+                    .build()
+                chain.proceed(request)
+            }
+            .connectTimeout(connectTimeout, TimeUnit.MILLISECONDS)
+            .readTimeout(readTimeout, TimeUnit.MILLISECONDS)
             .build()
     }
 
@@ -71,6 +96,12 @@ object NetworkModule {
     @Singleton
     fun provideLastFmApi(@LastFmRetrofit retrofit: Retrofit): LastFmApi {
         return retrofit.create(LastFmApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideWebDavDataSource(okHttpClient: OkHttpClient): com.pulse.music.data.source.WebDavDataSource {
+        return com.pulse.music.data.source.WebDavDataSource(okHttpClient)
     }
 }
 

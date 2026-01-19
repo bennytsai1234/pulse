@@ -42,22 +42,22 @@ dependencies {
     implementation(libs.androidx.media3.exoplayer)
 
     // Guava for ListenableFuture
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-guava:1.7.3")
+    implementation(libs.kotlinx.coroutines.guava)
 
     // Android Core
     implementation(libs.androidx.core.ktx)
 
     // ===== Testing Dependencies =====
     // JUnit 5
-    testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testImplementation(libs.junit.jupiter)
+    testRuntimeOnly(libs.junit.platform.launcher)
 
     // MockK for mocking
-    testImplementation("io.mockk:mockk:1.13.10")
+    testImplementation(libs.mockk)
 
     // Coroutines Test
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+    testImplementation(libs.kotlinx.coroutines.test)
 
     // Turbine for Flow testing
-    testImplementation("app.cash.turbine:turbine:1.1.0")
+    testImplementation(libs.turbine)
 }

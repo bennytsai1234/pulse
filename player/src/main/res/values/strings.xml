@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="browse_root_title">Pulse</string>
+    <string name="browse_root_title">Browse</string>
     <string name="browse_recent">Recently Played</string>
     <string name="browse_all_songs">All Songs</string>
     <string name="browse_albums">Albums</string>
     <string name="browse_artists">Artists</string>
+    <string name="browse_playlists">Playlists</string>
+    
+    <string name="download_channel_name">Downloads</string>
+    <string name="download_channel_description">Background downloads for music</string>
 </resources>

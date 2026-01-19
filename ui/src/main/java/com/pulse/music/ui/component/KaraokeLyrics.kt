@@ -35,6 +35,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -133,7 +134,7 @@ private fun LyricLineView(
     normalColor: Color
 ) {
     val scale by animateFloatAsState(
-        targetValue = if (isCurrentLine) 1.15f else 1f,
+        targetValue = if (isCurrentLine) 1.3f else 1f,
         animationSpec = tween(200, easing = androidx.compose.animation.core.FastOutSlowInEasing),
         label = "LyricScale"
     )
@@ -141,14 +142,14 @@ private fun LyricLineView(
     val alpha by animateFloatAsState(
         targetValue = when {
             isCurrentLine -> 1f
-            isPastLine -> 0.35f
-            else -> 0.5f
+            isPastLine -> 0.3f
+            else -> 0.3f
         },
         animationSpec = tween(200, easing = androidx.compose.animation.core.LinearEasing),
         label = "LyricAlpha"
     )
 
-    // 浮動效果：當前行向上浮動
+    // Float effect: current line floats up
     val translationY by animateFloatAsState(
         targetValue = if (isCurrentLine) -12f else 0f,
         animationSpec = tween(250, easing = androidx.compose.animation.core.FastOutSlowInEasing),
@@ -164,7 +165,7 @@ private fun LyricLineView(
                 scaleY = scale
                 this.alpha = alpha
                 this.translationY = translationY
-                // 使用 shadowElevation 創建浮起效果
+                // Use shadowElevation for lift effect
                 if (isCurrentLine) {
                     shadowElevation = 8f
                 }
@@ -172,7 +173,7 @@ private fun LyricLineView(
         contentAlignment = Alignment.Center
     ) {
         if (lyricLine.hasWordTimings && isCurrentLine) {
-            // 卡拉OK模式：逐字高亮
+            // Karaoke Mode: Word by word
             KaraokeWordByWord(
                 words = lyricLine.words,
                 currentPosition = currentPosition,
@@ -180,7 +181,7 @@ private fun LyricLineView(
                 normalColor = normalColor
             )
         } else {
-            // 普通模式：整行高亮
+            // Standard Mode: Line by line
             StandardLyricLine(
                 text = lyricLine.text,
                 isCurrentLine = isCurrentLine,
@@ -242,7 +243,11 @@ private fun KaraokeWord(
             style = TextStyle(
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
-                color = normalColor
+                color = normalColor,
+                shadow = Shadow(
+                    color = highlightColor.copy(alpha = 0.5f),
+                    blurRadius = 12f
+                )
             )
         )
 
@@ -252,7 +257,11 @@ private fun KaraokeWord(
             style = TextStyle(
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
-                color = highlightColor
+                color = highlightColor,
+                shadow = Shadow(
+                    color = highlightColor,
+                    blurRadius = 24f
+                )
             ),
             modifier = Modifier.drawWithContent {
                 val clipWidth = size.width * animatedProgress
@@ -296,7 +305,11 @@ private fun StandardLyricLine(
             fontSize = if (isCurrentLine) 24.sp else 18.sp,
             fontWeight = if (isCurrentLine) FontWeight.Bold else FontWeight.Normal,
             color = textColor,
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
+            shadow = if (isCurrentLine) Shadow(
+                color = highlightColor,
+                blurRadius = 24f
+            ) else null
         ),
         modifier = Modifier.fillMaxWidth()
     )

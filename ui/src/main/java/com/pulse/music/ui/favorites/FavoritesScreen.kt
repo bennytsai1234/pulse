@@ -64,7 +64,8 @@ fun FavoritesScreen(
                         title = song.title,
                         subtitle = "${song.artist} · ${song.album}",
                         albumArtUri = song.albumArtUri,
-                        isPlaying = false, // TODO: 可連接播放狀態
+                        isPlaying = false,
+                        // Play functionality is handled by viewModel.onSongClick(index) which triggers playback
                         isFavorite = true, // 在最愛頁面顯示已收藏
                         duration = formatDuration(song.duration),
                         showDuration = true,

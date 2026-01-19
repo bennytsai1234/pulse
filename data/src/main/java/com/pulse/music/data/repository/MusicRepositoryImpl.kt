@@ -12,6 +12,10 @@ import com.pulse.music.domain.model.Playlist
 import com.pulse.music.domain.model.ScanStatus
 import com.pulse.music.domain.model.Song
 import com.pulse.music.domain.model.SongTags
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import com.pulse.music.data.source.SongPagingSource
 import com.pulse.music.domain.repository.MusicRepository
 import com.pulse.music.domain.repository.UserPreferencesRepository
 import kotlinx.coroutines.Dispatchers
@@ -22,6 +26,8 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
+
+import com.pulse.music.domain.model.Genre
 
 class MusicRepositoryImpl @Inject constructor(
     private val localAudioSource: LocalAudioSource,
@@ -36,6 +42,35 @@ class MusicRepositoryImpl @Inject constructor(
         return songDao.getAllSongs().map { entities ->
             entities.map { it.asDomainModel() }
         }
+    }
+
+    override fun getGenres(): Flow<List<Genre>> {
+        // Since we don't have a Genre table yet, we aggregate from songs.
+        // This is inefficient for large libraries but works for now.
+        return getSongs().map { songs ->
+            songs.asSequence()
+                .mapNotNull { it.genre }
+                .groupingBy { it }
+                .eachCount()
+                .map { (name, count) -> Genre(name, count) }
+                .sortedBy { it.name }
+        }
+    }
+
+    override fun getPagedSongs(sortOrder: String): Flow<PagingData<Song>> {
+        val order = when (sortOrder) {
+            "DATE_ADDED" -> com.pulse.music.data.source.SongSortOrder.DATE_ADDED
+            "ARTIST" -> com.pulse.music.data.source.SongSortOrder.ARTIST
+            "ALBUM" -> com.pulse.music.data.source.SongSortOrder.ALBUM
+            else -> com.pulse.music.data.source.SongSortOrder.TITLE
+        }
+        return Pager(
+            config = PagingConfig(
+                pageSize = 20,
+                enablePlaceholders = false
+            ),
+            pagingSourceFactory = { SongPagingSource(songDao, sortOrder = order) }
+        ).flow
     }
 
     override fun getSong(id: Long): Flow<Song?> {

@@ -5,37 +5,42 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.activity.ComponentActivity
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.core.content.ContextCompat
-import androidx.navigation.compose.rememberNavController
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.compose.foundation.isSystemInDarkTheme
 import com.pulse.music.domain.repository.UserPreferencesRepository
 import com.pulse.music.core.designsystem.PulseTheme
-import com.pulse.music.ui.navigation.MusicNavigation
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 import androidx.activity.enableEdgeToEdge
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+
+import com.pulse.music.ui.theme.DynamicThemeHandler
+import com.pulse.music.ui.theme.LocalDynamicTheme
+import androidx.compose.runtime.CompositionLocalProvider
+
+import android.view.WindowManager
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     @Inject
     lateinit var userPreferencesRepository: UserPreferencesRepository
+    
+    @Inject
+    lateinit var musicRepository: com.pulse.music.domain.repository.MusicRepository
 
     // Observable permission state for the UI
     private val _permissionGranted = MutableStateFlow(false)
@@ -66,26 +71,62 @@ class MainActivity : AppCompatActivity() {
             requestPermissions()
         }
 
+        // Observe Screen Settings
+        lifecycleScope.launch {
+            userPreferencesRepository.keepScreenOn.collect { keepOn ->
+                if (keepOn) {
+                    window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                } else {
+                    window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                }
+            }
+        }
+
+        lifecycleScope.launch {
+            userPreferencesRepository.isRotationLocked.collect { locked ->
+                if (locked) {
+                    requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_LOCKED
+                } else {
+                    requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+                }
+            }
+        }
+
         setContent {
             val themeMode by userPreferencesRepository.themeMode.collectAsState(initial = UserPreferencesRepository.THEME_SYSTEM)
             val useDynamicColor by userPreferencesRepository.useDynamicColor.collectAsState(initial = false)
             val isSystemDark = isSystemInDarkTheme()
             val hasPermission by permissionGranted.collectAsState()
-
+            
             val darkTheme = when (themeMode) {
                  UserPreferencesRepository.THEME_LIGHT -> false
                  UserPreferencesRepository.THEME_DARK -> true
                  else -> isSystemDark
             }
 
-            PulseTheme(darkTheme = darkTheme, dynamicColor = useDynamicColor) {
-                Surface(modifier = Modifier.fillMaxSize()) {
-                    if (hasPermission) {
-                        MainScreen()
-                    } else {
-                        PermissionRequiredScreen(
-                            onRequestPermission = { requestPermissions() }
-                        )
+            // Provide the dynamic theme state
+            CompositionLocalProvider(LocalDynamicTheme provides com.pulse.music.ui.theme.DynamicThemeState()) {
+                val viewModel: MainViewModel = androidx.hilt.navigation.compose.hiltViewModel()
+                val musicState: com.pulse.music.domain.model.MusicState by viewModel.musicState.collectAsState(
+                    initial = com.pulse.music.domain.model.MusicState()
+                )
+                val currentSong = musicState.currentSong
+                
+                DynamicThemeHandler(artworkUri = currentSong?.albumArtUri) { seedColor ->
+                    PulseTheme(
+                        darkTheme = darkTheme, 
+                        dynamicColor = useDynamicColor,
+                        seedColor = if (useDynamicColor) seedColor else null 
+                    ) {
+                        Surface(modifier = Modifier.fillMaxSize()) {
+                            if (hasPermission) {
+                                MainScreen()
+                            } else {
+                                PermissionRequiredScreen(
+                                    onRequestPermission = { requestPermissions() }
+                                )
+                            }
+                        }
                     }
                 }
             }
@@ -132,5 +173,3 @@ class MainActivity : AppCompatActivity() {
         }
     }
 }
-
-

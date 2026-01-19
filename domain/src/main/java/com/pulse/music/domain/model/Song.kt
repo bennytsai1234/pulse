@@ -16,6 +16,7 @@ data class Song(
     val trackNumber: Int = 0,
     val year: Int = 0,
     val dateAdded: Long = 0,   // 用於「最近加入」排序
+    val genre: String? = null,
     val isFavorite: Boolean = false  // 是否為最愛
 ) {
     // 輔助屬性：產生專輯封面 Uri (用於 Coil)

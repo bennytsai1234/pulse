@@ -33,19 +33,30 @@ class SettingsViewModel @Inject constructor(
 
     private val _scanStatus = MutableStateFlow<ScanStatus>(ScanStatus.Idle)
 
+    private data class SettingsPreferences(
+        val minAudioDuration: Long,
+        val includedFolders: Set<String>,
+        val themeMode: String,
+        val useInternalEqualizer: Boolean
+    )
+
     val uiState: StateFlow<SettingsUiState> = combine(
-        userPreferencesRepository.minAudioDuration,
-        userPreferencesRepository.includedFolders,
-        userPreferencesRepository.themeMode,
-        userPreferencesRepository.useInternalEqualizer,
+        combine(
+            userPreferencesRepository.minAudioDuration,
+            userPreferencesRepository.includedFolders,
+            userPreferencesRepository.themeMode,
+            userPreferencesRepository.useInternalEqualizer
+        ) { duration, folders, theme, useInternal ->
+            SettingsPreferences(duration, folders, theme, useInternal)
+        },
         _scanStatus,
         musicController.musicState
-    ) { duration, folders, theme, useInternal, scanStatus, musicState ->
+    ) { prefs, scanStatus, musicState ->
         SettingsUiState(
-            minAudioDuration = duration,
-            includedFolders = folders,
-            themeMode = theme,
-            useInternalEqualizer = useInternal,
+            minAudioDuration = prefs.minAudioDuration,
+            includedFolders = prefs.includedFolders,
+            themeMode = prefs.themeMode,
+            useInternalEqualizer = prefs.useInternalEqualizer,
             scanStatus = scanStatus,
             audioSessionId = musicState.audioSessionId
         )

@@ -12,6 +12,7 @@ import androidx.media3.session.MediaLibraryService
 import androidx.media3.session.MediaLibraryService.LibraryParams
 import androidx.media3.session.MediaSession
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
@@ -22,6 +23,7 @@ import javax.inject.Inject
  * 負責管理 ExoPlayer 生命週期、MediaSession 以及背景播放邏輯。
  */
 @AndroidEntryPoint
+@androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
 class PulseAudioService : MediaLibraryService() {
 
     // 透過 Hilt 注入已經配置好的 ExoPlayer 實例
@@ -38,9 +40,19 @@ class PulseAudioService : MediaLibraryService() {
     @Inject
     lateinit var crossfadeController: com.pulse.music.player.crossfade.CrossfadeController
 
+    @Inject
+    lateinit var audioEffectController: com.pulse.music.player.controller.AudioEffectController
+
+    @Inject
+    lateinit var equalizerController: com.pulse.music.player.controller.EqualizerController
+
+    private lateinit var headsetReceiver: com.pulse.music.player.receiver.HeadsetReceiver
+    private lateinit var shakeDetector: com.pulse.music.player.sensor.ShakeDetector
+
     private var mediaLibrarySession: MediaLibrarySession? = null
 
     private val serviceScope = kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.SupervisorJob() + kotlinx.coroutines.Dispatchers.Main)
+    private val libraryExecutor = java.util.concurrent.Executors.newSingleThreadExecutor()
     private var sleepTimerJob: kotlinx.coroutines.Job? = null
 
     private val librarySessionCallback = object : MediaLibrarySession.Callback {
@@ -60,6 +72,7 @@ class PulseAudioService : MediaLibraryService() {
             return MediaSession.ConnectionResult.accept(sessionCommands, connectionResult.availablePlayerCommands)
         }
 
+        @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
         override fun onCustomCommand(
             session: MediaSession,
             controller: MediaSession.ControllerInfo,
@@ -222,7 +235,7 @@ class PulseAudioService : MediaLibraryService() {
                     }
                     LibraryResult.ofItemList(children, params)
                 },
-                com.google.common.util.concurrent.MoreExecutors.directExecutor()
+                libraryExecutor
             )
         }
 
@@ -342,9 +355,38 @@ class PulseAudioService : MediaLibraryService() {
             .setSessionActivity(openActivityIntent)
             .build()
 
+        // Initialize Audio Effects with Session ID
+        if (player.audioSessionId != C.AUDIO_SESSION_ID_UNSET) {
+            audioEffectController.init(player.audioSessionId)
+            equalizerController.init(player.audioSessionId)
+        }
+
+        // Initialize Sensors & Receivers
+        headsetReceiver = com.pulse.music.player.receiver.HeadsetReceiver(player) {
+            // Auto-play on headset connect (if allowed setting, default true for now)
+            if (!player.isPlaying && player.mediaItemCount > 0) {
+                player.prepare()
+                player.play()
+            }
+        }
+        headsetReceiver.register(this)
+
+        shakeDetector = com.pulse.music.player.sensor.ShakeDetector(this) {
+            // On Shake -> Skip to Next
+            if (player.hasNextMediaItem()) {
+                player.seekToNextMediaItem()
+                player.play()
+            }
+        }
+        shakeDetector.start()
+
         restorePlaybackState()
 
         player.addListener(object : Player.Listener {
+            override fun onAudioSessionIdChanged(audioSessionId: Int) {
+                audioEffectController.init(audioSessionId)
+                equalizerController.init(audioSessionId)
+            }
             override fun onIsPlayingChanged(isPlaying: Boolean) {
                 updateWidget()
                 if (!isPlaying) {
@@ -376,14 +418,24 @@ class PulseAudioService : MediaLibraryService() {
             }
 
             override fun onPlayerError(error: androidx.media3.common.PlaybackException) {
-                android.util.Log.e("PulseAudioService", "Player Error: ${error.message}")
-                android.widget.Toast.makeText(applicationContext, "Playback Error: ${error.errorCodeName}", android.widget.Toast.LENGTH_SHORT).show()
+                android.util.Log.e("PulseAudioService", "Player Error: ${error.message}", error)
+                
+                // Show localized error if possible or generic
+                kotlinx.coroutines.MainScope().launch {
+                    android.widget.Toast.makeText(applicationContext, "Playback Error: ${error.errorCodeName}", android.widget.Toast.LENGTH_SHORT).show()
+                }
 
-                // Attempt to skip to next track if available
+                // Attempt recovery logic
+                // If it's a transient network error or source error, we might skip.
                 if (player.hasNextMediaItem()) {
                     player.seekToNextMediaItem()
                     player.prepare()
                     player.play()
+                } else {
+                    // Stop if no more songs to prevent loop of errors
+                    if (player.mediaItemCount <= 1) {
+                        stopSelf()
+                    }
                 }
             }
         })
@@ -441,10 +493,11 @@ class PulseAudioService : MediaLibraryService() {
         val intent = Intent("com.pulse.music.action.UPDATE_WIDGET")
         val currentMediaItem = player.currentMediaItem
         val metadata = currentMediaItem?.mediaMetadata
-
+        
+        // Ensure we send safer types or check for nulls properly
         intent.putExtra("com.pulse.music.extra.IS_PLAYING", player.isPlaying)
-        intent.putExtra("com.pulse.music.extra.TITLE", metadata?.title?.toString())
-        intent.putExtra("com.pulse.music.extra.ARTIST", metadata?.artist?.toString())
+        intent.putExtra("com.pulse.music.extra.TITLE", metadata?.title?.toString() ?: "Unknown Title")
+        intent.putExtra("com.pulse.music.extra.ARTIST", metadata?.artist?.toString() ?: "Unknown Artist")
 
         // We can't access WidgetConstants directly if it's in core/common and player depends on it.
         // Assuming player depends on core/common (it should).
@@ -512,7 +565,15 @@ class PulseAudioService : MediaLibraryService() {
 
     override fun onDestroy() {
         savePlaybackState()
+        
+        try { headsetReceiver.unregister(this) } catch (e: Exception) {}
+        try { shakeDetector.stop() } catch (e: Exception) {}
+        
         crossfadeController.release()
+        audioEffectController.release()
+        equalizerController.release()
+        serviceScope.cancel()
+        libraryExecutor.shutdown()
         mediaLibrarySession?.run {
             player.release()
             release()

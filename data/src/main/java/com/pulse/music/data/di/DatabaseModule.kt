@@ -59,11 +59,6 @@ object DatabaseModule {
     }
     
     @Provides
-    fun providePlaybackHistoryDao(database: PulseDatabase): com.pulse.music.data.database.PlaybackHistoryDao {
-        return database.playbackHistoryDao()
-    }
-    
-    @Provides
     fun provideScrobbleDao(database: PulseDatabase): com.pulse.music.data.database.ScrobbleDao {
         return database.scrobbleDao()
     }
@@ -71,6 +66,20 @@ object DatabaseModule {
     @Provides
     fun provideCustomLyricsDao(database: PulseDatabase): com.pulse.music.data.database.CustomLyricsDao {
         return database.customLyricsDao()
+    }
+
+    @Provides
+    fun provideAlbumDao(database: PulseDatabase): com.pulse.music.data.database.AlbumDao {
+        return database.albumDao()
+    }
+    @Provides
+    fun provideArtistDao(database: PulseDatabase): com.pulse.music.data.database.ArtistDao {
+        return database.artistDao()
+    }
+
+    @Provides
+    fun providePlaybackHistoryDao(database: PulseDatabase): com.pulse.music.data.database.PlaybackHistoryDao {
+        return database.playbackHistoryDao()
     }
 }
 

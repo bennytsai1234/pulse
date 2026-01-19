@@ -4,8 +4,11 @@ data class Album(
     val id: Long,
     val title: String,
     val artist: String,
-    val songCount: Int
+    val artistId: Long = 0,
+    val year: Int = 0,
+    val songCount: Int,
+    val albumArtUri: String? = null
 ) {
     val artUri: String
-        get() = "content://media/external/audio/albumart/$id"
+        get() = albumArtUri ?: "content://media/external/audio/albumart/$id"
 }

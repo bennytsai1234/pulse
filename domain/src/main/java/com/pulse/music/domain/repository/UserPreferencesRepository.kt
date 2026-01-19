@@ -63,6 +63,26 @@ interface UserPreferencesRepository {
     val useDynamicColor: Flow<Boolean>
     suspend fun setUseDynamicColor(use: Boolean)
 
+    // Network Settings
+    val connectTimeout: Flow<Long> // ms
+    val readTimeout: Flow<Long> // ms
+    val userAgent: Flow<String>
+    
+    // Display Settings
+    val keepScreenOn: Flow<Boolean>
+    val isRotationLocked: Flow<Boolean>
+    
+    // Library Settings
+    val excludedFolders: Flow<Set<String>>
+    
+    suspend fun setConnectTimeout(timeout: Long)
+    suspend fun setReadTimeout(timeout: Long)
+    suspend fun setUserAgent(userAgent: String)
+    
+    suspend fun setKeepScreenOn(enabled: Boolean)
+    suspend fun setRotationLocked(locked: Boolean)
+    
+    suspend fun setExcludedFolders(folders: Set<String>)
 
     companion object {
         const val THEME_SYSTEM = "SYSTEM"

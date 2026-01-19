@@ -45,5 +45,20 @@ interface SongDao {
 
     @Query("DELETE FROM songs WHERE id = :id")
     suspend fun deleteSong(id: Long)
+
+    @Query("SELECT * FROM songs ORDER BY title ASC LIMIT :limit OFFSET :offset")
+    suspend fun getSongsPaged(limit: Int, offset: Int): List<SongEntity>
+
+    @Query("SELECT * FROM songs ORDER BY dateAdded DESC LIMIT :limit OFFSET :offset")
+    suspend fun getSongsPagedByDateAdded(limit: Int, offset: Int): List<SongEntity>
+
+    @Query("SELECT * FROM songs ORDER BY artist ASC, title ASC LIMIT :limit OFFSET :offset")
+    suspend fun getSongsPagedByArtist(limit: Int, offset: Int): List<SongEntity>
+
+    @Query("SELECT * FROM songs ORDER BY album ASC, trackNumber ASC LIMIT :limit OFFSET :offset")
+    suspend fun getSongsPagedByAlbum(limit: Int, offset: Int): List<SongEntity>
+
+    @Query("SELECT * FROM songs WHERE title LIKE '%' || :query || '%' OR artist LIKE '%' || :query || '%' ORDER BY title ASC LIMIT :limit OFFSET :offset")
+    suspend fun searchSongsPaged(query: String, limit: Int, offset: Int): List<SongEntity>
 }
 

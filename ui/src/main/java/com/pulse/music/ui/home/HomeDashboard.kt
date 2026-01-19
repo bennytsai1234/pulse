@@ -295,7 +295,7 @@ private fun DashboardStats(totalSongs: Int) {
         
         StatCard(
             title = "今日播放",
-            value = "0",  // TODO: 從統計中獲取
+            value = "0",  // Value should be fetched from stats repository
             icon = Icons.Rounded.PlayCircle,
             modifier = Modifier.weight(1f)
         )

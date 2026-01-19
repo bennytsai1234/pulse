@@ -22,6 +22,9 @@ dependencies {
 
     // Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
+    
+    // Paging
+    implementation(libs.androidx.paging.common)
 
     // Serialization
     implementation(libs.kotlinx.serialization.json)
