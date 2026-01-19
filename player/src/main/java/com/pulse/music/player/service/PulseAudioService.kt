@@ -10,9 +10,10 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.session.LibraryResult
 import androidx.media3.session.MediaLibraryService
 import androidx.media3.session.MediaLibraryService.LibraryParams
-import androidx.media3.session.MediaSession
-import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.cancel
+import androidx.media3.common.util.UnstableApi
+import com.google.common.util.concurrent.Futures
+import com.google.common.util.concurrent.ListenableFuture
+import kotlinx.coroutines.guava.future
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
@@ -138,105 +139,98 @@ class PulseAudioService : MediaLibraryService() {
             page: Int,
             pageSize: Int,
             params: LibraryParams?
-        ): com.google.common.util.concurrent.ListenableFuture<LibraryResult<com.google.common.collect.ImmutableList<androidx.media3.common.MediaItem>>> {
-            return com.google.common.util.concurrent.Futures.submit(
-                java.util.concurrent.Callable {
-                    val children = when (parentId) {
-                        MEDIA_ROOT_ID -> {
-                            // Top-level categories for Android Auto
-                            listOf(
-                                buildBrowsableMediaItem(MEDIA_RECENT_ID, getString(com.pulse.music.player.R.string.browse_recent), androidx.media3.common.MediaMetadata.MEDIA_TYPE_FOLDER_PLAYLISTS),
-                                buildBrowsableMediaItem(MEDIA_ALL_SONGS_ID, getString(com.pulse.music.player.R.string.browse_all_songs), androidx.media3.common.MediaMetadata.MEDIA_TYPE_FOLDER_ALBUMS),
-                                buildBrowsableMediaItem(MEDIA_ALBUMS_ID, getString(com.pulse.music.player.R.string.browse_albums), androidx.media3.common.MediaMetadata.MEDIA_TYPE_FOLDER_ALBUMS),
-                                buildBrowsableMediaItem(MEDIA_ARTISTS_ID, getString(com.pulse.music.player.R.string.browse_artists), androidx.media3.common.MediaMetadata.MEDIA_TYPE_FOLDER_ARTISTS)
-                            )
-                        }
-                        MEDIA_RECENT_ID -> {
-                            try {
-                                val recentSongs = kotlinx.coroutines.runBlocking { musicRepository.getRecentlyAdded().first() }
-                                recentSongs.map { it.toMediaItem() }
-                            } catch (e: Exception) {
-                                emptyList()
-                            }
-                        }
-                        MEDIA_ALL_SONGS_ID -> {
-                            try {
-                                val allSongs = kotlinx.coroutines.runBlocking { musicRepository.getSongs().first() }
-                                allSongs.map { it.toMediaItem() }
-                            } catch (e: Exception) {
-                                emptyList()
-                            }
-                        }
-                        MEDIA_ALBUMS_ID -> {
-                             try {
-                                val albums = kotlinx.coroutines.runBlocking { musicRepository.getAlbums().first() }
-                                albums.map { album ->
-                                    androidx.media3.common.MediaItem.Builder()
-                                        .setMediaId("album/${album.id}")
-                                        .setMediaMetadata(
-                                            androidx.media3.common.MediaMetadata.Builder()
-                                                .setIsBrowsable(true)
-                                                .setIsPlayable(false)
-                                                .setMediaType(androidx.media3.common.MediaMetadata.MEDIA_TYPE_ALBUM)
-                                                .setTitle(album.title)
-                                                .setArtist(album.artist)
-                                                .build()
-                                        )
-                                        .build()
-                                }
-                             } catch (e: Exception) {
-                                 emptyList()
-                             }
-                        }
-                        MEDIA_ARTISTS_ID -> {
-                            try {
-                                val artists = kotlinx.coroutines.runBlocking { musicRepository.getArtists().first() }
-                                artists.map { artist ->
-                                    androidx.media3.common.MediaItem.Builder()
-                                        .setMediaId("artist/${artist.name}")
-                                        .setMediaMetadata(
-                                            androidx.media3.common.MediaMetadata.Builder()
-                                                .setIsBrowsable(true)
-                                                .setIsPlayable(false)
-                                                .setMediaType(androidx.media3.common.MediaMetadata.MEDIA_TYPE_ARTIST)
-                                                .setTitle(artist.name)
-                                                .setSubtitle("${artist.songCount} songs")
-                                                .build()
-                                        )
-                                        .build()
-                                }
-                            } catch (e: Exception) {
-                                emptyList()
-                            }
-                        }
-                        else -> {
-                           // Handle sub-categories (Album content, Artist content)
-                           if (parentId.startsWith("album/")) {
-                               val albumId = parentId.removePrefix("album/").toLongOrNull() ?: -1L
-                               if (albumId != -1L) {
-                                   try {
-                                       val songs = kotlinx.coroutines.runBlocking { musicRepository.getSongsByAlbumId(albumId).first() }
-                                       songs.map { it.toMediaItem() }
-                                   } catch (e: Exception) { emptyList() }
-                               } else emptyList()
-                           } else if (parentId.startsWith("artist/")) {
-                               // Note: Repository currently lacks getSongsByArtist, just filtering all songs for MVP
-                               // Efficient implementation should add getSongsByArtist to Repository later.
-                               try {
-                                   val artistName = parentId.removePrefix("artist/")
-                                   val allSongs = kotlinx.coroutines.runBlocking { musicRepository.getSongs().first() }
-                                   allSongs.filter { it.artist == artistName }.map { it.toMediaItem() }
-                               } catch (e: Exception) { emptyList() }
-                           }
-                           else {
-                               emptyList()
-                           }
+        ): ListenableFuture<LibraryResult<com.google.common.collect.ImmutableList<androidx.media3.common.MediaItem>>> {
+            return serviceScope.future(kotlinx.coroutines.Dispatchers.IO) {
+                val children = when (parentId) {
+                    MEDIA_ROOT_ID -> {
+                        // Top-level categories
+                        listOf(
+                            buildBrowsableMediaItem(MEDIA_RECENT_ID, getString(com.pulse.music.player.R.string.browse_recent), androidx.media3.common.MediaMetadata.MEDIA_TYPE_FOLDER_PLAYLISTS),
+                            buildBrowsableMediaItem(MEDIA_ALL_SONGS_ID, getString(com.pulse.music.player.R.string.browse_all_songs), androidx.media3.common.MediaMetadata.MEDIA_TYPE_FOLDER_ALBUMS),
+                            buildBrowsableMediaItem(MEDIA_ALBUMS_ID, getString(com.pulse.music.player.R.string.browse_albums), androidx.media3.common.MediaMetadata.MEDIA_TYPE_FOLDER_ALBUMS),
+                            buildBrowsableMediaItem(MEDIA_ARTISTS_ID, getString(com.pulse.music.player.R.string.browse_artists), androidx.media3.common.MediaMetadata.MEDIA_TYPE_FOLDER_ARTISTS)
+                        )
+                    }
+                    MEDIA_RECENT_ID -> {
+                        try {
+                            val recentSongs = musicRepository.getRecentlyAdded().first()
+                            recentSongs.map { it.toMediaItem() }
+                        } catch (e: Exception) {
+                            emptyList()
                         }
                     }
-                    LibraryResult.ofItemList(children, params)
-                },
-                libraryExecutor
-            )
+                    MEDIA_ALL_SONGS_ID -> {
+                        try {
+                            val allSongs = musicRepository.getSongs().first()
+                            allSongs.map { it.toMediaItem() }
+                        } catch (e: Exception) {
+                            emptyList()
+                        }
+                    }
+                    MEDIA_ALBUMS_ID -> {
+                        try {
+                            val albums = musicRepository.getAlbums().first()
+                            albums.map { album ->
+                                androidx.media3.common.MediaItem.Builder()
+                                    .setMediaId("album/${album.id}")
+                                    .setMediaMetadata(
+                                        androidx.media3.common.MediaMetadata.Builder()
+                                            .setIsBrowsable(true)
+                                            .setIsPlayable(false)
+                                            .setMediaType(androidx.media3.common.MediaMetadata.MEDIA_TYPE_ALBUM)
+                                            .setTitle(album.title)
+                                            .setArtist(album.artist)
+                                            .build()
+                                    )
+                                    .build()
+                            }
+                        } catch (e: Exception) {
+                            emptyList()
+                        }
+                    }
+                    MEDIA_ARTISTS_ID -> {
+                        try {
+                            val artists = musicRepository.getArtists().first()
+                            artists.map { artist ->
+                                androidx.media3.common.MediaItem.Builder()
+                                    .setMediaId("artist/${artist.name}")
+                                    .setMediaMetadata(
+                                        androidx.media3.common.MediaMetadata.Builder()
+                                            .setIsBrowsable(true)
+                                            .setIsPlayable(false)
+                                            .setMediaType(androidx.media3.common.MediaMetadata.MEDIA_TYPE_ARTIST)
+                                            .setTitle(artist.name)
+                                            .setSubtitle("${artist.songCount} songs")
+                                            .build()
+                                    )
+                                    .build()
+                            }
+                        } catch (e: Exception) {
+                            emptyList()
+                        }
+                    }
+                    else -> {
+                        if (parentId.startsWith("album/")) {
+                            val albumId = parentId.removePrefix("album/").toLongOrNull() ?: -1L
+                            if (albumId != -1L) {
+                                try {
+                                    val songs = musicRepository.getSongsByAlbumId(albumId).first()
+                                    songs.map { it.toMediaItem() }
+                                } catch (e: Exception) { emptyList() }
+                            } else emptyList()
+                        } else if (parentId.startsWith("artist/")) {
+                            try {
+                                val artistName = parentId.removePrefix("artist/")
+                                val allSongs = musicRepository.getSongs().first()
+                                allSongs.filter { it.artist == artistName }.map { it.toMediaItem() }
+                            } catch (e: Exception) { emptyList() }
+                        } else {
+                            emptyList()
+                        }
+                    }
+                }
+                LibraryResult.ofItemList(children, params)
+            }
         }
 
         private fun buildBrowsableMediaItem(id: String, title: String, mediaType: Int): androidx.media3.common.MediaItem {

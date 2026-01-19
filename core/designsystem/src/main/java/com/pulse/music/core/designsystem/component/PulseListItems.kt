@@ -125,6 +125,7 @@ fun PulseSongListItem(
                         .data(albumArtUri)
                         .crossfade(true)
                         .memoryCacheKey(albumArtUri)
+                        .size(300)
                         .build(),
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
@@ -319,6 +320,7 @@ fun PULSEAlbumListItem(
                     model = ImageRequest.Builder(context)
                         .data(albumArtUri)
                         .crossfade(true)
+                        .size(500)
                         .build(),
                     contentDescription = null,
                     contentScale = ContentScale.Crop,

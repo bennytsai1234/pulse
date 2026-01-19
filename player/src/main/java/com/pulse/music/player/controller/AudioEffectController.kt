@@ -6,12 +6,15 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
+@Suppress("DEPRECATION")
 class AudioEffectController @Inject constructor() {
 
     private var bassBoost: BassBoost? = null
     private var virtualizer: Virtualizer? = null
+    private var isSafeMode = false
 
     fun init(audioSessionId: Int) {
+        if (isSafeMode) return
         release()
         try {
             bassBoost = BassBoost(0, audioSessionId).apply {
@@ -21,7 +24,9 @@ class AudioEffectController @Inject constructor() {
                 enabled = false
             }
         } catch (e: Exception) {
-            e.printStackTrace()
+            android.util.Log.e("AudioEffectController", "Failed to initialize audio effects. Entering Safe Mode.", e)
+            isSafeMode = true
+            release()
         }
     }
 

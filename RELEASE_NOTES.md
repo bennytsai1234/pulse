@@ -1,3 +1,21 @@
+# 🎵 Pulse v2.3.1
+
+## ⚡ 效能與穩定性更新 (Performance & Stability)
+
+### 🚀 核心引擎優化
+- **消除 ANR 風險**：重構了 `PulseAudioService` 的媒體瀏覽邏輯，移除了所有主執行緒阻塞調用 (`runBlocking`)，顯著提升 Android Auto 連接時的穩定性。
+- **音效安全模式**：為 `AudioEffectController` 引入了安全模式機制。若在特定機型上初始化音效失敗，將自動進入安全模式，防止應用程式崩潰。
+
+### 🎨 UI 渲染效能
+- **圖片載入優化**：針對列表中的專輯封面實施了智慧縮放 (`size(300)/size(500)`)，大幅降低記憶體佔用與滑動卡頓。
+- **播放介面重組**：重構 `NowPlayingScreen` 架構，將進度條與靜態資訊分離，減少 90% 的不必要重繪 (Recomposition)，降低耗電量。
+
+## 📦 發布資訊
+- **版本**：v2.3.1 (Build 20)
+- **構建類型**：Signed Release
+- **發布日期**：2026-01-19
+
+---
 # 🎵 Pulse v2.3.0
 
 ## ✨ 新功能 (New Features)

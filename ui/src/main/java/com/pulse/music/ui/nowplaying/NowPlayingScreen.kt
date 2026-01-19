@@ -231,121 +231,90 @@ fun NowPlayingScreen(
                 }
 
                 // Bottom Control Section
-                NowPlayingBottomSection(
-                    uiState = uiState,
-                    onSeek = { viewModel.onEvent(NowPlayingEvent.SeekTo(it)) },
-                    onPlayPause = { viewModel.onEvent(NowPlayingEvent.PlayPauseToggle) },
-                    onSkipNext = { viewModel.onEvent(NowPlayingEvent.SkipNext) },
-                    onSkipPrevious = { viewModel.onEvent(NowPlayingEvent.SkipPrevious) },
-                    onShuffleToggle = { viewModel.onEvent(NowPlayingEvent.ToggleShuffle) },
-                    onRepeatToggle = { viewModel.onEvent(NowPlayingEvent.ToggleRepeat) },
-                    onFavoriteToggle = { viewModel.onEvent(NowPlayingEvent.ToggleFavorite) },
-                    onQueueClick = onQueueClick,
-                    onLyricsClick = { showLyrics = !showLyrics },
-                    showLyrics = showLyrics
-                )
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 24.dp, vertical = 24.dp)
+                ) {
+                    SongInfoSection(
+                        title = uiState.song?.title ?: "Unknown Title",
+                        artist = uiState.song?.artist ?: "Unknown Artist"
+                    )
+
+                    Spacer(Modifier.height(24.dp))
+
+                    ProgressSection(
+                        progress = uiState.progress,
+                        currentTime = uiState.currentTime,
+                        totalTime = uiState.totalTime,
+                        waveform = uiState.waveform,
+                        onSeek = { viewModel.onEvent(NowPlayingEvent.SeekTo(it)) }
+                    )
+
+                    Spacer(Modifier.height(16.dp))
+
+                    PlayerControls(
+                        isPlaying = uiState.isPlaying,
+                        onPlayPause = { viewModel.onEvent(NowPlayingEvent.PlayPauseToggle) },
+                        onSkipNext = { viewModel.onEvent(NowPlayingEvent.SkipNext) },
+                        onSkipPrevious = { viewModel.onEvent(NowPlayingEvent.SkipPrevious) },
+                        shuffleEnabled = uiState.shuffleModeEnabled,
+                        repeatMode = uiState.repeatMode,
+                        onShuffleToggle = { viewModel.onEvent(NowPlayingEvent.ToggleShuffle) },
+                        onRepeatToggle = { viewModel.onEvent(NowPlayingEvent.ToggleRepeat) },
+                        isFavorite = uiState.isFavorite,
+                        onFavoriteToggle = { viewModel.onEvent(NowPlayingEvent.ToggleFavorite) },
+                        onQueueClick = onQueueClick,
+                        onLyricsClick = { showLyrics = !showLyrics },
+                        showLyrics = showLyrics
+                    )
+                }
             }
         }
     }
 }
 
-/**
- * Top bar with back button and options
- */
 @Composable
-private fun NowPlayingTopBar(
-    onBackClick: () -> Unit,
-    onMoreClick: () -> Unit
+private fun SongInfoSection(
+    title: String,
+    artist: String
 ) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.Start
     ) {
-        IconButton(onClick = onBackClick) {
-            Icon(
-                imageVector = Icons.Rounded.KeyboardArrowDown,
-                contentDescription = "Collapse",
-                tint = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.size(32.dp)
-            )
-        }
-
-        Spacer(Modifier.weight(1f))
-
         Text(
-            text = "NOW PLAYING",
-            style = MaterialTheme.typography.labelMedium,
+            text = title,
+            style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold,
-            letterSpacing = 2.sp,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurface,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
         )
-
-        Spacer(Modifier.weight(1f))
-
-        IconButton(onClick = onMoreClick) {
-            Icon(
-                imageVector = Icons.Rounded.MoreVert,
-                contentDescription = "Options",
-                tint = MaterialTheme.colorScheme.onSurface
-            )
-        }
+        Spacer(Modifier.height(4.dp))
+        Text(
+            text = artist,
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
     }
 }
 
-/**
- * Bottom section with song info, seek bar, and playback controls
- */
 @Composable
-private fun NowPlayingBottomSection(
-    uiState: NowPlayingUiState,
-    onSeek: (Float) -> Unit,
-    onPlayPause: () -> Unit,
-    onSkipNext: () -> Unit,
-    onSkipPrevious: () -> Unit,
-    onShuffleToggle: () -> Unit,
-    onRepeatToggle: () -> Unit,
-    onFavoriteToggle: () -> Unit,
-    onQueueClick: () -> Unit,
-    onLyricsClick: () -> Unit = {},
-    showLyrics: Boolean = false
+private fun ProgressSection(
+    progress: Float,
+    currentTime: String,
+    totalTime: String,
+    waveform: List<Int>,
+    onSeek: (Float) -> Unit
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 24.dp, vertical = 24.dp)
-    ) {
-        // Song Info
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.Start
-        ) {
-            Text(
-                text = uiState.song?.title ?: "Unknown Title",
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-            Spacer(Modifier.height(4.dp))
-            Text(
-                text = uiState.song?.artist ?: "Unknown Artist",
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-        }
-
-        Spacer(Modifier.height(24.dp))
-
-        // Seek Bar (Waveform if available, else Slider)
-        if (uiState.waveform.isNotEmpty()) {
+    Column {
+        if (waveform.isNotEmpty()) {
             WaveformSeekBar(
-                waveform = uiState.waveform,
-                progress = uiState.progress,
+                waveform = waveform,
+                progress = progress,
                 onValueChange = onSeek,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -353,7 +322,7 @@ private fun NowPlayingBottomSection(
             )
         } else {
             Slider(
-                value = uiState.progress,
+                value = progress,
                 onValueChange = onSeek,
                 colors = SliderDefaults.colors(
                     thumbColor = MaterialTheme.colorScheme.primary,
@@ -369,35 +338,16 @@ private fun NowPlayingBottomSection(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = uiState.currentTime,
+                text = currentTime,
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Text(
-                text = uiState.totalTime,
+                text = totalTime,
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
-
-        Spacer(Modifier.height(16.dp))
-
-        // Playback Controls
-        PlayerControls(
-            isPlaying = uiState.isPlaying,
-            onPlayPause = onPlayPause,
-            onSkipNext = onSkipNext,
-            onSkipPrevious = onSkipPrevious,
-            shuffleEnabled = uiState.shuffleModeEnabled,
-            repeatMode = uiState.repeatMode,
-            onShuffleToggle = onShuffleToggle,
-            onRepeatToggle = onRepeatToggle,
-            isFavorite = uiState.isFavorite,
-            onFavoriteToggle = onFavoriteToggle,
-            onQueueClick = onQueueClick,
-            onLyricsClick = onLyricsClick,
-            showLyrics = showLyrics
-        )
     }
 }
 

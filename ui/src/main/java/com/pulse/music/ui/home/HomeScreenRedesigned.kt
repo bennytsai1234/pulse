@@ -17,10 +17,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.PlaylistAdd
 import androidx.compose.material.icons.automirrored.rounded.PlaylistPlay
 import androidx.compose.material.icons.automirrored.rounded.Sort
 import androidx.compose.material.icons.rounded.*
-import androidx.compose.material.icons.rounded.DirectionsCar
 import androidx.compose.material.icons.rounded.Explore
 import androidx.compose.material.icons.rounded.BarChart
 import androidx.compose.material3.*
@@ -396,7 +396,7 @@ private fun SelectionBottomBar(
             AssistChip(
                 onClick = onAddToPlaylist,
                 label = { Text("加入播放清單") },
-                leadingIcon = { Icon(Icons.Rounded.PlaylistAdd, null, modifier = Modifier.size(18.dp)) },
+                leadingIcon = { Icon(Icons.AutoMirrored.Rounded.PlaylistAdd, null, modifier = Modifier.size(18.dp)) },
                 colors = AssistChipDefaults.assistChipColors(
                     containerColor = MaterialTheme.colorScheme.secondaryContainer,
                     labelColor = MaterialTheme.colorScheme.onSecondaryContainer,
