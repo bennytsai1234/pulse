@@ -16,6 +16,7 @@ import com.google.common.util.concurrent.ListenableFuture
 import kotlinx.coroutines.guava.future
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.first
+import com.pulse.music.player.mapper.toMediaItem
 import javax.inject.Inject
 
 
@@ -246,37 +247,6 @@ class PulseAudioService : MediaLibraryService() {
                 )
                 .build()
         }
-    }
-
-    // Helper function moved from MusicServiceConnection for reusability if needed,
-    // but here we duplicate/implement locally to ensure Service independence or import it.
-    // For this context, we will perform simple mapping or reuse if accessible.
-    // Ideally, mapper should be in a shared utility or extension.
-    // Since MusicServiceConnection.kt is in 'manager' and this is 'service', let's implement a local helper
-    // or rely on the one defined at the bottom of THIS file if present?
-    // Checking file content... no toMediaItem extension in THIS file currently based on view_file output.
-    // Wait, I see toSong/toMediaItem at the bottom of MusicServiceConnection.kt.
-    // Let's add the extension here to avoid circular dependency or visibility issues.
-
-    private fun com.pulse.music.domain.model.Song.toMediaItem(): androidx.media3.common.MediaItem {
-        val extras = Bundle().apply {
-            putString("DATA_PATH", dataPath)
-            putLong("ALBUM_ID", albumId)
-        }
-        val metadata = androidx.media3.common.MediaMetadata.Builder()
-            .setTitle(title)
-            .setArtist(artist)
-            .setAlbumTitle(album)
-            .setExtras(extras)
-            .setIsBrowsable(false)
-            .setIsPlayable(true)
-            .build()
-
-        return androidx.media3.common.MediaItem.Builder()
-            .setMediaId(id.toString())
-            .setUri(contentUri)
-            .setMediaMetadata(metadata)
-            .build()
     }
 
     companion object {

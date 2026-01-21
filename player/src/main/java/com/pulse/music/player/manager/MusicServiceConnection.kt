@@ -17,7 +17,8 @@ import com.pulse.music.domain.model.ScrobbleEntry
 import com.pulse.music.domain.model.Song
 import com.pulse.music.domain.repository.MusicController
 import com.pulse.music.domain.repository.ScrobbleRepository
-import com.pulse.music.player.service.PulseAudioService
+import com.pulse.music.player.mapper.toMediaItem
+import com.pulse.music.player.mapper.toSong
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -96,8 +97,7 @@ class MusicServiceConnection @Inject constructor(
                     if (playStartTime > 0) {
                         accumulatedPlayTime += System.currentTimeMillis() - playStartTime
                         playStartTime = 0L
-                    }
-                }
+}
             }
 
             override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
@@ -286,38 +286,4 @@ class MusicServiceConnection @Inject constructor(
         mediaController?.sendCustomCommand(command, Bundle.EMPTY)
     }
 }
-
-fun MediaItem.toSong(): Song {
-    val meta = mediaMetadata
-    return Song(
-        id = mediaId.toLongOrNull() ?: 0L,
-        title = meta.title?.toString() ?: "Unknown",
-        artist = meta.artist?.toString() ?: "Unknown",
-        album = meta.albumTitle?.toString() ?: "Unknown",
-        albumId = meta.extras?.getLong("ALBUM_ID") ?: 0L,
-        duration = meta.extras?.getLong("DURATION") ?: 0L,
-        contentUri = requestMetadata.mediaUri.toString(),
-        dataPath = meta.extras?.getString("DATA_PATH") ?: ""
-    )
-}
-
-fun Song.toMediaItem(): MediaItem {
-    val extras = Bundle().apply {
-        putString("DATA_PATH", dataPath)
-        putLong("ALBUM_ID", albumId)
-        putLong("DURATION", duration)
-    }
-
-    val metadata = MediaMetadata.Builder()
-        .setTitle(title)
-        .setArtist(artist)
-        .setAlbumTitle(album)
-        .setExtras(extras)
-        .build()
-
-    return MediaItem.Builder()
-        .setMediaId(id.toString())
-        .setUri(contentUri)
-        .setMediaMetadata(metadata)
-        .build()
 }
