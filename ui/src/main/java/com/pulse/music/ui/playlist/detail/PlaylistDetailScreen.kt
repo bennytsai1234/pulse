@@ -348,6 +348,7 @@ fun PlaylistHeader(playlist: com.pulse.music.domain.model.Playlist) {
                             ImageRequest.Builder(LocalContext.current)
                                     .data(coverArtUri)
                                     .crossfade(true)
+                                    .size(500) // Lower res for blur
                                     .build(),
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
@@ -398,9 +399,10 @@ fun PlaylistHeader(playlist: com.pulse.music.domain.model.Playlist) {
                 AsyncImage(
                         model =
                                 ImageRequest.Builder(LocalContext.current)
-                                        .data(coverArtUri)
-                                        .crossfade(true)
-                                        .build(),
+                                .data(coverArtUri)
+                                .crossfade(true)
+                                .size(300)
+                                .build(),
                         contentDescription = null,
                         contentScale = ContentScale.Crop,
                         modifier =

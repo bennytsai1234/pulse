@@ -209,6 +209,7 @@ fun SearchScreen(
                                     model = ImageRequest.Builder(LocalContext.current)
                                         .data(album.artUri)
                                         .crossfade(true)
+                                        .size(150)
                                         .build(),
                                     contentDescription = null,
                                     contentScale = ContentScale.Crop,

@@ -313,6 +313,7 @@ fun QueueItem(song: Song, isCurrent: Boolean, isPlaying: Boolean, onClick: () ->
                                 ImageRequest.Builder(LocalContext.current)
                                         .data(song.albumArtUri)
                                         .crossfade(true)
+                                        .size(300)
                                         .build(),
                         contentDescription = null,
                         contentScale = ContentScale.Crop,

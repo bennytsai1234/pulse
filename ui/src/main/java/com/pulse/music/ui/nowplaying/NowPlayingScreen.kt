@@ -275,6 +275,48 @@ fun NowPlayingScreen(
 }
 
 @Composable
+private fun NowPlayingTopBar(
+    onBackClick: () -> Unit,
+    onMoreClick: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        IconButton(onClick = onBackClick) {
+            Icon(
+                imageVector = Icons.Rounded.KeyboardArrowDown,
+                contentDescription = "Collapse",
+                tint = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.size(32.dp)
+            )
+        }
+
+        Spacer(Modifier.weight(1f))
+
+        Text(
+            text = "NOW PLAYING",
+            style = MaterialTheme.typography.labelMedium,
+            fontWeight = FontWeight.Bold,
+            letterSpacing = 2.sp,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+
+        Spacer(Modifier.weight(1f))
+
+        IconButton(onClick = onMoreClick) {
+            Icon(
+                imageVector = Icons.Rounded.MoreVert,
+                contentDescription = "Options",
+                tint = MaterialTheme.colorScheme.onSurface
+            )
+        }
+    }
+}
+
+@Composable
 private fun SongInfoSection(
     title: String,
     artist: String
@@ -307,7 +349,7 @@ private fun ProgressSection(
     progress: Float,
     currentTime: String,
     totalTime: String,
-    waveform: List<Int>,
+    waveform: List<Float>,
     onSeek: (Float) -> Unit
 ) {
     Column {

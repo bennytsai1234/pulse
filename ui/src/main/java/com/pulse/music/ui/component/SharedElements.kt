@@ -58,6 +58,7 @@ fun SharedAlbumCover(
         model = ImageRequest.Builder(LocalContext.current)
             .data(artUri)
             .crossfade(true)
+            .size(500)
             .build(),
         contentDescription = "Album Cover",
         contentScale = ContentScale.Crop,
@@ -101,6 +102,7 @@ fun SharedSongCover(
         model = ImageRequest.Builder(LocalContext.current)
             .data(artUri)
             .crossfade(true)
+            .size(500)
             .build(),
         contentDescription = "Song Cover",
         contentScale = ContentScale.Crop,

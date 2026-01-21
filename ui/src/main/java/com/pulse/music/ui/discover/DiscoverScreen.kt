@@ -51,6 +51,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
+import coil.request.ImageRequest
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import com.pulse.music.domain.model.Recommendation
 import com.pulse.music.domain.model.RecommendationPlaylist
@@ -229,7 +231,11 @@ private fun DailyMixCard(
                 ) {
                     val coverUri = playlist.coverArtUri ?: playlist.songs.firstOrNull()?.albumArtUri
                     AsyncImage(
-                        model = coverUri,
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(coverUri)
+                            .crossfade(true)
+                            .size(500)
+                            .build(),
                         contentDescription = null,
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop
@@ -333,7 +339,11 @@ private fun RecommendationCard(
     ) {
         Column {
             AsyncImage(
-                model = recommendation.song.albumArtUri,
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(recommendation.song.albumArtUri)
+                    .crossfade(true)
+                    .size(300)
+                    .build(),
                 contentDescription = null,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -385,7 +395,11 @@ private fun RecommendationListItem(
         verticalAlignment = Alignment.CenterVertically
     ) {
         AsyncImage(
-            model = recommendation.song.albumArtUri,
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(recommendation.song.albumArtUri)
+                .crossfade(true)
+                .size(300)
+                .build(),
             contentDescription = null,
             modifier = Modifier
                 .size(56.dp)

@@ -160,6 +160,7 @@ private fun ArtistHeader(
                         ImageRequest.Builder(LocalContext.current)
                                 .data(coverArtUri)
                                 .crossfade(true)
+                                .size(500) // Lower res for blurred background
                                 .build(),
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
@@ -216,9 +217,10 @@ private fun ArtistHeader(
                         AsyncImage(
                                 model =
                                         ImageRequest.Builder(LocalContext.current)
-                                                .data(coverArtUri)
-                                                .crossfade(true)
-                                                .build(),
+                                        .data(coverArtUri)
+                                        .crossfade(true)
+                                        .size(300)
+                                        .build(),
                                 contentDescription = null,
                                 contentScale = ContentScale.Crop,
                                 modifier = Modifier.fillMaxSize(),
@@ -308,6 +310,7 @@ private fun AlbumGridItem(
                             ImageRequest.Builder(LocalContext.current)
                                     .data(albumArtUri)
                                     .crossfade(true)
+                                    .size(300)
                                     .build(),
                     contentDescription = null,
                     contentScale = ContentScale.Crop,

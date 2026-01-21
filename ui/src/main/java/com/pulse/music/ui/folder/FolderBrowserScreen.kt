@@ -64,6 +64,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
+import coil.request.ImageRequest
+import androidx.compose.ui.platform.LocalContext
 import com.pulse.music.core.designsystem.component.PulseTopBarWithBack
 import com.pulse.music.domain.model.MusicFolder
 import com.pulse.music.domain.model.Song
@@ -296,7 +298,10 @@ fun FolderBrowserScreen(
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
-                            items(content.subfolders) { subfolder ->
+                            items(
+                                items = content.subfolders,
+                                key = { it.path }
+                            ) { subfolder ->
                                 FolderListItem(
                                         folder = subfolder,
                                         onClick = { viewModel.navigateToFolder(subfolder.path) },
@@ -316,7 +321,10 @@ fun FolderBrowserScreen(
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
-                            items(content.songs) { song ->
+                            items(
+                                items = content.songs,
+                                key = { it.id }
+                            ) { song ->
                                 SongListItem(song = song, onClick = { viewModel.playSong(song) })
                             }
                         }
@@ -363,7 +371,12 @@ private fun FolderGridItem(folder: MusicFolder, onClick: () -> Unit, formattedDu
             ) {
                 if (folder.coverArtUri != null) {
                     AsyncImage(
-                            model = folder.coverArtUri,
+                            model =
+                                    ImageRequest.Builder(LocalContext.current)
+                                            .data(folder.coverArtUri)
+                                            .crossfade(true)
+                                            .size(300)
+                                            .build(),
                             contentDescription = null,
                             modifier = Modifier.fillMaxSize(),
                             contentScale = ContentScale.Crop
@@ -463,7 +476,12 @@ private fun SongListItem(song: Song, onClick: () -> Unit) {
                 contentAlignment = Alignment.Center
         ) {
             AsyncImage(
-                    model = song.albumArtUri,
+                    model =
+                            ImageRequest.Builder(LocalContext.current)
+                                    .data(song.albumArtUri)
+                                    .crossfade(true)
+                                    .size(150)
+                                    .build(),
                     contentDescription = null,
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop

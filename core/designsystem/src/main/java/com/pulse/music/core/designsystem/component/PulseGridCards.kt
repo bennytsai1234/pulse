@@ -79,9 +79,10 @@ fun PulseAlbumGridCard(
                 if (artUri != null) {
                     AsyncImage(
                         model = ImageRequest.Builder(context)
-                            .data(artUri)
-                            .crossfade(true)
-                            .build(),
+                        .data(artUri)
+                        .crossfade(true)
+                        .size(300) // Optimize for grid
+                        .build(),
                         contentDescription = null,
                         contentScale = ContentScale.Crop,
                         modifier = Modifier.fillMaxSize()

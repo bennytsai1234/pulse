@@ -94,7 +94,7 @@ fun PulseTheme(
 
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = PulseTypography, // Uses default for now, can customize later
+        typography = PulseTypography, // Uses new geometric typography
         content = content
     )
 }

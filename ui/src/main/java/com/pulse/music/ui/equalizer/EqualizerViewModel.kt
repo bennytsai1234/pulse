@@ -2,14 +2,10 @@
 
 package com.pulse.music.ui.equalizer
 
-import android.media.audiofx.BassBoost
-import android.media.audiofx.Equalizer
-import android.media.audiofx.LoudnessEnhancer
-import android.media.audiofx.Virtualizer
-import android.os.Build
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pulse.music.domain.model.CustomEqPreset
+import com.pulse.music.domain.repository.AudioEffectController
 import com.pulse.music.domain.repository.EqPresetRepository
 import com.pulse.music.domain.repository.UserPreferencesRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -75,13 +71,9 @@ data class EqualizerUiState(
 @HiltViewModel
 class EqualizerViewModel @Inject constructor(
     private val userPreferencesRepository: UserPreferencesRepository,
-    private val eqPresetRepository: EqPresetRepository
+    private val eqPresetRepository: EqPresetRepository,
+    private val audioEffectController: AudioEffectController
 ) : ViewModel() {
-
-    private var equalizer: Equalizer? = null
-    private var bassBoost: BassBoost? = null
-    private var virtualizer: Virtualizer? = null
-    private var loudnessEnhancer: LoudnessEnhancer? = null
 
     private val _uiState = MutableStateFlow(EqualizerUiState())
     val uiState: StateFlow<EqualizerUiState> = _uiState.asStateFlow()
@@ -101,17 +93,7 @@ class EqualizerViewModel @Inject constructor(
     fun initializeEqualizer(audioSessionId: Int) {
         viewModelScope.launch {
             try {
-                // Release previous instances
-                equalizer?.release()
-                bassBoost?.release()
-                virtualizer?.release()
-
-                // Initialize Equalizer
-                equalizer = Equalizer(0, audioSessionId).apply {
-                    enabled = false
-                }
-
-                val eq = equalizer ?: return@launch
+                audioEffectController.init(audioSessionId)
 
                 // Load saved settings
                 val savedEnabled = userPreferencesRepository.equalizerEnabled.first()
@@ -119,101 +101,79 @@ class EqualizerViewModel @Inject constructor(
                 val savedPresetIndex = userPreferencesRepository.equalizerPresetIndex.first()
 
                 // Apply saved preset if available
-                if (savedPresetIndex >= 0 && savedPresetIndex < eq.numberOfPresets) {
-                    eq.usePreset(savedPresetIndex.toShort())
+                if (savedPresetIndex >= 0 && savedPresetIndex < audioEffectController.getPresetCount()) {
+                    audioEffectController.usePreset(savedPresetIndex.toShort())
                 } else if (savedBandLevels.isNotEmpty()) {
                     // Apply saved band levels
                     savedBandLevels.forEachIndexed { index, level ->
-                        if (index < eq.numberOfBands) {
-                            eq.setBandLevel(index.toShort(), level.toShort())
+                        if (index < audioEffectController.getNumberOfBands()) {
+                            audioEffectController.setBandLevel(index.toShort(), level.toShort())
                         }
                     }
                 }
 
-                eq.enabled = savedEnabled
+                audioEffectController.setEqualizerEnabled(savedEnabled)
 
-                val bands = (0 until eq.numberOfBands).map { i ->
+                val numBands = audioEffectController.getNumberOfBands()
+                val bands = (0 until numBands).map { i ->
                     val bandIndex = i.toShort()
+                    val range = audioEffectController.getBandLevelRange()
                     EqualizerBand(
                         index = i,
-                        centerFrequency = eq.getCenterFreq(bandIndex) / 1000,
-                        minLevel = eq.bandLevelRange[0].toInt(),
-                        maxLevel = eq.bandLevelRange[1].toInt(),
-                        currentLevel = eq.getBandLevel(bandIndex).toInt()
+                        centerFrequency = audioEffectController.getCenterFreq(bandIndex) / 1000,
+                        minLevel = range[0].toInt(),
+                        maxLevel = range[1].toInt(),
+                        currentLevel = audioEffectController.getBandLevel(bandIndex).toInt()
                     )
                 }
 
-                val presets = (0 until eq.numberOfPresets).map { i ->
+                val numPresets = audioEffectController.getPresetCount()
+                val presets = (0 until numPresets).map { i ->
                     EqualizerPreset(
                         index = i,
-                        name = eq.getPresetName(i.toShort())
+                        name = audioEffectController.getPresetName(i.toShort())
                     )
                 }
 
                 // Initialize Bass Boost
-                var bassBoostAvailable = false
                 val savedBassBoostEnabled = userPreferencesRepository.bassBoostEnabled.first()
                 val savedBassBoostStrength = userPreferencesRepository.bassBoostStrength.first()
-                try {
-                    bassBoost = BassBoost(0, audioSessionId).apply {
-                        enabled = savedBassBoostEnabled
-                        if (strengthSupported) {
-                            setStrength(savedBassBoostStrength.toShort())
-                        }
-                    }
-                    bassBoostAvailable = bassBoost?.strengthSupported == true
-                } catch (e: Exception) {
-                    e.printStackTrace()
+                audioEffectController.setBassBoostEnabled(savedBassBoostEnabled)
+                if (audioEffectController.isBassBoostSupported()) {
+                    audioEffectController.setBassBoostStrength(savedBassBoostStrength.toShort())
                 }
 
                 // Initialize Virtualizer
-                var virtualizerAvailable = false
                 val savedVirtualizerEnabled = userPreferencesRepository.virtualizerEnabled.first()
                 val savedVirtualizerStrength = userPreferencesRepository.virtualizerStrength.first()
-                try {
-                    virtualizer = Virtualizer(0, audioSessionId).apply {
-                        enabled = savedVirtualizerEnabled
-                        if (strengthSupported) {
-                            setStrength(savedVirtualizerStrength.toShort())
-                        }
-                    }
-                    virtualizerAvailable = virtualizer?.strengthSupported == true
-                } catch (e: Exception) {
-                    e.printStackTrace()
+                audioEffectController.setVirtualizerEnabled(savedVirtualizerEnabled)
+                if (audioEffectController.isVirtualizerSupported()) {
+                    audioEffectController.setVirtualizerStrength(savedVirtualizerStrength.toShort())
                 }
-
-                // Initialize Loudness Enhancer (API 19+)
-                var loudnessAvailable = false
+                
+                // Initialize Loudness
                 val savedLoudnessEnabled = userPreferencesRepository.loudnessEnabled.first()
                 val savedLoudnessGain = userPreferencesRepository.loudnessGain.first()
-                try {
-                    loudnessEnhancer = LoudnessEnhancer(audioSessionId).apply {
-                        enabled = savedLoudnessEnabled
-                        setTargetGain(savedLoudnessGain)
-                        // Note: LoudnessEnhancer gain is in millibel, we store as 0-1000 range
-                    }
-                    loudnessAvailable = true
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
-
+                audioEffectController.setLoudnessEnabled(savedLoudnessEnabled)
+                audioEffectController.setLoudnessGain(savedLoudnessGain)
+                
                 _uiState.update {
                     it.copy(
-                        isEnabled = eq.enabled,
+                        isEnabled = audioEffectController.isEqualizerEnabled(),
                         bands = bands,
                         presets = presets,
                         currentPresetIndex = savedPresetIndex,
                         isAvailable = true,
                         errorMessage = null,
-                        bassBoostAvailable = bassBoostAvailable,
-                        bassBoostEnabled = bassBoost?.enabled == true,
-                        bassBoostStrength = savedBassBoostStrength,
-                        virtualizerAvailable = virtualizerAvailable,
-                        virtualizerEnabled = virtualizer?.enabled == true,
-                        virtualizerStrength = savedVirtualizerStrength,
-                        loudnessAvailable = loudnessAvailable,
-                        loudnessEnabled = loudnessEnhancer?.enabled == true,
-                        loudnessGain = savedLoudnessGain
+                        bassBoostAvailable = audioEffectController.isBassBoostSupported(),
+                        bassBoostEnabled = audioEffectController.isBassBoostEnabled(),
+                        bassBoostStrength = audioEffectController.getBassBoostStrength().toInt(),
+                        virtualizerAvailable = audioEffectController.isVirtualizerSupported(),
+                        virtualizerEnabled = audioEffectController.isVirtualizerEnabled(),
+                        virtualizerStrength = audioEffectController.getVirtualizerStrength().toInt(),
+                        loudnessAvailable = audioEffectController.isLoudnessSupported(),
+                        loudnessEnabled = audioEffectController.isLoudnessEnabled(),
+                        loudnessGain = audioEffectController.getLoudnessGain()
                     )
                 }
             } catch (e: Exception) {
@@ -229,157 +189,136 @@ class EqualizerViewModel @Inject constructor(
     }
 
     fun setEnabled(enabled: Boolean) {
-        equalizer?.let { eq ->
-            eq.enabled = enabled
-            _uiState.update { it.copy(isEnabled = enabled) }
-            viewModelScope.launch {
-                userPreferencesRepository.setEqualizerEnabled(enabled)
-            }
+        audioEffectController.setEqualizerEnabled(enabled)
+        _uiState.update { it.copy(isEnabled = enabled) }
+        viewModelScope.launch {
+            userPreferencesRepository.setEqualizerEnabled(enabled)
         }
     }
 
     fun setBandLevel(bandIndex: Int, normalizedLevel: Float) {
-        equalizer?.let { eq ->
-            val band = _uiState.value.bands.getOrNull(bandIndex) ?: return
-            val level = (band.minLevel + (band.maxLevel - band.minLevel) * normalizedLevel).toInt()
+        val band = _uiState.value.bands.getOrNull(bandIndex) ?: return
+        val level = (band.minLevel + (band.maxLevel - band.minLevel) * normalizedLevel).toInt()
 
-            eq.setBandLevel(bandIndex.toShort(), level.toShort())
+        audioEffectController.setBandLevel(bandIndex.toShort(), level.toShort())
 
-            _uiState.update { state ->
-                state.copy(
-                    bands = state.bands.map {
-                        if (it.index == bandIndex) it.copy(currentLevel = level) else it
-                    },
-                    currentPresetIndex = -1
-                )
-            }
+        _uiState.update { state ->
+            state.copy(
+                bands = state.bands.map {
+                    if (it.index == bandIndex) it.copy(currentLevel = level) else it
+                },
+                currentPresetIndex = -1
+            )
+        }
 
-            // Save band levels
-            viewModelScope.launch {
-                userPreferencesRepository.setEqualizerBandLevels(
-                    _uiState.value.bands.map { it.currentLevel }
-                )
-                userPreferencesRepository.setEqualizerPresetIndex(-1)
-            }
+        // Save band levels
+        viewModelScope.launch {
+            userPreferencesRepository.setEqualizerBandLevels(
+                _uiState.value.bands.map { it.currentLevel }
+            )
+            userPreferencesRepository.setEqualizerPresetIndex(-1)
         }
     }
 
     fun selectPreset(presetIndex: Int) {
-        equalizer?.let { eq ->
-            eq.usePreset(presetIndex.toShort())
+        audioEffectController.usePreset(presetIndex.toShort())
 
-            val bands = _uiState.value.bands.map { band ->
-                band.copy(currentLevel = eq.getBandLevel(band.index.toShort()).toInt())
-            }
+        val bands = _uiState.value.bands.map { band ->
+            band.copy(currentLevel = audioEffectController.getBandLevel(band.index.toShort()).toInt())
+        }
 
-            _uiState.update {
-                it.copy(
-                    bands = bands,
-                    currentPresetIndex = presetIndex
-                )
-            }
+        _uiState.update {
+            it.copy(
+                bands = bands,
+                currentPresetIndex = presetIndex
+            )
+        }
 
-            // Save preset selection
-            viewModelScope.launch {
-                userPreferencesRepository.setEqualizerPresetIndex(presetIndex)
-                userPreferencesRepository.setEqualizerBandLevels(bands.map { it.currentLevel })
-            }
+        // Save preset selection
+        viewModelScope.launch {
+            userPreferencesRepository.setEqualizerPresetIndex(presetIndex)
+            userPreferencesRepository.setEqualizerBandLevels(bands.map { it.currentLevel })
         }
     }
 
     fun resetToFlat() {
-        equalizer?.let { eq ->
-            val midLevel = ((eq.bandLevelRange[0] + eq.bandLevelRange[1]) / 2).toShort()
+        val range = audioEffectController.getBandLevelRange()
+        val midLevel = ((range[0] + range[1]) / 2).toShort()
+        val numBands = audioEffectController.getNumberOfBands()
 
-            for (i in 0 until eq.numberOfBands) {
-                eq.setBandLevel(i.toShort(), midLevel)
-            }
+        for (i in 0 until numBands) {
+            audioEffectController.setBandLevel(i.toShort(), midLevel)
+        }
 
-            val bands = _uiState.value.bands.map {
-                it.copy(currentLevel = midLevel.toInt())
-            }
+        val bands = _uiState.value.bands.map {
+            it.copy(currentLevel = midLevel.toInt())
+        }
 
-            _uiState.update {
-                it.copy(bands = bands, currentPresetIndex = -1)
-            }
+        _uiState.update {
+            it.copy(bands = bands, currentPresetIndex = -1)
+        }
 
-            // Save reset state
-            viewModelScope.launch {
-                userPreferencesRepository.setEqualizerPresetIndex(-1)
-                userPreferencesRepository.setEqualizerBandLevels(bands.map { it.currentLevel })
-                // Also reset loudness settings
-                setLoudnessEnabled(false)
-                setLoudnessGain(0)
-            }
+        // Save reset state
+        viewModelScope.launch {
+            userPreferencesRepository.setEqualizerPresetIndex(-1)
+            userPreferencesRepository.setEqualizerBandLevels(bands.map { it.currentLevel })
         }
     }
 
     // ==================== Bass Boost ====================
 
     fun setBassBoostEnabled(enabled: Boolean) {
-        bassBoost?.let { bb ->
-            bb.enabled = enabled
-            _uiState.update { it.copy(bassBoostEnabled = enabled) }
-            viewModelScope.launch {
-                userPreferencesRepository.setBassBoostEnabled(enabled)
-            }
+        audioEffectController.setBassBoostEnabled(enabled)
+        _uiState.update { it.copy(bassBoostEnabled = enabled) }
+        viewModelScope.launch {
+            userPreferencesRepository.setBassBoostEnabled(enabled)
         }
     }
 
     fun setBassBoostStrength(strength: Int) {
-        bassBoost?.let { bb ->
-            val clampedStrength = strength.coerceIn(0, 1000).toShort()
-            bb.setStrength(clampedStrength)
-            _uiState.update { it.copy(bassBoostStrength = clampedStrength.toInt()) }
-            viewModelScope.launch {
-                userPreferencesRepository.setBassBoostStrength(clampedStrength.toInt())
-            }
+        val clampedStrength = strength.coerceIn(0, 1000).toShort()
+        audioEffectController.setBassBoostStrength(clampedStrength)
+        _uiState.update { it.copy(bassBoostStrength = clampedStrength.toInt()) }
+        viewModelScope.launch {
+            userPreferencesRepository.setBassBoostStrength(clampedStrength.toInt())
         }
     }
 
     // ==================== Virtualizer ====================
 
     fun setVirtualizerEnabled(enabled: Boolean) {
-        virtualizer?.let { virt ->
-            virt.enabled = enabled
-            _uiState.update { it.copy(virtualizerEnabled = enabled) }
-            viewModelScope.launch {
-                userPreferencesRepository.setVirtualizerEnabled(enabled)
-            }
+        audioEffectController.setVirtualizerEnabled(enabled)
+        _uiState.update { it.copy(virtualizerEnabled = enabled) }
+        viewModelScope.launch {
+            userPreferencesRepository.setVirtualizerEnabled(enabled)
         }
     }
 
     fun setVirtualizerStrength(strength: Int) {
-        virtualizer?.let { virt ->
-            val clampedStrength = strength.coerceIn(0, 1000).toShort()
-            virt.setStrength(clampedStrength)
-            _uiState.update { it.copy(virtualizerStrength = clampedStrength.toInt()) }
-            viewModelScope.launch {
-                userPreferencesRepository.setVirtualizerStrength(clampedStrength.toInt())
-            }
+        val clampedStrength = strength.coerceIn(0, 1000).toShort()
+        audioEffectController.setVirtualizerStrength(clampedStrength)
+        _uiState.update { it.copy(virtualizerStrength = clampedStrength.toInt()) }
+        viewModelScope.launch {
+            userPreferencesRepository.setVirtualizerStrength(clampedStrength.toInt())
         }
     }
 
     // ==================== Loudness Enhancer ====================
-
+    
     fun setLoudnessEnabled(enabled: Boolean) {
-        loudnessEnhancer?.let { le ->
-            le.enabled = enabled
-            _uiState.update { it.copy(loudnessEnabled = enabled) }
-            viewModelScope.launch {
-                userPreferencesRepository.setLoudnessEnabled(enabled)
-            }
+        audioEffectController.setLoudnessEnabled(enabled)
+        _uiState.update { it.copy(loudnessEnabled = enabled) }
+        viewModelScope.launch {
+            userPreferencesRepository.setLoudnessEnabled(enabled)
         }
     }
 
     fun setLoudnessGain(gainMb: Int) {
-        loudnessEnhancer?.let { le ->
-            val clampedGain = gainMb.coerceIn(0, 1000)
-            le.setTargetGain(clampedGain)
-            _uiState.update { it.copy(loudnessGain = clampedGain) }
-            viewModelScope.launch {
-                userPreferencesRepository.setLoudnessGain(clampedGain)
-            }
+        val clampedGain = gainMb.coerceIn(0, 1000)
+        audioEffectController.setLoudnessGain(clampedGain)
+        _uiState.update { it.copy(loudnessGain = clampedGain) }
+        viewModelScope.launch {
+            userPreferencesRepository.setLoudnessGain(clampedGain)
         }
     }
 
@@ -417,55 +356,49 @@ class EqualizerViewModel @Inject constructor(
     }
 
     fun applyCustomPreset(preset: CustomEqPreset) {
-        equalizer?.let { eq ->
-            // Apply band levels
-            preset.bandLevels.forEachIndexed { index, level ->
-                if (index < eq.numberOfBands) {
-                    eq.setBandLevel(index.toShort(), level.toShort())
-                }
+        // Apply band levels
+        preset.bandLevels.forEachIndexed { index, level ->
+            if (index < audioEffectController.getNumberOfBands()) {
+                audioEffectController.setBandLevel(index.toShort(), level.toShort())
             }
+        }
 
-            val bands = _uiState.value.bands.mapIndexed { index, band ->
-                if (index < preset.bandLevels.size) {
-                    band.copy(currentLevel = preset.bandLevels[index])
-                } else band
-            }
+        val bands = _uiState.value.bands.mapIndexed { index, band ->
+            if (index < preset.bandLevels.size) {
+                band.copy(currentLevel = preset.bandLevels[index])
+            } else band
+        }
 
-            // Apply Bass Boost
-            bassBoost?.let { bb ->
-                if (bb.strengthSupported) {
-                    bb.setStrength(preset.bassBoostStrength.toShort())
-                }
-            }
+        // Apply Bass Boost
+        if (audioEffectController.isBassBoostSupported()) {
+            audioEffectController.setBassBoostStrength(preset.bassBoostStrength.toShort())
+        }
 
-            // Apply Virtualizer
-            virtualizer?.let { virt ->
-                if (virt.strengthSupported) {
-                    virt.setStrength(preset.virtualizerStrength.toShort())
-                }
-            }
+        // Apply Virtualizer
+        if (audioEffectController.isVirtualizerSupported()) {
+            audioEffectController.setVirtualizerStrength(preset.virtualizerStrength.toShort())
+        }
 
-            // Apply Loudness
-            loudnessEnhancer?.setTargetGain(preset.loudnessGain)
+        // Apply Loudness
+        audioEffectController.setLoudnessGain(preset.loudnessGain)
 
-            _uiState.update {
-                it.copy(
-                    bands = bands,
-                    currentPresetIndex = -1,
-                    currentCustomPresetId = preset.id,
-                    bassBoostStrength = preset.bassBoostStrength,
-                    virtualizerStrength = preset.virtualizerStrength,
-                    loudnessGain = preset.loudnessGain
-                )
-            }
+        _uiState.update {
+            it.copy(
+                bands = bands,
+                currentPresetIndex = -1,
+                currentCustomPresetId = preset.id,
+                bassBoostStrength = preset.bassBoostStrength,
+                virtualizerStrength = preset.virtualizerStrength,
+                loudnessGain = preset.loudnessGain
+            )
+        }
 
-            // Save to preferences
-            viewModelScope.launch {
-                userPreferencesRepository.setEqualizerPresetIndex(-1)
-                userPreferencesRepository.setEqualizerBandLevels(preset.bandLevels)
-                userPreferencesRepository.setBassBoostStrength(preset.bassBoostStrength)
-                userPreferencesRepository.setVirtualizerStrength(preset.virtualizerStrength)
-            }
+        // Save to preferences
+        viewModelScope.launch {
+            userPreferencesRepository.setEqualizerPresetIndex(-1)
+            userPreferencesRepository.setEqualizerBandLevels(preset.bandLevels)
+            userPreferencesRepository.setBassBoostStrength(preset.bassBoostStrength)
+            userPreferencesRepository.setVirtualizerStrength(preset.virtualizerStrength)
         }
     }
 
@@ -480,14 +413,7 @@ class EqualizerViewModel @Inject constructor(
 
     override fun onCleared() {
         super.onCleared()
-        equalizer?.release()
-        bassBoost?.release()
-        virtualizer?.release()
-        loudnessEnhancer?.release()
-        equalizer = null
-        bassBoost = null
-        virtualizer = null
-        loudnessEnhancer = null
+        // Do NOT release controller here, as it is a Singleton injected
     }
 }
 
